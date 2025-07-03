@@ -5,11 +5,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import team.mjk.agent.domain.member.presentation.exception.EmailOrPasswordNotInvalidException;
 import team.mjk.agent.global.auth.application.dto.AuthAttributes;
 import team.mjk.agent.global.domain.BaseTimeEntity;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 import static jakarta.persistence.EnumType.STRING;
@@ -23,9 +25,23 @@ public class Member extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String email;
 
     private String password;
+
+    private String name;
+
+    private String firstName;
+
+    private String lastName;
+
+    private String phoneNumber;
+
+    @Enumerated(STRING)
+    private Gender gender;
+
+    private LocalDate birthDate;
 
     private String externalId;
 
@@ -56,6 +72,22 @@ public class Member extends BaseTimeEntity {
 
     public boolean hasDifferentProviderWithEmail(String email, String externalId) {
         return Objects.equals(this.email, email) && !Objects.equals(this.externalId, externalId);
+    }
+
+    public void saveMemberInfo(
+            String name,
+            String firstName,
+            String lastName,
+            String phoneNumber,
+            Gender gender,
+            LocalDate birthDate
+    ) {
+        this.name = name;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phoneNumber = phoneNumber;
+        this.gender = gender;
+        this.birthDate = birthDate;
     }
 
 }
