@@ -5,5 +5,5 @@ public record LoginResultResponse(
         String accessToken,
         String refreshToken
 
-) {
+) implements TokenResult{
 }

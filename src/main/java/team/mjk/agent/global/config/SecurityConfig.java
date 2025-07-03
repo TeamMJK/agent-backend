@@ -7,10 +7,17 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsUtils;
+import team.mjk.agent.global.auth.presentation.filter.RedirectUrlFilter;
+import team.mjk.agent.global.jwt.config.SecurityProperties;
 import team.mjk.agent.global.jwt.filter.JwtTokenFilter;
 
 import java.util.List;
@@ -21,16 +28,21 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @Configuration
 public class SecurityConfig {
 
+    private final DefaultOAuth2UserService defaultOAuth2UserService;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
     private final JwtTokenFilter jwtTokenFilter;
+    private final RedirectUrlFilter redirectUrlFilter;
+    private final SecurityProperties securityProperties;
+    private final AuthenticationSuccessHandler authenticationSuccessHandler;
+    private final AuthenticationFailureHandler authenticationFailureHandler;
 
     private static final String[] PERMIT_ALL_PATTERNS = {
-            "/login/**",
-            "/members",
             "/swagger-ui/**",
             "/actuator/**",
             "/v3/api-docs/**",
-            "/swagger-ui.html",
+            "/login/**",
             "/oauth2/**",
+            "/members"
     };
 
     @Bean
@@ -45,6 +57,8 @@ public class SecurityConfig {
         configureSessionManagement(httpSecurity);
         configureApiAuthorization(httpSecurity);
         configureContentSecurityPolicy(httpSecurity);
+        configureOAuth2Login(httpSecurity);
+        configureExceptionHandler(httpSecurity);
 
         return httpSecurity.build();
     }
@@ -88,4 +102,19 @@ public class SecurityConfig {
                 ));
     }
 
+    private void configureOAuth2Login(HttpSecurity http) throws Exception {
+        http.addFilterBefore(redirectUrlFilter, OAuth2AuthorizationRequestRedirectFilter.class);
+        http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        http.oauth2Login(oauth2 ->
+                oauth2.loginPage(securityProperties.loginUrl())
+                        .userInfoEndpoint(userInfo -> userInfo.userService(defaultOAuth2UserService))
+                        .successHandler(authenticationSuccessHandler)
+                        .failureHandler(authenticationFailureHandler)
+        );
+    }
+
+    private void configureExceptionHandler(HttpSecurity http) throws Exception {
+        http.exceptionHandling(exceptionHandler ->
+                exceptionHandler.authenticationEntryPoint(authenticationEntryPoint));
+    }
 }
