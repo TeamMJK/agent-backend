@@ -5,17 +5,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 import team.mjk.agent.global.auth.application.AuthService;
 import team.mjk.agent.global.auth.dto.request.LoginResultRequest;
 import team.mjk.agent.global.auth.dto.response.LoginResultResponse;
 
 @RequiredArgsConstructor
 @RequestMapping("/login")
-@RestController
+@Controller
 public class AuthController {
 
     private final AuthService authService;
@@ -26,6 +24,11 @@ public class AuthController {
             HttpServletResponse response) {
         LoginResultResponse result = authService.login(request.email(), request.password(), response);
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @GetMapping
+    public String login() {
+        return "redirect:/oauth2/authorization/google";
     }
 
 }

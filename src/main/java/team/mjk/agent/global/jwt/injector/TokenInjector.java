@@ -4,7 +4,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import team.mjk.agent.global.auth.dto.response.LoginResultResponse;
+import team.mjk.agent.global.auth.dto.response.TokenResult;
 import team.mjk.agent.global.jwt.config.SecurityProperties;
 import team.mjk.agent.global.jwt.config.TokenProperties;
 
@@ -18,7 +18,7 @@ public class TokenInjector {
     private final TokenProperties tokenProperties;
     private final SecurityProperties securityProperties;
 
-    public void injectTokensToCookie(LoginResultResponse result, HttpServletResponse response) {
+    public void injectTokensToCookie(TokenResult result, HttpServletResponse response) {
         int accessTokenMaxAge = (int)tokenProperties.expirationTime().accessToken() + 5;
         int refreshTokenMaxAge = (int)tokenProperties.expirationTime().refreshToken() + 5;
 
