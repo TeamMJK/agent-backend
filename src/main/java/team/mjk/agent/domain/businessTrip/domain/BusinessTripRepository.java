@@ -4,4 +4,6 @@ public interface BusinessTripRepository {
 
   void save(BusinessTrip businessTrip);
 
+  BusinessTrip findById(Long businessTripId);
+
 }

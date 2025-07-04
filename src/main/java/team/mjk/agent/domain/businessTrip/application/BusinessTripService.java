@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import team.mjk.agent.domain.businessTrip.domain.BusinessTrip;
 import team.mjk.agent.domain.businessTrip.domain.BusinessTripRepository;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
+import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetResponse;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripSaveResponse;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
@@ -34,6 +35,20 @@ public class BusinessTripService {
 
     return BusinessTripSaveResponse.builder()
         .businessTripId(businessTrip.getId())
+        .build();
+  }
+
+  public BusinessTripGetResponse getBusinessTrip(Long memberId, Long businessTripId) {
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(MemberNotFoundException::new);
+
+    BusinessTrip businessTrip = businessTripRepository.findById(businessTripId);
+    return BusinessTripGetResponse.builder()
+        .departDate(businessTrip.getDepartDate())
+        .arriveDate(businessTrip.getArriveDate())
+        .destination(businessTrip.getDestination())
+        .names(businessTrip.getNames())
+        .writer(businessTrip.getWriter())
         .build();
   }
 
