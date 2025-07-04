@@ -1,5 +1,6 @@
 package team.mjk.agent.domain.businessTrip.application;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,6 +8,7 @@ import team.mjk.agent.domain.businessTrip.domain.BusinessTrip;
 import team.mjk.agent.domain.businessTrip.domain.BusinessTripRepository;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripUpdateRequest;
+import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetAllResponse;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetResponse;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripSaveResponse;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripUpdateResponse;
@@ -40,6 +42,7 @@ public class BusinessTripService {
         .build();
   }
 
+  @Transactional(readOnly = true)
   public BusinessTripGetResponse getBusinessTrip(Long memberId, Long businessTripId) {
     Member member = memberRepository.findByMemberId(memberId)
         .orElseThrow(MemberNotFoundException::new);
@@ -68,6 +71,14 @@ public class BusinessTripService {
 
     return BusinessTripUpdateResponse.builder()
         .businessTripId(businessTripId)
+        .build();
+  }
+
+  @Transactional(readOnly = true)
+  public BusinessTripGetAllResponse getAllBusinessTrip() {
+    List<BusinessTrip> businessTripList = businessTripRepository.findAll();
+    return BusinessTripGetAllResponse.builder()
+        .businessTripList(businessTripList)
         .build();
   }
 

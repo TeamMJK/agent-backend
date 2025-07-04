@@ -1,5 +1,6 @@
 package team.mjk.agent.domain.businessTrip.presentation;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import team.mjk.agent.domain.businessTrip.application.BusinessTripService;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripUpdateRequest;
+import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetAllResponse;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetResponse;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripSaveResponse;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripUpdateResponse;
@@ -52,6 +54,12 @@ public class BusinessTripController {
       @RequestBody BusinessTripUpdateRequest request
   ) {
     BusinessTripUpdateResponse response = businessTripService.update(memberId, businessTripId, request);
+    return new ResponseEntity<>(response, HttpStatus.OK);
+  }
+
+  @GetMapping
+  public ResponseEntity<BusinessTripGetAllResponse> getAllBusinessTrip() {
+    BusinessTripGetAllResponse response = businessTripService.getAllBusinessTrip();
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 

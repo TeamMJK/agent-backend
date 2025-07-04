@@ -1,5 +1,6 @@
 package team.mjk.agent.domain.businessTrip.infrastructure;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import team.mjk.agent.domain.businessTrip.domain.BusinessTrip;
@@ -21,6 +22,11 @@ public class BusinessRepositoryImpl implements BusinessTripRepository {
   public BusinessTrip findById(Long businessTripId) {
     return businessJpaRepository.findById(businessTripId)
         .orElseThrow(BusinessTripInfoNotFoundException::new);
+  }
+
+  @Override
+  public List<BusinessTrip> findAll() {
+    return businessJpaRepository.findAll();
   }
 
 }
