@@ -29,6 +29,15 @@ public class Passport {
     this.passportExpireDate = passportExpireDate;
   }
 
+  public void update(String passportNumber, LocalDate passportExpireDate) {
+    if (passportNumber != null) {
+      this.passportNumber = passportNumber;
+    }
+    if (passportExpireDate != null) {
+      this.passportExpireDate = passportExpireDate;
+    }
+  }
+
   public static Passport create(String passportNumber, LocalDate passportExpireDate) {
     return Passport.builder()
         .passportNumber(passportNumber)
