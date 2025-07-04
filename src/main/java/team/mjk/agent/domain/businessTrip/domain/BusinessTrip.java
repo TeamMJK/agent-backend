@@ -12,12 +12,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripUpdateRequest;
 import team.mjk.agent.global.domain.BaseTimeEntity;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class BusinessTrip  extends BaseTimeEntity {
+public class BusinessTrip {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,6 +48,21 @@ public class BusinessTrip  extends BaseTimeEntity {
     this.arriveDate = arriveDate;
     this.names = names;
     this.writer = writer;
+  }
+
+  public void update(BusinessTripUpdateRequest request) {
+    if (request.departDate() != null) {
+      this.departDate = request.departDate();
+    }
+    if (request.arriveDate() != null) {
+      this.arriveDate = request.arriveDate();
+    }
+    if (request.destination() != null) {
+      this.destination = request.destination();
+    }
+    if (request.names() != null) {
+      this.names = request.names();
+    }
   }
 
   public static BusinessTrip create(
