@@ -77,6 +77,7 @@ public class BusinessTripService {
   @Transactional(readOnly = true)
   public BusinessTripGetAllResponse getAllBusinessTrip() {
     List<BusinessTrip> businessTripList = businessTripRepository.findAll();
+
     return BusinessTripGetAllResponse.builder()
         .businessTripList(businessTripList)
         .build();

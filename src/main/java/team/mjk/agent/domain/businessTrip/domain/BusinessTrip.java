@@ -51,18 +51,10 @@ public class BusinessTrip {
   }
 
   public void update(BusinessTripUpdateRequest request) {
-    if (request.departDate() != null) {
-      this.departDate = request.departDate();
-    }
-    if (request.arriveDate() != null) {
-      this.arriveDate = request.arriveDate();
-    }
-    if (request.destination() != null) {
-      this.destination = request.destination();
-    }
-    if (request.names() != null) {
-      this.names = request.names();
-    }
+    this.departDate = request.departDate();
+    this.arriveDate =  request.arriveDate();
+    this.destination = request.destination();
+    this.names = request.names();
   }
 
   public static BusinessTrip create(
