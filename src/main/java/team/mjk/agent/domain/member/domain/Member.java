@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.cglib.core.Local;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import team.mjk.agent.domain.member.presentation.exception.EmailOrPasswordNotInvalidException;
+import team.mjk.agent.domain.passport.domain.Passport;
 import team.mjk.agent.global.auth.application.dto.AuthAttributes;
 import team.mjk.agent.global.domain.BaseTimeEntity;
 
@@ -48,6 +49,10 @@ public class Member extends BaseTimeEntity {
     @Enumerated(STRING)
     private LoginProvider loginProvider;
 
+    @OneToOne
+    @JoinColumn(name = "passport_id", unique = true)
+    private Passport passport;
+
     @Builder
     private Member(String email, String password, String externalId, LoginProvider loginProvider) {
         this.email = email;
@@ -74,6 +79,11 @@ public class Member extends BaseTimeEntity {
         return Objects.equals(this.email, email) && !Objects.equals(this.externalId, externalId);
     }
 
+    //정적 메서드로 뺄 수 있을듯?
+    /*
+    public static
+
+    * */
     public void saveMemberInfo(
             String name,
             String firstName,
@@ -88,6 +98,10 @@ public class Member extends BaseTimeEntity {
         this.phoneNumber = phoneNumber;
         this.gender = gender;
         this.birthDate = birthDate;
+    }
+
+    public void savePassport(Passport passport){
+        this.passport = passport;
     }
 
 }
