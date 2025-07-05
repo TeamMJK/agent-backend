@@ -21,4 +21,8 @@ public class InvitationRepository {
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않는 코드입니다"));
     }
 
+    public void save(Invitation invitation) {
+        invitationRedisRepository.save(invitation);
+    }
+
 }

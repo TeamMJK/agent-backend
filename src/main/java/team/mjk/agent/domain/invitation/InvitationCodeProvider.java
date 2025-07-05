@@ -5,14 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import team.mjk.agent.domain.invitation.entity.Invitation;
-import team.mjk.agent.domain.invitation.repository.InvitationRedisRepository;
+import team.mjk.agent.domain.invitation.repository.InvitationRepository;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class InvitationCodeProvider {
 
-    private final InvitationRedisRepository invitationRepository;
+    private final InvitationRepository invitationRepository;
 
     private static final long DEFAULT_EXPIRED_MINUTES = 60L;
     private static final int INVITE_CODE_LENGTH = 32;
