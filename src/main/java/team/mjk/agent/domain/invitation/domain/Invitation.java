@@ -1,4 +1,4 @@
-package team.mjk.agent.domain.invitation.entity;
+package team.mjk.agent.domain.invitation.domain;
 
 import static java.util.Objects.requireNonNull;
 
@@ -31,9 +31,9 @@ public class Invitation {
     public static Invitation create(Long companyId, String code, Long expirationInMinutes) {
         Invitation invitation = new Invitation();
 
-        invitation.id = "company " + requireNonNull(companyId);
-        invitation.companyId =  companyId;
-        invitation.code = requireNonNull(code);
+        invitation.id = "company " + requireNonNull(code);
+        invitation.companyId =  requireNonNull(companyId);
+        invitation.code = code;
         invitation.expiration = requireNonNull(expirationInMinutes);
 
         return invitation;
