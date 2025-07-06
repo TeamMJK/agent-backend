@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.cglib.core.Local;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.member.dto.request.MemberInfoUpdateRequest;
 import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
 import team.mjk.agent.domain.member.presentation.exception.EmailOrPasswordNotInvalidException;
@@ -50,6 +51,10 @@ public class Member extends BaseTimeEntity {
 
   @Enumerated(STRING)
   private LoginProvider loginProvider;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "company_id")
+  private Company company;
 
   @OneToOne
   @JoinColumn(name = "passport_id", unique = true)
@@ -104,6 +109,10 @@ public class Member extends BaseTimeEntity {
 
   public void savePassport(Passport passport) {
     this.passport = passport;
+  }
+
+  public void saveCompany(Company company) {
+    this.company = company;
   }
 
   public void update(MemberInfoUpdateRequest request) {

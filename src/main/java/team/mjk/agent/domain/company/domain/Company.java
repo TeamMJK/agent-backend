@@ -21,8 +21,11 @@ public class Company {
     @Column(unique = true, nullable = false)
     private String name;
 
-    public Company(String name) {
+    private String founder;
+
+    public Company(String name, String founder) {
         this.name = name;
+        this.founder = founder;
     }
 
     public void updateName(String name) {

@@ -29,5 +29,4 @@ public class InvitationCodeProvider {
         return invitation;
     }
 
-
 }

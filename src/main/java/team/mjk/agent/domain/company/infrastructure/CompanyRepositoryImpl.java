@@ -16,4 +16,9 @@ public class CompanyRepositoryImpl implements CompanyRepository {
         return companyJpaRepository.findById(id);
     }
 
+    @Override
+    public Company save(Company company) {
+        return companyJpaRepository.save(company);
+    }
+
 }
