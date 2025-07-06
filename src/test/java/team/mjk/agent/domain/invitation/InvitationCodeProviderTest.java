@@ -9,8 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import team.mjk.agent.domain.invitation.entity.Invitation;
-import team.mjk.agent.domain.invitation.repository.InvitationRepository;
+import team.mjk.agent.domain.invitation.domain.Invitation;
+import team.mjk.agent.domain.invitation.infrastructure.InvitationRepositoryImpl;
 
 @Transactional
 @SpringBootTest
@@ -20,7 +20,7 @@ class InvitationCodeProviderTest {
     private InvitationCodeProvider invitationCodeProvider;
 
     @Mock
-    private InvitationRepository invitationRepository;
+    private InvitationRepositoryImpl invitationRepositoryImpl;
 
 
     @DisplayName("초대 코드를 생성한다")
@@ -31,7 +31,7 @@ class InvitationCodeProviderTest {
         assertThat(invitation).isNotNull();
         assertThat(invitation.getCode()).isNotNull();
 
-        verify(invitationRepository).save(invitation);
+        verify(invitationRepositoryImpl).save(invitation);
 
     }
 
