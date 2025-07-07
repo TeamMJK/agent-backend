@@ -4,10 +4,10 @@ import java.util.List;
 
 public interface BusinessTripRepository {
 
-  void save(BusinessTrip businessTrip);
+  BusinessTrip save(BusinessTrip businessTrip);
 
-  BusinessTrip findById(Long businessTripId);
+  BusinessTrip findByIdAndCompanyId(Long businessTripId, Long companyId);
 
-  List<BusinessTrip> findAll();
+  List<BusinessTrip> findAllByCompanyId(Long companyId);
 
 }

@@ -8,4 +8,5 @@ public class CompanyNotFoundException extends CustomException {
   public CompanyNotFoundException() {
     super(CompanyExceptionCode.NOT_FOUND_COMPANY);
   }
+
 }

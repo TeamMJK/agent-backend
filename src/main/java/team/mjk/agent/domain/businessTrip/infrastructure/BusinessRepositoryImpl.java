@@ -14,19 +14,19 @@ public class BusinessRepositoryImpl implements BusinessTripRepository {
   private final BusinessJpaRepository businessJpaRepository;
 
   @Override
-  public void save(BusinessTrip businessTrip) {
-    businessJpaRepository.save(businessTrip);
+  public BusinessTrip save(BusinessTrip businessTrip) {
+    return businessJpaRepository.save(businessTrip);
   }
 
   @Override
-  public BusinessTrip findById(Long businessTripId) {
-    return businessJpaRepository.findById(businessTripId)
+  public BusinessTrip findByIdAndCompanyId(Long businessTripId, Long companyId) {
+    return businessJpaRepository.findByIdAndCompanyId(businessTripId, companyId)
         .orElseThrow(BusinessTripInfoNotFoundException::new);
   }
 
   @Override
-  public List<BusinessTrip> findAll() {
-    return businessJpaRepository.findAll();
+  public List<BusinessTrip> findAllByCompanyId(Long companyId) {
+    return businessJpaRepository.findAllByCompanyId(companyId);
   }
 
 }

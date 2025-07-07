@@ -33,7 +33,8 @@ public class BusinessTripService {
         request.arriveDate(),
         request.destination(),
         request.names(),
-        member.getName()
+        member.getName(),
+        member.getCompany().getId()
     );
     businessTripRepository.save(businessTrip);
 
@@ -47,7 +48,11 @@ public class BusinessTripService {
     Member member = memberRepository.findByMemberId(memberId)
         .orElseThrow(MemberNotFoundException::new);
 
-    BusinessTrip businessTrip = businessTripRepository.findById(businessTripId);
+    Long companyId = member.getCompany().getId();
+
+    BusinessTrip businessTrip = businessTripRepository.findByIdAndCompanyId(businessTripId,
+        companyId);
+
     return BusinessTripGetResponse.builder()
         .departDate(businessTrip.getDepartDate())
         .arriveDate(businessTrip.getArriveDate())
@@ -66,7 +71,10 @@ public class BusinessTripService {
     Member member = memberRepository.findByMemberId(memberId)
         .orElseThrow(MemberNotFoundException::new);
 
-    BusinessTrip businessTrip = businessTripRepository.findById(businessTripId);
+    Long companyId = member.getCompany().getId();
+
+    BusinessTrip businessTrip = businessTripRepository.findByIdAndCompanyId(businessTripId,
+        companyId);
     businessTrip.update(request);
 
     return BusinessTripUpdateResponse.builder()
@@ -75,8 +83,13 @@ public class BusinessTripService {
   }
 
   @Transactional(readOnly = true)
-  public BusinessTripGetAllResponse getAllBusinessTrip() {
-    List<BusinessTrip> businessTripList = businessTripRepository.findAll();
+  public BusinessTripGetAllResponse getAllBusinessTrip(Long memberId) {
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(MemberNotFoundException::new);
+
+    Long companyId = member.getCompany().getId();
+
+    List<BusinessTrip> businessTripList = businessTripRepository.findAllByCompanyId(companyId);
 
     return BusinessTripGetAllResponse.builder()
         .businessTripList(businessTripList)

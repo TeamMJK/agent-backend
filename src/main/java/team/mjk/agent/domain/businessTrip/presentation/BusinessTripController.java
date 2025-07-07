@@ -56,8 +56,8 @@ public class BusinessTripController {
   }
 
   @GetMapping
-  public ResponseEntity<BusinessTripGetAllResponse> getAllBusinessTrip() {
-    BusinessTripGetAllResponse response = businessTripService.getAllBusinessTrip();
+  public ResponseEntity<BusinessTripGetAllResponse> getAllBusinessTrip(@MemberId Long memberId) {
+    BusinessTripGetAllResponse response = businessTripService.getAllBusinessTrip(memberId);
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
