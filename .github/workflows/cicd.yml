@@ -30,7 +30,7 @@ jobs:
         echo "$YML_LOCAL" > application-local.yml
       shell: bash
       env:
-        PROPERTIES_PROD: ${{ secrets.YML_LOCAL }}
+        YML_LOCAL: ${{ secrets.YML_LOCAL }}
 
     # 2. Spring Boot 애플리케이션 빌드
     - name: Build with Gradle (without test)
