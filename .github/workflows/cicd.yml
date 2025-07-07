@@ -23,11 +23,11 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Make application.yml
+    - name: Make application-local.yml
       run: |
         cd ./src/main/resources
-        touch application.yml
-        echo "$YML_LOCAL" > application.yml
+        touch application-local.yml
+        echo "$YML_LOCAL" > application-local.yml
       shell: bash
       env:
         YML_LOCAL: ${{ secrets.YML_LOCAL }}
