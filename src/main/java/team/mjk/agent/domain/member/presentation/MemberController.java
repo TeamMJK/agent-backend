@@ -7,8 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import team.mjk.agent.domain.member.application.MemberService;
 import team.mjk.agent.domain.member.dto.request.MemberInfoSaveRequest;
+import team.mjk.agent.domain.member.dto.request.MemberInfoUpdateRequest;
 import team.mjk.agent.domain.member.dto.request.MemberSaveRequest;
+import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
 import team.mjk.agent.domain.member.dto.response.MemberInfoSaveResponse;
+import team.mjk.agent.domain.member.dto.response.MemberInfoUpdateResponse;
 import team.mjk.agent.domain.member.dto.response.MemberSaveResponse;
 import team.mjk.agent.global.annotation.MemberId;
 
@@ -17,23 +20,38 @@ import team.mjk.agent.global.annotation.MemberId;
 @RestController
 public class MemberController {
 
-    private final MemberService memberService;
+  private final MemberService memberService;
 
-    @PostMapping
-    public ResponseEntity<MemberSaveResponse> signUp(
-            @Valid @RequestBody MemberSaveRequest request
-    ) {
-        MemberSaveResponse response = memberService.signUp(request);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
+  @PostMapping
+  public ResponseEntity<MemberSaveResponse> signUp(
+      @Valid @RequestBody MemberSaveRequest request
+  ) {
+    MemberSaveResponse response = memberService.signUp(request);
+    return new ResponseEntity<>(response, HttpStatus.CREATED);
+  }
 
-    @PostMapping("/sensitive-member-info")
-    public ResponseEntity<MemberInfoSaveResponse> saveMemberInfo(
-            @MemberId Long memberId,
-            @RequestBody MemberInfoSaveRequest request
-    ) {
-        MemberInfoSaveResponse response = memberService.saveMemberInfo(memberId, request);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
+  @PostMapping("/sensitive-member-info")
+  public ResponseEntity<MemberInfoSaveResponse> saveMemberInfo(
+      @MemberId Long memberId,
+      @RequestBody MemberInfoSaveRequest request
+  ) {
+    MemberInfoSaveResponse response = memberService.saveMemberInfo(memberId, request);
+    return new ResponseEntity<>(response, HttpStatus.CREATED);
+  }
+
+  @GetMapping("/me")
+  public ResponseEntity<MemberInfoGetResponse> getMemberInfo(@MemberId Long memberId) {
+    MemberInfoGetResponse response = memberService.getMemberInfo(memberId);
+    return new ResponseEntity<>(response, HttpStatus.OK);
+  }
+
+  @PatchMapping("/me")
+  public ResponseEntity<MemberInfoUpdateResponse> updateMemberInfo(
+      @MemberId Long memberId,
+      @RequestBody MemberInfoUpdateRequest request
+  ) {
+    MemberInfoUpdateResponse response = memberService.updateMemberInfo(memberId, request);
+    return new ResponseEntity<>(response,HttpStatus.OK);
+  }
 
 }
