@@ -42,6 +42,19 @@ spring:
             redirect-uri: ${GOOGLE_REDIRECT_URI:http://localhost:8080/login/oauth2/code/google}
             authorization-grant-type: authorization_code
 
+# === S3 설정 추가 ===
+cloud:
+  aws:
+    s3:
+      bucket: ${AWS_S3_BUCKET:your-bucket-name}
+    credentials:
+      access-key: ${AWS_ACCESS_KEY:your-access-key}
+      secret-key: ${AWS_SECRET_KEY:your-secret-key}
+    region:
+      static: ${AWS_REGION:ap-northeast-2}
+    stack:
+      auto: false
+
 jwt:
   secret-key: ${JWT_SECRET_KEY:apsxhtmvmfhwprxmghkdlxldrnfmagozjxhsghkdlxld12345}
   expiration-time:

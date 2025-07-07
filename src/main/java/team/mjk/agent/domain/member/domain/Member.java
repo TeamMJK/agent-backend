@@ -116,27 +116,13 @@ public class Member extends BaseTimeEntity {
   }
 
   public void update(MemberInfoUpdateRequest request) {
-    if (request.name() != null) {
-      this.name = request.name();
-    }
-    if (request.firstName() != null) {
-      this.firstName = request.firstName();
-    }
-    if (request.lastName() != null) {
-      this.lastName = request.lastName();
-    }
-    if (request.phoneNumber() != null) {
-      this.phoneNumber = request.phoneNumber();
-    }
-    if (request.gender() != null) {
-      this.gender = Gender.valueOf(request.gender());
-    }
-    if (request.birthDate() != null) {
-      this.birthDate = request.birthDate();
-    }
-    if (this.passport != null) {
-      this.passport.update(request.passportNumber(), request.passportExpireDate());
-    }
+    this.name = request.name();
+    this.firstName = request.firstName();
+    this.lastName = request.lastName();
+    this.phoneNumber = request.phoneNumber();
+    this.gender = Gender.valueOf(request.gender());
+    this.birthDate = request.birthDate();
+    this.passport.update(request.passportNumber(), request.passportExpireDate());
   }
 
   public static MemberInfoGetResponse toMemberInfoGetResponse(Member member) {
