@@ -34,6 +34,8 @@ public class Receipt extends BaseTimeEntity {
 
     private String url;
 
+    private Long companyId;
+
     @Builder
     private Receipt(
             Member member,
@@ -41,7 +43,8 @@ public class Receipt extends BaseTimeEntity {
             String approvalNumber,
             String storeAddress,
             BigDecimal totalAmount,
-            String url
+            String url,
+            Long companyId
     ) {
         this.member = member;
         this.paymentDate = paymentDate;
@@ -49,6 +52,7 @@ public class Receipt extends BaseTimeEntity {
         this.storeAddress = storeAddress;
         this.totalAmount = totalAmount;
         this.url = url;
+        this.companyId = companyId;
     }
 
 }

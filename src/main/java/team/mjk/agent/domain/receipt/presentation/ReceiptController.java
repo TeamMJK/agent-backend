@@ -1,5 +1,6 @@
 package team.mjk.agent.domain.receipt.presentation;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import team.mjk.agent.domain.receipt.application.ReceiptService;
 import team.mjk.agent.domain.receipt.dto.request.ReceiptSaveRequest;
+import team.mjk.agent.domain.receipt.dto.response.ReceiptGetAllResponse;
+import team.mjk.agent.domain.receipt.dto.response.ReceiptGetResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptSaveResponse;
 import team.mjk.agent.global.annotation.MemberId;
 
@@ -42,6 +45,23 @@ public class ReceiptController {
     ) {
         receiptService.deleteImageFromS3(memberId, addr);
         return ResponseEntity.ok(null);
+    }
+
+    @GetMapping("/{receipt-id}")
+    public ResponseEntity<ReceiptGetResponse> getReceipt(
+        @MemberId Long memberId,
+        @PathVariable("receipt-id") Long receiptId
+    ) {
+        ReceiptGetResponse response = receiptService.getReceipt(memberId,receiptId);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    @GetMapping
+    public ResponseEntity<ReceiptGetAllResponse> getAllReceipt(
+        @MemberId Long memberId
+    ) {
+        ReceiptGetAllResponse response = receiptService.getAllReceipt(memberId);
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
 }

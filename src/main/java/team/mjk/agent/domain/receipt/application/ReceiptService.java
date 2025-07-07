@@ -17,6 +17,8 @@ import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundExcepti
 import team.mjk.agent.domain.receipt.domain.Receipt;
 import team.mjk.agent.domain.receipt.domain.ReceiptRepository;
 import team.mjk.agent.domain.receipt.dto.request.ReceiptSaveRequest;
+import team.mjk.agent.domain.receipt.dto.response.ReceiptGetAllResponse;
+import team.mjk.agent.domain.receipt.dto.response.ReceiptGetResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptSaveResponse;
 import team.mjk.agent.domain.receipt.presentation.exception.*;
 
@@ -54,6 +56,7 @@ public class ReceiptService {
                 .approvalNumber(request.approvalNumber())
                 .storeAddress(request.storeAddress())
                 .totalAmount(request.totalAmount())
+                .companyId(member.getCompany().getId())
                 .build();
 
         receiptRepository.save(receipt);
@@ -148,6 +151,35 @@ public class ReceiptService {
         }
 
         return amazonS3.getUrl(bucketName, s3FileName).toString();
+    }
+
+    @Transactional(readOnly = true)
+    public ReceiptGetResponse getReceipt(Long memberId, Long receiptId) {
+        Member member = memberRepository.findByMemberId(memberId)
+            .orElseThrow(MemberNotFoundException::new);
+
+        Long companyId = member.getCompany().getId();
+
+        Receipt receipt = receiptRepository.findByIdAndCompanyId(receiptId,companyId);
+        return ReceiptGetResponse.builder()
+            .approvalNumber(receipt.getApprovalNumber())
+            .paymentDate(receipt.getPaymentDate())
+            .storeAddress(receipt.getStoreAddress())
+            .totalAmount(receipt.getTotalAmount())
+            .build();
+    }
+
+    @Transactional(readOnly = true)
+    public ReceiptGetAllResponse getAllReceipt(Long memberId) {
+        Member member = memberRepository.findByMemberId(memberId)
+            .orElseThrow(MemberNotFoundException::new);
+
+        Long companyId = member.getCompany().getId();
+
+        List<Receipt> receiptList = receiptRepository.findAllByCompanyId(companyId);
+        return ReceiptGetAllResponse.builder()
+            .receiptList(receiptList)
+            .build();
     }
 
     private String getKeyFromImageAddress(String imageAddress) {
