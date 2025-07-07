@@ -72,8 +72,11 @@ jobs:
         - name: docker run new container
           run: |
             sudo docker run -d \
-            -p 8080:8080 \
-            ${{ secrets.DOCKERHUB_USERNAME }}/mjk_agent
+              -p 8080:8080 \
+              -v /home/ubuntu/application-local.yml:/app/src/main/resources/application-local.yml \
+              y2jun/mjk_agent:latest \
+              --spring.profiles.active=local
+
   
   
         # 4. 미사용 이미지를 정리합니다
