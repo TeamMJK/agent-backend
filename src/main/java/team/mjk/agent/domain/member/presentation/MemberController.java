@@ -33,7 +33,7 @@ public class MemberController implements MemberDocsController {
   @PostMapping("/sensitive-member-info")
   public ResponseEntity<MemberInfoSaveResponse> saveMemberInfo(
       @MemberId Long memberId,
-      @RequestBody MemberInfoSaveRequest request
+      @Valid @RequestBody MemberInfoSaveRequest request
   ) {
     MemberInfoSaveResponse response = memberService.saveMemberInfo(memberId, request);
     return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -48,7 +48,7 @@ public class MemberController implements MemberDocsController {
   @PatchMapping("/me")
   public ResponseEntity<MemberInfoUpdateResponse> updateMemberInfo(
       @MemberId Long memberId,
-      @RequestBody MemberInfoUpdateRequest request
+      @Valid @RequestBody MemberInfoUpdateRequest request
   ) {
     MemberInfoUpdateResponse response = memberService.updateMemberInfo(memberId, request);
     return new ResponseEntity<>(response,HttpStatus.OK);
