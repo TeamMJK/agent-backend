@@ -3,6 +3,7 @@ package team.mjk.agent.domain.receipt.presentation;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,7 +17,7 @@ import team.mjk.agent.global.annotation.MemberId;
 @RequiredArgsConstructor
 @RequestMapping("/receipts")
 @RestController
-public class ReceiptController {
+public class ReceiptController implements ReceiptDocsController {
 
     private final ReceiptService receiptService;
 
@@ -29,7 +30,7 @@ public class ReceiptController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PostMapping("/upload")
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> s3Upload(
             @MemberId Long memberId,
             @RequestPart(value = "image", required = false) MultipartFile image

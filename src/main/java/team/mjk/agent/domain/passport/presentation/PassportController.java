@@ -15,7 +15,7 @@ import team.mjk.agent.global.annotation.MemberId;
 @RequiredArgsConstructor
 @RequestMapping("/members")
 @RestController
-public class PassportController {
+public class PassportController implements PassportDocsController {
 
   private final PassportService passportService;
 

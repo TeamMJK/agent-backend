@@ -22,7 +22,7 @@ import team.mjk.agent.global.annotation.MemberId;
 @RequiredArgsConstructor
 @RequestMapping("/business-trips")
 @RestController
-public class BusinessTripController {
+public class BusinessTripController implements BusinessTripDocsController{
 
   private final BusinessTripService businessTripService;
 

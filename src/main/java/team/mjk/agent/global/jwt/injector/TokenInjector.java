@@ -3,6 +3,7 @@ package team.mjk.agent.global.jwt.injector;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import team.mjk.agent.global.auth.dto.response.TokenResult;
 import team.mjk.agent.global.jwt.config.SecurityProperties;
@@ -11,6 +12,7 @@ import team.mjk.agent.global.jwt.config.TokenProperties;
 import static team.mjk.agent.global.jwt.resolver.JwtTokenResolver.ACCESS_TOKEN;
 import static team.mjk.agent.global.jwt.resolver.JwtTokenResolver.REFRESH_TOKEN;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class TokenInjector {

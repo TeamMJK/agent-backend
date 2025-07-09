@@ -18,7 +18,7 @@ import team.mjk.agent.global.annotation.MemberId;
 @RequiredArgsConstructor
 @RequestMapping("/companies")
 @RestController
-public class CompanyController {
+public class CompanyController implements CompanyDocsController {
 
   private final CompanyService companyService;
 
