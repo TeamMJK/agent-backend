@@ -9,10 +9,10 @@ public record MemberInfoUpdateRequest(
     @NotBlank(message = "이름을 입력해주세요.")
     String name,
 
-    @NotBlank(message = "영문 성을 입력해주세요.")
+    @NotBlank(message = "영문 이름을 입력해주세요.")
     String firstName,
 
-    @NotBlank(message = "영문 이름을 입력해주세요.")
+    @NotBlank(message = "영문 성을 입력해주세요.")
     String lastName,
 
     @NotBlank(message = "핸드폰 번호를 입력해주세요.")
