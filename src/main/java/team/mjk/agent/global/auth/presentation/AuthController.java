@@ -13,22 +13,18 @@ import team.mjk.agent.global.auth.dto.response.LoginResultResponse;
 
 @RequiredArgsConstructor
 @RequestMapping("/login")
-@Controller
-public class AuthController {
+@RestController
+public class AuthController implements AuthDocsController{
 
     private final AuthService authService;
 
     @PostMapping
     public ResponseEntity<LoginResultResponse> login(
             @Valid @RequestBody LoginResultRequest request,
-            HttpServletResponse response) {
+            HttpServletResponse response
+    ) {
         LoginResultResponse result = authService.login(request.email(), request.password(), response);
         return new ResponseEntity<>(result, HttpStatus.OK);
-    }
-
-    @GetMapping
-    public String login() {
-        return "redirect:/oauth2/authorization/google";
     }
 
 }

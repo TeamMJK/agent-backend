@@ -30,7 +30,7 @@ public class AuthService {
 
         tokenInjector.injectTokensToCookie(result, response);
 
-        return loginProcessor.generateLoginResult(member.getId());
+        return result;
     }
 
 }
