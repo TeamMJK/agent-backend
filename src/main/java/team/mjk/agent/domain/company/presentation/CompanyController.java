@@ -22,7 +22,6 @@ public class CompanyController implements CompanyDocsController {
 
   private final CompanyService companyService;
 
-  @GetMapping("/{companyId}/invitation-code")
   public ResponseEntity<String> createInvitationCode(@PathVariable Long companyId) {
     Invitation invitationCode = companyService.createInvitationCode(companyId);
 
@@ -49,6 +48,13 @@ public class CompanyController implements CompanyDocsController {
     return new ResponseEntity<>(companyName, HttpStatus.OK);
   }
 
+  @GetMapping
+  public ResponseEntity<String> getCompany(
+      @MemberId Long memberId
+  ) {
+    String companyName = companyService.getCompanyName(memberId);
 
+    return new ResponseEntity<>(companyName, HttpStatus.OK);
+  }
 
 }

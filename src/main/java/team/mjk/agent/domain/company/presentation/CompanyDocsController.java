@@ -55,4 +55,16 @@ public interface CompanyDocsController {
             @RequestBody(description = "회사 초대 코드 요청 DTO", required = true) CompanyInvitationCodeRequest request
     );
 
+    @Operation(summary = "회사 정보", description = "회사 정보에서 회사 이름을 가져옵니다.")
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "200",
+            description = "회사 정보 가져오기 성공",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
+        )
+    })
+    ResponseEntity<String> getCompany(
+        @Parameter(hidden = true) Long memberId
+    );
+
 }

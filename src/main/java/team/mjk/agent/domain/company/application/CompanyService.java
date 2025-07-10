@@ -63,4 +63,12 @@ public class CompanyService {
         return company.getName();
     }
 
+    @Transactional(readOnly = true)
+    public String getCompanyName(Long memberId) {
+        Member member = memberRepository.findByMemberId(memberId)
+            .orElseThrow(MemberNotFoundException::new);
+
+        return member.getCompany().getName();
+    }
+
 }
