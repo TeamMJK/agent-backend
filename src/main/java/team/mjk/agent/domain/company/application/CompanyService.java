@@ -34,12 +34,14 @@ public class CompanyService {
         return invitationCodeProvider.create(companyId);
     }
 
+    @Transactional
     public Long create(CompanySaveRequest request, Long memberId) {
         Member member = memberRepository.findByMemberId(memberId)
             .orElseThrow(MemberNotFoundException::new);
 
         Company company = new Company(request.name(), member.getName());
         companyRepository.save(company);
+        member.saveCompany(company);
         return company.getId();
     }
 
