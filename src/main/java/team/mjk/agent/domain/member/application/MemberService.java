@@ -16,6 +16,8 @@ import team.mjk.agent.domain.member.dto.response.MemberInfoUpdateResponse;
 import team.mjk.agent.domain.member.dto.response.MemberSaveResponse;
 import team.mjk.agent.domain.member.presentation.exception.EmailAlreadyExistsException;
 import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
+import team.mjk.agent.domain.passport.domain.Passport;
+import team.mjk.agent.domain.passport.domain.PassportRepository;
 
 @RequiredArgsConstructor
 @Service
@@ -23,6 +25,7 @@ public class MemberService {
 
   private final MemberRepository memberRepository;
   private final PasswordEncoder passwordEncoder;
+  private final PassportRepository passportRepository;
 
   public MemberSaveResponse signUp(MemberSaveRequest request) {
     validateEmail(request.email());
@@ -52,6 +55,13 @@ public class MemberService {
         request.birthDate()
     );
 
+    Passport passport = Passport.create(
+        request.passportNumber(),
+        request.passportExpireDate()
+    );
+    passportRepository.save(passport);
+
+    member.savePassport(passport);
     return MemberInfoSaveResponse.builder()
         .memberId(member.getId())
         .build();
