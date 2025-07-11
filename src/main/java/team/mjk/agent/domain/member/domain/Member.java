@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.member.dto.request.MemberInfoUpdateRequest;
