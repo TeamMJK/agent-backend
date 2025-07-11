@@ -12,9 +12,13 @@ import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetAllRespons
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetResponse;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripSaveResponse;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripUpdateResponse;
+import team.mjk.agent.domain.company.domain.Company;
+import team.mjk.agent.domain.company.domain.Workspace;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
+import team.mjk.agent.global.mcp.McpService;
+import team.mjk.agent.global.mcp.McpServiceRegistry;
 
 @RequiredArgsConstructor
 @Service
@@ -22,6 +26,7 @@ public class BusinessTripService {
 
   private final MemberRepository memberRepository;
   private final BusinessTripRepository businessTripRepository;
+  private final McpServiceRegistry registry;
 
   @Transactional
   public BusinessTripSaveResponse save(Long memberId, BusinessTripSaveRequest request) {
@@ -41,6 +46,20 @@ public class BusinessTripService {
     return BusinessTripSaveResponse.builder()
         .businessTripId(businessTrip.getId())
         .build();
+  }
+
+  @Transactional
+  public Workspace saveMcp(Long memberId, BusinessTripSaveRequest request) {
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(MemberNotFoundException::new);
+
+    Company company = member.getCompany();
+    Workspace workspace = company.getWorkspace();
+
+    McpService mcpService = registry.getService(workspace);
+    mcpService.create(request, company.getId());
+
+    return company.getWorkspace();
   }
 
   @Transactional(readOnly = true)

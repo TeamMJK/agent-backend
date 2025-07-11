@@ -17,6 +17,7 @@ import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetAllRespons
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetResponse;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripSaveResponse;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripUpdateResponse;
+import team.mjk.agent.domain.company.domain.Workspace;
 import team.mjk.agent.global.annotation.MemberId;
 
 @RequiredArgsConstructor
@@ -33,6 +34,15 @@ public class BusinessTripController implements BusinessTripDocsController{
   ) {
     BusinessTripSaveResponse response = businessTripService.save(memberId, request);
     return new ResponseEntity<>(response, HttpStatus.CREATED);
+  }
+
+  @PostMapping("/mcp")
+  public ResponseEntity<Workspace> saveBusinessTripMcp(
+      @MemberId Long memberId,
+      @RequestBody BusinessTripSaveRequest request
+  ) {
+    Workspace workspace =  businessTripService.saveMcp(memberId, request);
+    return new ResponseEntity<>(workspace,HttpStatus.CREATED);
   }
 
   @GetMapping("/{business-trip-id}")

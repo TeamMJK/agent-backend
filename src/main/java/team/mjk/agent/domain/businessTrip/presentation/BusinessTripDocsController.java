@@ -16,6 +16,7 @@ import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetAllRespons
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetResponse;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripSaveResponse;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripUpdateResponse;
+import team.mjk.agent.domain.company.domain.Workspace;
 
 @Tag(name = "BusinessTrip", description = "출장 관련 API")
 @RequestMapping("/business-trips")
@@ -32,6 +33,19 @@ public interface BusinessTripDocsController {
     ResponseEntity<BusinessTripSaveResponse> saveBusinessTrip(
             @Parameter(hidden = true) Long memberId,
             @RequestBody(description = "출장 등록 요청 DTO", required = true) BusinessTripSaveRequest request
+    );
+
+    @Operation(summary = "출장 MCP 등록", description = "출장 신청 정보를 회사 MCP 에 등록하니다.")
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "201",
+            description = "출장 정보 MCP 에 등록 성공",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = BusinessTripSaveResponse.class))
+        )
+    })
+    ResponseEntity<Workspace> saveBusinessTripMcp(
+        @Parameter(hidden = true) Long memberId,
+        @RequestBody(description = "출장 등록 요청 DTO", required = true) BusinessTripSaveRequest request
     );
 
     @Operation(summary = "출장 상세 조회", description = "특정 출장 정보를 조회합니다.")
