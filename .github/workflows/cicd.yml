@@ -59,16 +59,22 @@ jobs:
       needs: build-docker-image
       runs-on: self-hosted
   
-      steps:
-        # 1. 최신 이미지를 풀받습니다
+            steps:
+        # 1. 최신 이미지를 pull
         - name: docker pull
           run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mjk_agent
-        
-        # 2. 기존의 컨테이너를 중지시킵니다
+
+        # 2. Redis 컨테이너가 없으면 자동 실행
+        - name: ensure redis container exists
+          run: |
+            docker ps -a --format '{{.Names}}' | grep -q '^redis$' || \
+              docker run -d --name redis --network my-network -p 6379:6379 -v redis-data:/data redis:latest
+
+        # 3. 기존 Spring Boot 컨테이너 중지
         - name: docker stop container
           run: sudo docker stop $(sudo docker ps -q) 2>/dev/null || true
-  
-        # 3. 최신 이미지를 컨테이너화하여 실행시킵니다
+
+        # 4. Spring Boot 컨테이너 실행
         - name: docker run new container
           run: |
             sudo docker run -d \
@@ -77,7 +83,6 @@ jobs:
               -e REDIS_HOST=redis \
               y2jun/mjk_agent:latest
 
-
-        # 4. 미사용 이미지를 정리합니다
+        # 5. 미사용 이미지 정리
         - name: delete old docker image
           run: sudo docker system prune -f
