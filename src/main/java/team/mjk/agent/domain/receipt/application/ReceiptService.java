@@ -99,6 +99,19 @@ public class ReceiptService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public ReceiptGetAllResponse getAllReceipt(Long memberId) {
+        Member member = memberRepository.findByMemberId(memberId)
+                .orElseThrow(MemberNotFoundException::new);
+
+        Long companyId = member.getCompany().getId();
+
+        List<Receipt> receiptList = receiptRepository.findAllByCompanyId(companyId);
+        return ReceiptGetAllResponse.builder()
+                .receiptList(receiptList)
+                .build();
+    }
+
     private String uploadImage(MultipartFile image) {
         this.validateImageFileExtension(image.getOriginalFilename());
         try {
@@ -166,19 +179,6 @@ public class ReceiptService {
             .paymentDate(receipt.getPaymentDate())
             .storeAddress(receipt.getStoreAddress())
             .totalAmount(receipt.getTotalAmount())
-            .build();
-    }
-
-    @Transactional(readOnly = true)
-    public ReceiptGetAllResponse getAllReceipt(Long memberId) {
-        Member member = memberRepository.findByMemberId(memberId)
-            .orElseThrow(MemberNotFoundException::new);
-
-        Long companyId = member.getCompany().getId();
-
-        List<Receipt> receiptList = receiptRepository.findAllByCompanyId(companyId);
-        return ReceiptGetAllResponse.builder()
-            .receiptList(receiptList)
             .build();
     }
 
