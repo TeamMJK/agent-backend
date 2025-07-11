@@ -60,14 +60,17 @@ jobs:
       runs-on: self-hosted
   
       steps:
-        # 1. 최신 이미지를 pull
+                # 1. 최신 이미지를 pull
         - name: docker pull
           run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mjk_agent
 
-        # 2. 기존 Spring Boot 컨테이너 중지
-        - name: docker stop container
-          run: sudo docker stop $(sudo docker ps -q) 2>/dev/null || true
+        # 2. 기존 Spring Boot 컨테이너 중지 (컨테이너 이름이 계속 바뀌는 경우)
+        - name: docker stop old container
+          run: |
+            sudo docker ps -a --filter "ancestor=${{ secrets.DOCKERHUB_USERNAME }}/mjk_agent" --format "{{.ID}}" | \
+              xargs -r sudo docker stop
 
+        # 3. Redis 컨테이너 확인 및 실행
         - name: ensure redis container exists
           run: |
             sudo docker ps -a --format '{{.Names}}' | grep -q '^redis$' || \
@@ -80,7 +83,7 @@ jobs:
               -p 8080:8080 \
               --network my-network \
               -e REDIS_HOST=redis \
-              y2jun/mjk_agent:latest
+              ${{ secrets.DOCKERHUB_USERNAME }}/mjk_agent:latest
 
         # 5. 미사용 이미지 정리
         - name: delete old docker image
