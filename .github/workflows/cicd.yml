@@ -41,7 +41,7 @@ jobs:
 
     # 3. Docker 이미지 빌드
     - name: docker image build
-      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/mjk_agent .
+      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/mjk_agent:latest .
 
     # 4. DockerHub 로그인
     - name: docker login
@@ -67,8 +67,9 @@ jobs:
         # 2. 기존 Spring Boot 컨테이너 중지 및 삭제
         - name: docker stop & remove old container
           run: |
-            sudo docker ps -a --filter "ancestor=y2jun/mjk_agent" --format "{{.ID}}" | \
+            sudo docker ps -a --filter "ancestor=y2jun/mjk_agent:latest" --format "{{.ID}}" | \
             xargs -r -I {} sudo sh -c 'docker stop {} && docker rm {}'
+
 
         # 3. Redis 컨테이너 확인 및 실행
         - name: ensure redis container exists
