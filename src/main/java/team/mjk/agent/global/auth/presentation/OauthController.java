@@ -1,10 +1,9 @@
-package team.mjk.agent.global.auth;
+package team.mjk.agent.global.auth.presentation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import team.mjk.agent.global.auth.presentation.OauthDocsController;
 
 @RequiredArgsConstructor
 @RequestMapping("/login")
