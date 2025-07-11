@@ -54,11 +54,9 @@ jobs:
       steps:
         - name: docker pull latest image
           run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mjk_agent:latest
-
-        - name: stop & remove old container
-          run: |
-            sudo docker ps -a --filter "ancestor=${{ secrets.DOCKERHUB_USERNAME }}/mjk_agent:latest" --format "{{.ID}}" | \
+            sudo docker ps -a --format "{{.ID}} {{.Ports}}" | grep '0.0.0.0:8080' | awk '{print $1}' | \
             xargs -r -I {} sudo sh -c 'docker stop {} && docker rm {}'
+
 
         - name: ensure redis container exists
           run: |
