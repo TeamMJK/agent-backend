@@ -59,7 +59,7 @@ jobs:
       needs: build-docker-image
       runs-on: self-hosted
   
-            steps:
+      steps:
         # 1. 최신 이미지를 pull
         - name: docker pull
           run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mjk_agent
