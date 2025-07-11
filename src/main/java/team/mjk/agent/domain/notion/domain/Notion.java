@@ -49,5 +49,9 @@ public class Notion {
         .build();
   }
 
+  public void update(String token, String databaseId) {
+    this.token = token;
+    this.databaseId = databaseId;
+  }
 
 }

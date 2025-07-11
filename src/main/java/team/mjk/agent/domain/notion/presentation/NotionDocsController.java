@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import team.mjk.agent.domain.notion.dto.request.NotionTokenRequest;
+import team.mjk.agent.domain.notion.dto.request.NotionTokenUpdateRequest;
 
 @Tag(name = "Notion", description = "노션 관련 API")
 @RequestMapping("/notions")
@@ -28,6 +29,19 @@ public interface NotionDocsController {
   ResponseEntity<Long> saveNotion(
       @Parameter(hidden = true) Long memberId,
       @RequestBody(description = "노션 등록 요청 DTO", required = true) NotionTokenRequest request
+  );
+
+  @Operation(summary = "노션 수정", description = "노션 api key 값과 databaseId 값을 수정합니다..")
+  @ApiResponses({
+      @ApiResponse(
+          responseCode = "200",
+          description = "노션 수정 성공",
+          content = @Content(mediaType = "application/json", schema = @Schema(implementation = Long.class))
+      )
+  })
+  ResponseEntity<Long> updateNotion(
+      @Parameter(hidden = true) Long memberId,
+      @RequestBody(description = "노션 수정 요청 DTO", required = true) NotionTokenUpdateRequest request
   );
 
 }

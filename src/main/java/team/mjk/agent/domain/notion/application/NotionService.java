@@ -11,6 +11,7 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
 import team.mjk.agent.domain.company.domain.Workspace;
 import team.mjk.agent.domain.member.domain.Member;
@@ -19,6 +20,7 @@ import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundExcepti
 import team.mjk.agent.domain.notion.domain.Notion;
 import team.mjk.agent.domain.notion.domain.NotionRepository;
 import team.mjk.agent.domain.notion.dto.request.NotionTokenRequest;
+import team.mjk.agent.domain.notion.dto.request.NotionTokenUpdateRequest;
 import team.mjk.agent.domain.notion.presentation.exception.NotionAPIException;
 import team.mjk.agent.global.mcp.McpService;
 import okhttp3.Request;
@@ -32,13 +34,24 @@ public class NotionService implements McpService {
   private final MemberRepository memberRepository;
   private final ObjectMapper objectMapper;
 
-  public Long saveInfo(Long memberId, NotionTokenRequest request) {
+  public Long save(Long memberId, NotionTokenRequest request) {
     Member member = memberRepository.findByMemberId(memberId)
         .orElseThrow(MemberNotFoundException::new);
     Long companyId = member.getCompany().getId();
 
     Notion notion = Notion.create(request.token(), request.databaseId(), companyId);
     notionRepository.save(notion);
+    return notion.getId();
+  }
+
+  @Transactional
+  public Long update(Long memberId, NotionTokenUpdateRequest request) {
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(MemberNotFoundException::new);
+    Long companyId = member.getCompany().getId();
+
+    Notion notion = notionRepository.findByCompanyId(companyId);
+    notion.update(request.token(),request.databaseId());
     return notion.getId();
   }
 
