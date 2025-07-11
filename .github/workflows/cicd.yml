@@ -64,15 +64,14 @@ jobs:
         - name: docker pull
           run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mjk_agent
 
-        # 2. Redis 컨테이너가 없으면 자동 실행
+        # 2. 기존 Spring Boot 컨테이너 중지
+        - name: docker stop container
+          run: sudo docker stop $(sudo docker ps -q) 2>/dev/null || true
+
         - name: ensure redis container exists
           run: |
             sudo docker ps -a --format '{{.Names}}' | grep -q '^redis$' || \
               sudo docker run -d --name redis --network my-network -p 6379:6379 -v redis-data:/data redis:latest
-
-        # 3. 기존 Spring Boot 컨테이너 중지
-        - name: docker stop container
-          run: sudo docker stop $(sudo docker ps -q) 2>/dev/null || true
 
         # 4. Spring Boot 컨테이너 실행
         - name: docker run new container
