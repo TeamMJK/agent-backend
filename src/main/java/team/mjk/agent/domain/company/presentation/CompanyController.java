@@ -3,6 +3,7 @@ package team.mjk.agent.domain.company.presentation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,8 +23,11 @@ public class CompanyController implements CompanyDocsController {
 
   private final CompanyService companyService;
 
-  public ResponseEntity<String> createInvitationCode(@PathVariable Long companyId) {
-    Invitation invitationCode = companyService.createInvitationCode(companyId);
+  @GetMapping("/invitation")
+  public ResponseEntity<String> createInvitationCode(
+      @MemberId Long memberId
+      ) {
+    Invitation invitationCode = companyService.createInvitationCode(memberId);
 
     return new ResponseEntity<>(invitationCode.getCode(), HttpStatus.CREATED);
   }

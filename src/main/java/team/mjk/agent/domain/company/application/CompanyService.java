@@ -25,7 +25,11 @@ public class CompanyService {
     private final CompanyRepository companyRepository;
     private final MemberRepository memberRepository;
 
-    public Invitation createInvitationCode(Long companyId) {
+    public Invitation createInvitationCode(Long memberId) {
+        Member member =  memberRepository.findByMemberId(memberId)
+            .orElseThrow(MemberNotFoundException::new);
+
+        Long companyId = member.getCompany().getId();
         // TODO: 커스텀 예외 처리 하세용
         if(companyRepository.findById(companyId).isEmpty()) {
             throw new CompanyNotFoundException();
