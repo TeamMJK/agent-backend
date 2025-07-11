@@ -20,61 +20,61 @@ import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundExcepti
 @Service
 public class CompanyService {
 
-    private final InvitationCodeProvider invitationCodeProvider;
-    private final InvitationRepository invitationRepository;
-    private final CompanyRepository companyRepository;
-    private final MemberRepository memberRepository;
+  private final InvitationCodeProvider invitationCodeProvider;
+  private final InvitationRepository invitationRepository;
+  private final CompanyRepository companyRepository;
+  private final MemberRepository memberRepository;
 
-    public Invitation createInvitationCode(Long memberId) {
-        Member member =  memberRepository.findByMemberId(memberId)
-            .orElseThrow(MemberNotFoundException::new);
+  public Invitation createInvitationCode(Long memberId) {
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(MemberNotFoundException::new);
 
-        Long companyId = member.getCompany().getId();
-        // TODO: 커스텀 예외 처리 하세용
-        if(companyRepository.findById(companyId).isEmpty()) {
-            throw new CompanyNotFoundException();
-        }
-
-        return invitationCodeProvider.create(companyId);
+    Long companyId = member.getCompany().getId();
+    // TODO: 커스텀 예외 처리 하세용
+    if (companyRepository.findById(companyId).isEmpty()) {
+      throw new CompanyNotFoundException();
     }
 
-    @Transactional
-    public Long create(CompanySaveRequest request, Long memberId) {
-        Member member = memberRepository.findByMemberId(memberId)
-            .orElseThrow(MemberNotFoundException::new);
+    return invitationCodeProvider.create(companyId);
+  }
 
-        Company company = new Company(request.name(), member.getName());
-        companyRepository.save(company);
-        member.saveCompany(company);
-        return company.getId();
-    }
+  @Transactional
+  public Long create(CompanySaveRequest request, Long memberId) {
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(MemberNotFoundException::new);
 
-    @Transactional
-    public String join(Long memberId, CompanyInvitationCodeRequest request) {
-        Member member = memberRepository.findByMemberId(memberId)
-            .orElseThrow(MemberNotFoundException::new);
+    Company company = Company.create(request.name(), member.getName(), request.workspace());
+    companyRepository.save(company);
+    member.saveCompany(company);
+    return company.getId();
+  }
 
-        Invitation invitation = invitationRepository.findByCode(request.invitationCode())
-            .orElseThrow(InvalidInvitationCode::new);
+  @Transactional
+  public String join(Long memberId, CompanyInvitationCodeRequest request) {
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(MemberNotFoundException::new);
 
-        Long companyId = invitation.getCompanyId();
+    Invitation invitation = invitationRepository.findByCode(request.invitationCode())
+        .orElseThrow(InvalidInvitationCode::new);
 
-        Company company = companyRepository.findById(companyId)
-            .orElseThrow(CompanyNotFoundException::new);
+    Long companyId = invitation.getCompanyId();
 
-        member.saveCompany(company);
+    Company company = companyRepository.findById(companyId)
+        .orElseThrow(CompanyNotFoundException::new);
 
-        invitationRepository.delete(invitation);
+    member.saveCompany(company);
 
-        return company.getName();
-    }
+    invitationRepository.delete(invitation);
 
-    @Transactional(readOnly = true)
-    public String getCompanyName(Long memberId) {
-        Member member = memberRepository.findByMemberId(memberId)
-            .orElseThrow(MemberNotFoundException::new);
+    return company.getName();
+  }
 
-        return member.getCompany().getName();
-    }
+  @Transactional(readOnly = true)
+  public String getCompanyName(Long memberId) {
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(MemberNotFoundException::new);
+
+    return member.getCompany().getName();
+  }
 
 }

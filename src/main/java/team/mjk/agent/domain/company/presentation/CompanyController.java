@@ -1,5 +1,6 @@
 package team.mjk.agent.domain.company.presentation;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,7 @@ public class CompanyController implements CompanyDocsController {
   @PostMapping
   public ResponseEntity<Long> createCompany(
       @MemberId Long memberId,
-      @RequestBody CompanySaveRequest request
+      @Valid @RequestBody CompanySaveRequest request
   ) {
     Long companyId = companyService.create(request, memberId);
 

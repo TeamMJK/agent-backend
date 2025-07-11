@@ -1,11 +1,15 @@
 package team.mjk.agent.domain.company.domain;
 
+import static jakarta.persistence.EnumType.STRING;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,22 +18,35 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Company {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String name;
+  @Column(unique = true, nullable = false)
+  private String name;
 
-    private String founder;
+  private String founder;
 
-    public Company(String name, String founder) {
-        this.name = name;
-        this.founder = founder;
-    }
+  @Enumerated(STRING)
+  private Workspace workspace;
 
-    public void updateName(String name) {
-        this.name = name;
-    }
+  @Builder
+  private Company(String name, String founder, Workspace workspace) {
+    this.name = name;
+    this.founder = founder;
+    this.workspace = workspace;
+  }
+
+  public static Company create(String name, String founder, Workspace workspace) {
+    return Company.builder()
+        .name(name)
+        .founder(founder)
+        .workspace(workspace)
+        .build();
+  }
+
+  public void updateName(String name) {
+    this.name = name;
+  }
 
 }
