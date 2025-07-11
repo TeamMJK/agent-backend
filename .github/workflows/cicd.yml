@@ -67,8 +67,8 @@ jobs:
         # 2. Redis 컨테이너가 없으면 자동 실행
         - name: ensure redis container exists
           run: |
-            docker ps -a --format '{{.Names}}' | grep -q '^redis$' || \
-              docker run -d --name redis --network my-network -p 6379:6379 -v redis-data:/data redis:latest
+            sudo docker ps -a --format '{{.Names}}' | grep -q '^redis$' || \
+              sudo docker run -d --name redis --network my-network -p 6379:6379 -v redis-data:/data redis:latest
 
         # 3. 기존 Spring Boot 컨테이너 중지
         - name: docker stop container
