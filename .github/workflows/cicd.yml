@@ -58,13 +58,11 @@ jobs:
   
       - name: stop & remove container using 8080 port (safe method)
         run: |
-          sudo docker ps -a --format "{{.ID}} {{.Ports}}" | grep '0.0.0.0:8080' | \
-          awk '{print $1}' | xargs -r -I {} sudo sh -c 'docker stop {} && docker rm {}'
+          sudo docker stop $(sudo docker ps -q) 2>/dev/null || true
   
       - name: ensure redis container exists
         run: |
-          sudo docker ps -a --format '{{.Names}}' | grep -q '^redis$' || \
-            sudo docker run -d --name redis --network my-network -p 6379:6379 -v redis-data:/data redis:latest
+          sudo docker run -d --name redis --network my-network -p 6379:6379 -v redis-data:/data redis:latest
   
       - name: run new container
         run: |
