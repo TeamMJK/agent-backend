@@ -55,22 +55,33 @@ jobs:
       - name: docker pull latest image
         run: |
           sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mjk_agent:latest
-  
-      - name: stop & remove container using 8080 port (safe method)
+    
+      - name: stop & remove all containers
         run: |
-          sudo docker stop $(sudo docker ps -q) 2>/dev/null || true
-  
-      - name: ensure redis container exists
-        run: |
-          sudo docker run -d --name redis --network my-network -p 6379:6379 -v redis-data:/data redis:latest
-  
-      - name: run new container
+          sudo docker ps -aq | xargs -r sudo docker stop
+          sudo docker ps -aq | xargs -r sudo docker rm
+    
+      - name: remove redis volume (optional)
+        run: sudo docker volume rm redis-data || true
+    
+      - name: run redis container
         run: |
           sudo docker run -d \
+            --name redis \
+            --network my-network \
+            -p 6379:6379 \
+            -v redis-data:/data \
+            redis:latest
+    
+      - name: run spring boot container
+        run: |
+          sudo docker run -d \
+            --name mjk_agent \
             -p 8080:8080 \
             --network my-network \
             -e REDIS_HOST=redis \
             ${{ secrets.DOCKERHUB_USERNAME }}/mjk_agent:latest
-  
-      - name: delete old docker image
+    
+      - name: prune unused docker data
         run: sudo docker system prune -f
+    
