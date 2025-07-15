@@ -35,7 +35,7 @@ public class TokenInjector {
         cookie.setHttpOnly(securityProperties.cookie().httpOnly());
         cookie.setDomain(securityProperties.cookie().domain());
         cookie.setSecure(securityProperties.cookie().secure());
-        cookie.setAttribute("SameSite", "Lax");
+        cookie.setAttribute("SameSite", "None");
 
         response.addCookie(cookie);
     }
@@ -47,7 +47,7 @@ public class TokenInjector {
         cookie.setHttpOnly(securityProperties.cookie().httpOnly());
         cookie.setDomain(securityProperties.cookie().domain());
         cookie.setSecure(securityProperties.cookie().secure());
-        cookie.setAttribute("SameSite", "Lax");
+        cookie.setAttribute("SameSite", "None");
 
         response.addCookie(cookie);
     }
