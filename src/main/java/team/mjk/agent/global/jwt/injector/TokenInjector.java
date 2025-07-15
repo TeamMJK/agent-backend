@@ -33,12 +33,7 @@ public class TokenInjector {
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);
         cookie.setHttpOnly(securityProperties.cookie().httpOnly());
-
-        String domain = securityProperties.cookie().domain();
-        if (domain != null && !domain.isBlank()) {
-            cookie.setDomain(domain);
-        }
-
+        cookie.setDomain(securityProperties.cookie().domain());
         cookie.setSecure(securityProperties.cookie().secure());
         cookie.setAttribute("SameSite", "None");
         response.addCookie(cookie);
