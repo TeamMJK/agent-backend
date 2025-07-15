@@ -82,8 +82,8 @@ public class SecurityConfig {
                     "http://localhost:8080",
                     "http://58.238.255.245:8080",
                     "https://www.mjk.o-r.kr",
-                    "http://localhost:3000",
-                    "https://d23wzggb08plfd.cloudfront.net"
+                    "https://d23wzggb08plfd.cloudfront.net",
+                    "http://localhost:3000"
             ));
             corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"));
             corsConfiguration.setAllowedHeaders(List.of("*"));
