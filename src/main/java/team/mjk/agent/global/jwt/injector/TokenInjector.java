@@ -41,10 +41,6 @@ public class TokenInjector {
 
         cookie.setSecure(securityProperties.cookie().secure());
         cookie.setAttribute("SameSite", "None");
-
-        log.info("Set-Cookie 헤더 추가 완료: name={}, domain={}, secure={}, httpOnly={}, maxAge={}, SameSite=None",
-                name, domain, securityProperties.cookie().secure(), securityProperties.cookie().httpOnly(), maxAge);
-
         response.addCookie(cookie);
     }
 
