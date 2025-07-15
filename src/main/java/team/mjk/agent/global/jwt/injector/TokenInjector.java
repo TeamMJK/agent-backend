@@ -24,11 +24,6 @@ public class TokenInjector {
         int accessTokenMaxAge = (int)tokenProperties.expirationTime().accessToken() + 5;
         int refreshTokenMaxAge = (int)tokenProperties.expirationTime().refreshToken() + 5;
 
-        log.info("Cookie domain: {}", securityProperties.cookie().domain());
-        log.info("Cookie secure: {}", securityProperties.cookie().secure());
-        log.info("Cookie httpOnly: {}", securityProperties.cookie().httpOnly());
-
-
         addCookie(ACCESS_TOKEN, result.accessToken(), accessTokenMaxAge, response);
         addCookie(REFRESH_TOKEN, result.refreshToken(), refreshTokenMaxAge, response);
     }
@@ -38,12 +33,21 @@ public class TokenInjector {
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);
         cookie.setHttpOnly(securityProperties.cookie().httpOnly());
-        cookie.setDomain(securityProperties.cookie().domain());
+
+        String domain = securityProperties.cookie().domain();
+        if (domain != null && !domain.isBlank()) {
+            cookie.setDomain(domain);
+        }
+
         cookie.setSecure(securityProperties.cookie().secure());
         cookie.setAttribute("SameSite", "None");
 
+        log.info("Set-Cookie 헤더 추가 완료: name={}, domain={}, secure={}, httpOnly={}, maxAge={}, SameSite=None",
+                name, domain, securityProperties.cookie().secure(), securityProperties.cookie().httpOnly(), maxAge);
+
         response.addCookie(cookie);
     }
+
 
     public void invalidateCookie(String name, HttpServletResponse response) {
         Cookie cookie = new Cookie(name, null);
