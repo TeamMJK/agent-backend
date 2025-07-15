@@ -24,6 +24,11 @@ public class TokenInjector {
         int accessTokenMaxAge = (int)tokenProperties.expirationTime().accessToken() + 5;
         int refreshTokenMaxAge = (int)tokenProperties.expirationTime().refreshToken() + 5;
 
+        log.info("Cookie domain: {}", securityProperties.cookie().domain());
+        log.info("Cookie secure: {}", securityProperties.cookie().secure());
+        log.info("Cookie httpOnly: {}", securityProperties.cookie().httpOnly());
+
+
         addCookie(ACCESS_TOKEN, result.accessToken(), accessTokenMaxAge, response);
         addCookie(REFRESH_TOKEN, result.refreshToken(), refreshTokenMaxAge, response);
     }
