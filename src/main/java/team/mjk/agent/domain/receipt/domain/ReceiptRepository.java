@@ -2,6 +2,7 @@ package team.mjk.agent.domain.receipt.domain;
 
 import java.util.List;
 import java.util.Optional;
+import team.mjk.agent.domain.company.domain.Company;
 
 public interface ReceiptRepository {
 
@@ -9,7 +10,7 @@ public interface ReceiptRepository {
 
     Receipt findByUrl(String url);
 
-    Receipt findByIdAndCompanyId(Long id, Long companyId);
+    Receipt findByIdAndCompany(Long id, Company company);
 
-    List<Receipt> findAllByCompanyId(Long companyId);
+    List<Receipt> findAllByCompany(Company company);
 }

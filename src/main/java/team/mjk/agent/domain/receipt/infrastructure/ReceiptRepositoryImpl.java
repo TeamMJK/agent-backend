@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.receipt.domain.Receipt;
 import team.mjk.agent.domain.receipt.domain.ReceiptRepository;
 import team.mjk.agent.domain.receipt.presentation.exception.ReceiptNotFoundExceptionCode;
@@ -27,14 +28,14 @@ public class ReceiptRepositoryImpl implements ReceiptRepository {
   }
 
   @Override
-  public Receipt findByIdAndCompanyId(Long id, Long companyId) {
-    return receiptJpaRepository.findByIdAndCompanyId(id, companyId)
+  public Receipt findByIdAndCompany(Long id, Company company) {
+    return receiptJpaRepository.findByIdAndCompany(id, company)
         .orElseThrow(ReceiptNotFoundExceptionCode::new);
   }
 
     @Override
-    public List<Receipt> findAllByCompanyId(Long companyId) {
-        return receiptJpaRepository.findAllByCompanyId(companyId);
+    public List<Receipt> findAllByCompany(Company company) {
+        return receiptJpaRepository.findAllByCompany(company);
     }
 
 

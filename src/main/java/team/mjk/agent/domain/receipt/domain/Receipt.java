@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.global.domain.BaseTimeEntity;
 
@@ -34,7 +35,9 @@ public class Receipt extends BaseTimeEntity {
 
     private String url;
 
-    private Long companyId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
+    private Company company;
 
     @Builder
     private Receipt(
@@ -44,7 +47,7 @@ public class Receipt extends BaseTimeEntity {
             String storeAddress,
             BigDecimal totalAmount,
             String url,
-            Long companyId
+            Company company
     ) {
         this.member = member;
         this.paymentDate = paymentDate;
@@ -52,7 +55,7 @@ public class Receipt extends BaseTimeEntity {
         this.storeAddress = storeAddress;
         this.totalAmount = totalAmount;
         this.url = url;
-        this.companyId = companyId;
+        this.company = company;
     }
 
 }

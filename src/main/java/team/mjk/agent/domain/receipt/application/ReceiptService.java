@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
@@ -55,7 +56,7 @@ public class ReceiptService {
                 .approvalNumber(request.approvalNumber())
                 .storeAddress(request.storeAddress())
                 .totalAmount(request.totalAmount())
-                .companyId(member.getCompany().getId())
+                .company(member.getCompany())
                 .build();
 
         receiptRepository.save(receipt);
@@ -103,9 +104,9 @@ public class ReceiptService {
         Member member = memberRepository.findByMemberId(memberId)
                 .orElseThrow(MemberNotFoundException::new);
 
-        Long companyId = member.getCompany().getId();
+        Company company = member.getCompany();
 
-        List<Receipt> receiptList = receiptRepository.findAllByCompanyId(companyId);
+        List<Receipt> receiptList = receiptRepository.findAllByCompany(company);
 
         return receiptList.stream()
                 .map(receipt -> ReceiptGetResponse.builder()
@@ -176,9 +177,9 @@ public class ReceiptService {
         Member member = memberRepository.findByMemberId(memberId)
             .orElseThrow(MemberNotFoundException::new);
 
-        Long companyId = member.getCompany().getId();
+        Company company = member.getCompany();
 
-        Receipt receipt = receiptRepository.findByIdAndCompanyId(receiptId,companyId);
+        Receipt receipt = receiptRepository.findByIdAndCompany(receiptId,company);
         return ReceiptGetResponse.builder()
             .approvalNumber(receipt.getApprovalNumber())
             .paymentDate(receipt.getPaymentDate())
