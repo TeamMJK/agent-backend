@@ -65,5 +65,13 @@ public class ReceiptController implements ReceiptDocsController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/{receiptId}")
+    public ResponseEntity<Void> deleteReceipt(
+            @MemberId Long memberId,
+            @PathVariable Long receiptId
+    ) {
+        receiptService.deleteReceipt(memberId,receiptId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 
 }

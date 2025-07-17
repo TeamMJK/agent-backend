@@ -118,6 +118,16 @@ public class ReceiptService {
                 .toList();
     }
 
+    @Transactional
+    public void deleteReceipt(Long memberId, Long receiptId) {
+        Receipt receipt = receiptRepository.findByReceiptId(receiptId);
+
+        Long receiptMemberId = receipt.getMember().getId();
+        validateForbidden(memberId, receiptMemberId);
+
+        receiptRepository.delete(receipt);
+    }
+
     private String uploadImage(MultipartFile image) {
         this.validateImageFileExtension(image.getOriginalFilename());
         try {

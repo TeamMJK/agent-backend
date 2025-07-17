@@ -86,4 +86,15 @@ public interface ReceiptDocsController {
             @Parameter(hidden = true) Long memberId
     );
 
+    @Operation(summary = "영수증 삭제", description = "특정 영수증을 삭제합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "영수증 또는 회원을 찾을 수 없음")
+    })
+    ResponseEntity<Void> deleteReceipt(
+            @Parameter(hidden = true) Long memberId,
+            @Parameter(description = "삭제할 영수증 ID", required = true) Long receiptId
+    );
+
+
 }

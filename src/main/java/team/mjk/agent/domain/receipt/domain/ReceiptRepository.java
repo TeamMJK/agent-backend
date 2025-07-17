@@ -13,4 +13,9 @@ public interface ReceiptRepository {
     Receipt findByIdAndCompany(Long id, Company company);
 
     List<Receipt> findAllByCompany(Company company);
+
+    void delete(Receipt receipt);
+
+    Receipt findByReceiptId(Long receiptId);
+
 }
