@@ -8,10 +8,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import team.mjk.agent.domain.receipt.application.ReceiptService;
 import team.mjk.agent.domain.receipt.dto.request.ReceiptSaveRequest;
-import team.mjk.agent.domain.receipt.dto.response.ReceiptGetAllResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptGetResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptSaveResponse;
 import team.mjk.agent.global.annotation.MemberId;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RequestMapping("/receipts")
@@ -57,11 +58,12 @@ public class ReceiptController implements ReceiptDocsController {
     }
 
     @GetMapping
-    public ResponseEntity<ReceiptGetAllResponse> getAllReceipt(
-        @MemberId Long memberId
+    public ResponseEntity<List<ReceiptGetResponse>> getAllReceipt(
+            @MemberId Long memberId
     ) {
-        ReceiptGetAllResponse response = receiptService.getAllReceipt(memberId);
-        return new ResponseEntity<>(response,HttpStatus.OK);
+        List<ReceiptGetResponse> response = receiptService.getAllReceipt(memberId);
+        return ResponseEntity.ok(response);
     }
+
 
 }

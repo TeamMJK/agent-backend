@@ -12,9 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 import team.mjk.agent.domain.receipt.dto.request.ReceiptSaveRequest;
-import team.mjk.agent.domain.receipt.dto.response.ReceiptGetAllResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptGetResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptSaveResponse;
+
+import java.util.List;
 
 @Tag(name = "Receipt", description = "영수증 관련 API")
 public interface ReceiptDocsController {
@@ -77,11 +78,11 @@ public interface ReceiptDocsController {
                     description = "조회 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ReceiptGetAllResponse.class)
+                            schema = @Schema(implementation = ReceiptGetResponse.class)
                     )
             )
     })
-    ResponseEntity<ReceiptGetAllResponse> getAllReceipt(
+    ResponseEntity<List<ReceiptGetResponse>> getAllReceipt(
             @Parameter(hidden = true) Long memberId
     );
 

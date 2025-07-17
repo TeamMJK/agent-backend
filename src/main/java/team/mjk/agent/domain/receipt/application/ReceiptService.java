@@ -17,7 +17,6 @@ import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundExcepti
 import team.mjk.agent.domain.receipt.domain.Receipt;
 import team.mjk.agent.domain.receipt.domain.ReceiptRepository;
 import team.mjk.agent.domain.receipt.dto.request.ReceiptSaveRequest;
-import team.mjk.agent.domain.receipt.dto.response.ReceiptGetAllResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptGetResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptSaveResponse;
 import team.mjk.agent.domain.receipt.presentation.exception.*;
@@ -100,16 +99,22 @@ public class ReceiptService {
     }
 
     @Transactional(readOnly = true)
-    public ReceiptGetAllResponse getAllReceipt(Long memberId) {
+    public List<ReceiptGetResponse> getAllReceipt(Long memberId) {
         Member member = memberRepository.findByMemberId(memberId)
                 .orElseThrow(MemberNotFoundException::new);
 
         Long companyId = member.getCompany().getId();
 
         List<Receipt> receiptList = receiptRepository.findAllByCompanyId(companyId);
-        return ReceiptGetAllResponse.builder()
-                .receiptList(receiptList)
-                .build();
+
+        return receiptList.stream()
+                .map(receipt -> ReceiptGetResponse.builder()
+                        .approvalNumber(receipt.getApprovalNumber())
+                        .paymentDate(receipt.getPaymentDate())
+                        .storeAddress(receipt.getStoreAddress())
+                        .totalAmount(receipt.getTotalAmount())
+                        .build())
+                .toList();
     }
 
     private String uploadImage(MultipartFile image) {
