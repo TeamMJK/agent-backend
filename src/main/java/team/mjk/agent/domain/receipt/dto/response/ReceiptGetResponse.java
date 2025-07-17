@@ -6,6 +6,9 @@ import lombok.Builder;
 
 @Builder
 public record ReceiptGetResponse(
+
+    Long receiptId,
+
     LocalDate paymentDate,
 
     String approvalNumber,

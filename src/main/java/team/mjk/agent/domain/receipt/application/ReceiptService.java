@@ -70,7 +70,7 @@ public class ReceiptService {
     public String upload(Long memberId, MultipartFile image) {
         Member member = memberRepository.findByMemberId(memberId)
                 .orElseThrow(MemberNotFoundException::new);
-        if(image.isEmpty() || Objects.isNull(image.getOriginalFilename())) {
+        if (image.isEmpty() || Objects.isNull(image.getOriginalFilename())) {
             throw new EmptyFileExceptionCode();
         }
         String imageUrl = this.uploadImage(image);
@@ -110,6 +110,7 @@ public class ReceiptService {
 
         return receiptList.stream()
                 .map(receipt -> ReceiptGetResponse.builder()
+                        .receiptId(receipt.getId())
                         .approvalNumber(receipt.getApprovalNumber())
                         .paymentDate(receipt.getPaymentDate())
                         .storeAddress(receipt.getStoreAddress())
@@ -185,17 +186,18 @@ public class ReceiptService {
     @Transactional(readOnly = true)
     public ReceiptGetResponse getReceipt(Long memberId, Long receiptId) {
         Member member = memberRepository.findByMemberId(memberId)
-            .orElseThrow(MemberNotFoundException::new);
+                .orElseThrow(MemberNotFoundException::new);
 
         Company company = member.getCompany();
 
-        Receipt receipt = receiptRepository.findByIdAndCompany(receiptId,company);
+        Receipt receipt = receiptRepository.findByIdAndCompany(receiptId, company);
         return ReceiptGetResponse.builder()
-            .approvalNumber(receipt.getApprovalNumber())
-            .paymentDate(receipt.getPaymentDate())
-            .storeAddress(receipt.getStoreAddress())
-            .totalAmount(receipt.getTotalAmount())
-            .build();
+                .receiptId(receipt.getId())
+                .approvalNumber(receipt.getApprovalNumber())
+                .paymentDate(receipt.getPaymentDate())
+                .storeAddress(receipt.getStoreAddress())
+                .totalAmount(receipt.getTotalAmount())
+                .build();
     }
 
     private String getKeyFromImageAddress(String imageAddress) {
