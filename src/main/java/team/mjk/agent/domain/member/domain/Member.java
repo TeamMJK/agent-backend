@@ -13,6 +13,7 @@ import team.mjk.agent.domain.member.presentation.exception.EmailOrPasswordNotInv
 import team.mjk.agent.domain.passport.domain.Passport;
 import team.mjk.agent.global.auth.application.dto.AuthAttributes;
 import team.mjk.agent.global.domain.BaseTimeEntity;
+import team.mjk.agent.global.util.KmsUtil;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -24,118 +25,124 @@ import static jakarta.persistence.EnumType.STRING;
 @Entity
 public class Member extends BaseTimeEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @Column(nullable = false)
-  private String email;
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String email;
 
-  private String password;
+    private String password;
 
-  private String name;
+    @Column(columnDefinition = "TEXT")
+    private String name;
 
-  private String firstName;
+    @Column(columnDefinition = "TEXT")
+    private String firstName;
 
-  private String lastName;
+    @Column(columnDefinition = "TEXT")
+    private String lastName;
 
-  private String phoneNumber;
+    @Column(columnDefinition = "TEXT")
+    private String phoneNumber;
 
-  @Enumerated(STRING)
-  private Gender gender;
+    @Enumerated(STRING)
+    @Column(columnDefinition = "TEXT")
+    private Gender gender;
 
-  private LocalDate birthDate;
+    @Column(columnDefinition = "TEXT")
+    private String birthDate;
 
-  private String externalId;
+    private String externalId;
 
-  @Enumerated(STRING)
-  private LoginProvider loginProvider;
+    @Enumerated(STRING)
+    private LoginProvider loginProvider;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "company_id")
-  private Company company;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
+    private Company company;
 
-  @OneToOne
-  @JoinColumn(name = "passport_id", unique = true)
-  private Passport passport;
+    @OneToOne
+    @JoinColumn(name = "passport_id", unique = true)
+    private Passport passport;
 
-  @Builder
-  private Member(String email, String password, String externalId, LoginProvider loginProvider) {
-    this.email = email;
-    this.password = password;
-    this.externalId = externalId;
-    this.loginProvider = loginProvider;
-  }
-
-  public void checkPassword(PasswordEncoder passwordEncoder, String password) {
-    if (!passwordEncoder.matches(password, this.password)) {
-      throw new EmailOrPasswordNotInvalidException();
+    @Builder
+    private Member(String email, String password, String externalId, LoginProvider loginProvider) {
+        this.email = email;
+        this.password = password;
+        this.externalId = externalId;
+        this.loginProvider = loginProvider;
     }
-  }
 
-  public static Member from(AuthAttributes authAttributes) {
-    return Member.builder()
-        .email(authAttributes.getEmail())
-        .externalId(authAttributes.getExternalId())
-        .loginProvider(authAttributes.getProvider())
-        .build();
-  }
+    public void checkPassword(PasswordEncoder passwordEncoder, String password) {
+        if (!passwordEncoder.matches(password, this.password)) {
+            throw new EmailOrPasswordNotInvalidException();
+        }
+    }
 
-  public boolean hasDifferentProviderWithEmail(String email, String externalId) {
-    return Objects.equals(this.email, email) && !Objects.equals(this.externalId, externalId);
-  }
+    public static Member from(AuthAttributes authAttributes) {
+        return Member.builder()
+                .email(authAttributes.getEmail())
+                .externalId(authAttributes.getExternalId())
+                .loginProvider(authAttributes.getProvider())
+                .build();
+    }
 
-  //정적 메서드로 뺄 수 있을듯?
+    public boolean hasDifferentProviderWithEmail(String email, String externalId) {
+        return Objects.equals(this.email, email) && !Objects.equals(this.externalId, externalId);
+    }
+
+    //정적 메서드로 뺄 수 있을듯?
     /*
     public static
 
     * */
-  public void saveMemberInfo(
-      String name,
-      String firstName,
-      String lastName,
-      String phoneNumber,
-      Gender gender,
-      LocalDate birthDate
-  ) {
-    this.name = name;
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.phoneNumber = phoneNumber;
-    this.gender = gender;
-    this.birthDate = birthDate;
-  }
+    public void saveMemberInfo(
+            String name,
+            String firstName,
+            String lastName,
+            String phoneNumber,
+            Gender gender,
+            String birthDate
+    ) {
+        this.name = name;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phoneNumber = phoneNumber;
+        this.gender = gender;
+        this.birthDate = birthDate;
+    }
 
-  public void savePassport(Passport passport) {
-    this.passport = passport;
-  }
+    public void savePassport(Passport passport) {
+        this.passport = passport;
+    }
 
-  public void saveCompany(Company company) {
-    this.company = company;
-  }
+    public void saveCompany(Company company) {
+        this.company = company;
+    }
 
-  public void update(MemberInfoUpdateRequest request) {
-    this.name = request.name();
-    this.firstName = request.firstName();
-    this.lastName = request.lastName();
-    this.phoneNumber = request.phoneNumber();
-    this.gender = Gender.valueOf(request.gender());
-    this.birthDate = request.birthDate();
-    this.passport.update(request.passportNumber(), request.passportExpireDate());
-  }
+    public void update(MemberInfoUpdateRequest request) {
+        this.name = request.name();
+        this.firstName = request.firstName();
+        this.lastName = request.lastName();
+        this.phoneNumber = request.phoneNumber();
+        this.gender = Gender.valueOf(request.gender());
+        this.birthDate = request.birthDate();
+        this.passport.update(request.passportNumber(), request.passportExpireDate());
+    }
 
-  public static MemberInfoGetResponse toMemberInfoGetResponse(Member member) {
-    return MemberInfoGetResponse.builder()
-        .name(member.getName())
-        .firstName(member.getFirstName())
-        .email(member.getEmail())
-        .lastName(member.getLastName())
-        .phoneNumber(member.getPhoneNumber())
-        .gender(String.valueOf(member.getGender()))
-        .birthDate(member.getBirthDate())
-        .passportNumber(member.getPassport().getPassportNumber())
-        .passportExpireDate(member.getPassport().getPassportExpireDate())
-        .build();
-  }
+    public static MemberInfoGetResponse toMemberInfoGetResponse(Member member, KmsUtil kmsUtil) {
+        return MemberInfoGetResponse.builder()
+                .name(kmsUtil.decrypt(member.getName()))
+                .firstName(kmsUtil.decrypt(member.getFirstName()))
+                .email(member.getEmail())
+                .lastName(kmsUtil.decrypt(member.getLastName()))
+                .phoneNumber(kmsUtil.decrypt(member.getPhoneNumber()))
+                .gender(String.valueOf(member.getGender()))
+                .birthDate(kmsUtil.decrypt(member.getBirthDate()))
+                .passportNumber(kmsUtil.decrypt(member.getPassport().getPassportNumber()))
+                .passportExpireDate(kmsUtil.decrypt(member.getPassport().getPassportExpireDate()))
+                .build();
+    }
 
 }

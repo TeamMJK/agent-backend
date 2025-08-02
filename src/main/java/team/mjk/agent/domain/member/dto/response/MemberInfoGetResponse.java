@@ -11,10 +11,10 @@ public record MemberInfoGetResponse(
     String lastName,
     String phoneNumber,
     String gender,
-    LocalDate birthDate,
+    String birthDate,
 
     String passportNumber,
-    LocalDate passportExpireDate
+    String passportExpireDate
 ) {
 
 }
