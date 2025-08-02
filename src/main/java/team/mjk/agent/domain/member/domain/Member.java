@@ -120,17 +120,29 @@ public class Member extends BaseTimeEntity {
         this.company = company;
     }
 
-    public void update(MemberInfoUpdateRequest request) {
-        this.name = request.name();
-        this.firstName = request.firstName();
-        this.lastName = request.lastName();
-        this.phoneNumber = request.phoneNumber();
-        this.gender = Gender.valueOf(request.gender());
-        this.birthDate = request.birthDate();
-        this.passport.update(request.passportNumber(), request.passportExpireDate());
-    }
+  public void update(MemberInfoUpdateRequest request, KmsUtil kmsUtil) {
+    String encryptName = kmsUtil.encrypt(request.name());
+    String encryptFirstName = kmsUtil.encrypt(request.firstName());
+    String encryptLastName = kmsUtil.encrypt(request.lastName());
+    String encryptPhoneNumber = kmsUtil.encrypt(request.phoneNumber());
+    String encryptBirthDate = kmsUtil.encrypt(request.birthDate());
+    String encryptedPassportNumber = kmsUtil.encrypt(request.passportNumber());
+    String encryptedPassportExpireDate = kmsUtil.encrypt(request.passportExpireDate());
 
-    public static MemberInfoGetResponse toMemberInfoGetResponse(Member member, KmsUtil kmsUtil) {
+    this.name = encryptName;
+    this.firstName = encryptFirstName;
+    this.lastName = encryptLastName;
+    this.phoneNumber = encryptPhoneNumber;
+    this.gender = Gender.valueOf(request.gender());
+    this.birthDate = encryptBirthDate;
+
+    this.passport.update(
+            encryptedPassportNumber,
+            encryptedPassportExpireDate
+    );
+  }
+
+  public static MemberInfoGetResponse toMemberInfoGetResponse(Member member, KmsUtil kmsUtil) {
         return MemberInfoGetResponse.builder()
                 .name(kmsUtil.decrypt(member.getName()))
                 .firstName(kmsUtil.decrypt(member.getFirstName()))

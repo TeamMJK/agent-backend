@@ -29,5 +29,6 @@ public record MemberInfoUpdateRequest(
 
     @NotNull(message = "여권 만료일을 선택해주세요.")
     String passportExpireDate
+
 ) {
 }
