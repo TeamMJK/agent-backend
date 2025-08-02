@@ -87,7 +87,7 @@ public class MemberService {
         Member member = memberRepository.findByMemberId(memberId)
                 .orElseThrow(MemberNotFoundException::new);
 
-        member.update(request);
+        member.update(request, kmsUtil);
 
         return MemberInfoUpdateResponse.builder()
                 .memberId(member.getId())
