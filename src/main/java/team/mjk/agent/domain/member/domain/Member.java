@@ -47,7 +47,6 @@ public class Member extends BaseTimeEntity {
     private String phoneNumber;
 
     @Enumerated(STRING)
-    @Column(columnDefinition = "TEXT")
     private Gender gender;
 
     @Column(columnDefinition = "TEXT")
