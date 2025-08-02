@@ -22,12 +22,12 @@ public record MemberInfoUpdateRequest(
     String gender,
 
     @NotNull(message = "생일을 선택해주세요.")
-    LocalDate birthDate,
+    String birthDate,
 
     @NotBlank(message = "여권 번호를 입력해주세요.")
     String passportNumber,
 
     @NotNull(message = "여권 만료일을 선택해주세요.")
-    LocalDate passportExpireDate
+    String passportExpireDate
 ) {
 }

@@ -1,9 +1,7 @@
 package team.mjk.agent.domain.passport.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -19,17 +17,19 @@ public class Passport {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(columnDefinition = "TEXT")
   private String passportNumber;
 
-  private LocalDate passportExpireDate;
+  @Column(columnDefinition = "TEXT")
+  private String passportExpireDate;
 
   @Builder
-  private Passport(String passportNumber, LocalDate passportExpireDate) {
+  private Passport(String passportNumber, String passportExpireDate) {
     this.passportNumber = passportNumber;
     this.passportExpireDate = passportExpireDate;
   }
 
-  public void update(String passportNumber, LocalDate passportExpireDate) {
+  public void update(String passportNumber, String passportExpireDate) {
     if (passportNumber != null) {
       this.passportNumber = passportNumber;
     }
@@ -38,7 +38,7 @@ public class Passport {
     }
   }
 
-  public static Passport create(String passportNumber, LocalDate passportExpireDate) {
+  public static Passport create(String passportNumber, String passportExpireDate) {
     return Passport.builder()
         .passportNumber(passportNumber)
         .passportExpireDate(passportExpireDate)

@@ -1,16 +1,15 @@
 package team.mjk.agent.domain.receipt.application;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.util.IOUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Utilities;
+import software.amazon.awssdk.services.s3.model.*;
+
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
@@ -22,7 +21,6 @@ import team.mjk.agent.domain.receipt.dto.response.ReceiptGetResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptSaveResponse;
 import team.mjk.agent.domain.receipt.presentation.exception.*;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -36,7 +34,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Service
 public class ReceiptService {
 
-    private final AmazonS3 amazonS3;
+    private final S3Client s3Client;
     private final ReceiptRepository receiptRepository;
     private final MemberRepository memberRepository;
 
@@ -93,7 +91,10 @@ public class ReceiptService {
 
         String key = getKeyFromImageAddress(imageAddress);
         try {
-            amazonS3.deleteObject(new DeleteObjectRequest(bucketName, key));
+            s3Client.deleteObject(DeleteObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build());
         } catch (Exception e) {
             throw new OnImageDeleteExceptionCode();
         }
@@ -157,30 +158,41 @@ public class ReceiptService {
 
     private String uploadImageToS3(MultipartFile image) throws IOException {
         String originalFilename = image.getOriginalFilename();
-        String extension = Objects.requireNonNull(originalFilename).substring(originalFilename.lastIndexOf("."));
+        String extension = Objects.requireNonNull(originalFilename)
+                .substring(originalFilename.lastIndexOf(".") + 1)
+                .toLowerCase();
 
-        String s3FileName = UUID.randomUUID().toString().substring(0, 10) + originalFilename;
+        String s3FileName = UUID.randomUUID().toString().substring(0, 10) + "_" +
+                originalFilename.replaceAll("[^a-zA-Z0-9._-]", "_");
 
-        InputStream is = image.getInputStream();
-        byte[] bytes = IOUtils.toByteArray(is);
+        try (InputStream is = image.getInputStream()) {
+            String contentType = "image/" + extension;
+            long contentLength = image.getSize();
 
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType("image/" + extension);
-        metadata.setContentLength(bytes.length);
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(s3FileName)
+                    .contentType(contentType)
+                    .build();
 
-        try {
-            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, s3FileName, byteArrayInputStream, metadata)
-                    .withCannedAcl(CannedAccessControlList.PublicRead);
-            amazonS3.putObject(putObjectRequest);
+            s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(is, contentLength));
         } catch (Exception e) {
             throw new PutObjectExceptionCode();
-        } finally {
-            byteArrayInputStream.close();
-            is.close();
         }
 
-        return amazonS3.getUrl(bucketName, s3FileName).toString();
+        return getS3ObjectUrl(bucketName, s3FileName);
+    }
+
+
+    private String getS3ObjectUrl(String bucketName, String key) {
+        S3Utilities utilities = s3Client.utilities();
+
+        GetUrlRequest request = GetUrlRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .build();
+
+        return utilities.getUrl(request).toString();
     }
 
     @Transactional(readOnly = true)

@@ -3,8 +3,6 @@ package team.mjk.agent.domain.member.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDate;
-
 public record MemberInfoSaveRequest(
 
         @NotBlank(message = "이름을 입력해주세요.")
@@ -23,12 +21,12 @@ public record MemberInfoSaveRequest(
         String gender,
 
         @NotNull(message = "생일을 선택해주세요.")
-        LocalDate birthDate,
+        String birthDate,
 
         @NotBlank(message = "여권 번호를 입력해주세요.")
         String passportNumber,
 
         @NotNull(message = "여권 만료일을 선택해주세요.")
-        LocalDate passportExpireDate
+        String passportExpireDate
 ) {
 }
