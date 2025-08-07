@@ -79,11 +79,9 @@ public class SecurityConfig {
         httpSecurity.cors(cors -> cors.configurationSource(request -> {
             var corsConfiguration = new CorsConfiguration();
             corsConfiguration.setAllowedOrigins(List.of(
-                    "http://localhost:8080",
-                    "http://58.238.255.245:8080",
-                    "https://www.mjk.o-r.kr",
-                    "https://d23wzggb08plfd.cloudfront.net",
-                    "http://localhost:3000"
+                    "https://mjk.ai.kr",
+                    "https://mjk.ai.kr/api"
+
             ));
             corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"));
             corsConfiguration.setAllowedHeaders(List.of("*"));
