@@ -120,29 +120,29 @@ public class Member extends BaseTimeEntity {
         this.company = company;
     }
 
-  public void update(MemberInfoUpdateRequest request, KmsUtil kmsUtil) {
-    String encryptName = kmsUtil.encrypt(request.name());
-    String encryptFirstName = kmsUtil.encrypt(request.firstName());
-    String encryptLastName = kmsUtil.encrypt(request.lastName());
-    String encryptPhoneNumber = kmsUtil.encrypt(request.phoneNumber());
-    String encryptBirthDate = kmsUtil.encrypt(request.birthDate());
-    String encryptedPassportNumber = kmsUtil.encrypt(request.passportNumber());
-    String encryptedPassportExpireDate = kmsUtil.encrypt(request.passportExpireDate());
+    public void update(MemberInfoUpdateRequest request, KmsUtil kmsUtil) {
+        String encryptName = kmsUtil.encrypt(request.name());
+        String encryptFirstName = kmsUtil.encrypt(request.firstName());
+        String encryptLastName = kmsUtil.encrypt(request.lastName());
+        String encryptPhoneNumber = kmsUtil.encrypt(request.phoneNumber());
+        String encryptBirthDate = kmsUtil.encrypt(request.birthDate());
+        String encryptedPassportNumber = kmsUtil.encrypt(request.passportNumber());
+        String encryptedPassportExpireDate = kmsUtil.encrypt(request.passportExpireDate());
 
-    this.name = encryptName;
-    this.firstName = encryptFirstName;
-    this.lastName = encryptLastName;
-    this.phoneNumber = encryptPhoneNumber;
-    this.gender = Gender.valueOf(request.gender());
-    this.birthDate = encryptBirthDate;
+        this.name = encryptName;
+        this.firstName = encryptFirstName;
+        this.lastName = encryptLastName;
+        this.phoneNumber = encryptPhoneNumber;
+        this.gender = Gender.valueOf(request.gender());
+        this.birthDate = encryptBirthDate;
 
-    this.passport.update(
-            encryptedPassportNumber,
-            encryptedPassportExpireDate
-    );
-  }
+        this.passport.update(
+                encryptedPassportNumber,
+                encryptedPassportExpireDate
+        );
+    }
 
-  public static MemberInfoGetResponse toMemberInfoGetResponse(Member member, KmsUtil kmsUtil) {
+    public static MemberInfoGetResponse toMemberInfoGetResponse(Member member, KmsUtil kmsUtil) {
         return MemberInfoGetResponse.builder()
                 .name(kmsUtil.decrypt(member.getName()))
                 .firstName(kmsUtil.decrypt(member.getFirstName()))
