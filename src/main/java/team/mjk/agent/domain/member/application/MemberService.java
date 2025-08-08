@@ -24,80 +24,82 @@ import team.mjk.agent.global.util.KmsUtil;
 @Service
 public class MemberService {
 
-    private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final PassportRepository passportRepository;
-    private final KmsUtil kmsUtil;
+  private final MemberRepository memberRepository;
+  private final PasswordEncoder passwordEncoder;
+  private final PassportRepository passportRepository;
+  private final KmsUtil kmsUtil;
 
-    public MemberSaveResponse signUp(MemberSaveRequest request) {
-        validateEmail(request.email());
+  public MemberSaveResponse signUp(MemberSaveRequest request) {
+    validateEmail(request.email());
 
-        Member member = Member.builder()
-                .email(request.email())
-                .password(passwordEncoder.encode(request.password()))
-                .build();
-        memberRepository.save(member);
+    Member member = Member.builder()
+        .email(request.email())
+        .password(passwordEncoder.encode(request.password()))
+        .build();
+    memberRepository.save(member);
 
-        return MemberSaveResponse.builder()
-                .memberId(member.getId())
-                .build();
+    return MemberSaveResponse.builder()
+        .memberId(member.getId())
+        .build();
+  }
+
+  @Transactional
+  public MemberInfoSaveResponse saveMemberInfo(Long memberId, MemberInfoSaveRequest request) {
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(MemberNotFoundException::new);
+
+    String encryptName = kmsUtil.encrypt(request.name());
+    String encryptFirstName = kmsUtil.encrypt(request.firstName());
+    String encryptLastName = kmsUtil.encrypt(request.lastName());
+    String encryptPhoneNumber = kmsUtil.encrypt(request.phoneNumber());
+    String encryptBirthDate = kmsUtil.encrypt(request.birthDate());
+    String encryptPassportNumber = kmsUtil.encrypt(request.passportNumber());
+    String encryptPassportExpireDate = kmsUtil.encrypt(request.passportExpireDate());
+
+    member.saveMemberInfo(
+        encryptName,
+        encryptFirstName,
+        encryptLastName,
+        encryptPhoneNumber,
+        Gender.valueOf(request.gender()),
+        encryptBirthDate
+    );
+
+    Passport passport = Passport.create(
+        encryptPassportNumber,
+        encryptPassportExpireDate
+    );
+    passportRepository.save(passport);
+
+    member.savePassport(passport);
+    return MemberInfoSaveResponse.builder()
+        .memberId(member.getId())
+        .build();
+  }
+
+  public MemberInfoGetResponse getMemberInfo(Long memberId) {
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(MemberNotFoundException::new);
+
+    return Member.toMemberInfoGetResponse(member, kmsUtil);
+  }
+
+  @Transactional
+  public MemberInfoUpdateResponse updateMemberInfo(Long memberId, MemberInfoUpdateRequest request) {
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(MemberNotFoundException::new);
+
+    member.update(request, kmsUtil);
+
+    return MemberInfoUpdateResponse.builder()
+        .memberId(member.getId())
+        .build();
+  }
+
+  private void validateEmail(String email) {
+    if (memberRepository.existsByEmail(email)) {
+      throw new EmailAlreadyExistsException();
     }
-
-    @Transactional
-    public MemberInfoSaveResponse saveMemberInfo(Long memberId, MemberInfoSaveRequest request) {
-        Member member = memberRepository.findByMemberId(memberId)
-                .orElseThrow(MemberNotFoundException::new);
-
-        String encryptName = kmsUtil.encrypt(request.name());
-        String encryptFirstName = kmsUtil.encrypt(request.firstName());
-        String encryptLastName = kmsUtil.encrypt(request.lastName());
-        String encryptPhoneNumber = kmsUtil.encrypt(request.phoneNumber());
-        String encryptBirthDate = kmsUtil.encrypt(request.birthDate());
-
-        member.saveMemberInfo(
-                encryptName,
-                encryptFirstName,
-                encryptLastName,
-                encryptPhoneNumber,
-                Gender.valueOf(request.gender()),
-                encryptBirthDate
-        );
-
-        Passport passport = Passport.create(
-                request.passportNumber(),
-                request.passportExpireDate()
-        );
-        passportRepository.save(passport);
-
-        member.savePassport(passport);
-        return MemberInfoSaveResponse.builder()
-                .memberId(member.getId())
-                .build();
-    }
-
-    public MemberInfoGetResponse getMemberInfo(Long memberId) {
-        Member member = memberRepository.findByMemberId(memberId)
-                .orElseThrow(MemberNotFoundException::new);
-
-        return Member.toMemberInfoGetResponse(member, kmsUtil);
-    }
-
-    @Transactional
-    public MemberInfoUpdateResponse updateMemberInfo(Long memberId, MemberInfoUpdateRequest request) {
-        Member member = memberRepository.findByMemberId(memberId)
-                .orElseThrow(MemberNotFoundException::new);
-
-        member.update(request, kmsUtil);
-
-        return MemberInfoUpdateResponse.builder()
-                .memberId(member.getId())
-                .build();
-    }
-
-    private void validateEmail(String email) {
-        if (memberRepository.existsByEmail(email)) {
-            throw new EmailAlreadyExistsException();
-        }
-    }
+  }
 
 }

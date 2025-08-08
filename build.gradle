@@ -23,10 +23,15 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    set('springAiVersion', "1.0.0-M6")
+}
+
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:2022.0.3"
         mavenBom "software.amazon.awssdk:bom:2.27.21"
+        mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
     }
 }
 
@@ -64,6 +69,10 @@ dependencies {
 
     // OkHttp
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+
+    implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
+    implementation 'org.springframework.retry:spring-retry:2.0.11'
+
 }
 
 

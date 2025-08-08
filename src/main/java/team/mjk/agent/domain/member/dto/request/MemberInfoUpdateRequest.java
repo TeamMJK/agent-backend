@@ -24,10 +24,8 @@ public record MemberInfoUpdateRequest(
     @NotNull(message = "생일을 선택해주세요.")
     String birthDate,
 
-    @NotBlank(message = "여권 번호를 입력해주세요.")
     String passportNumber,
 
-    @NotNull(message = "여권 만료일을 선택해주세요.")
     String passportExpireDate
 
 ) {

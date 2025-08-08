@@ -1,6 +1,7 @@
 package team.mjk.agent.domain.member.domain;
 
 import java.util.Optional;
+import team.mjk.agent.domain.company.domain.Company;
 
 public interface MemberRepository {
 
@@ -11,5 +12,7 @@ public interface MemberRepository {
     Optional<Member> findByMemberId(Long memberId);
 
     Optional<Member> findByEmail(String email);
+
+    Optional<Member> findByNameAndCompany(String name, Company company);
 
 }
