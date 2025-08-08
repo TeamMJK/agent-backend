@@ -82,7 +82,8 @@ public class SecurityConfig {
             var corsConfiguration = new CorsConfiguration();
             corsConfiguration.setAllowedOrigins(List.of(
                 "https://mjk.ai.kr",
-                "https://mjk.ai.kr/api"
+                "https://mjk.ai.kr/api",
+                "http://localhost:8080"
 
             ));
             corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"));
