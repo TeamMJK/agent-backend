@@ -19,6 +19,12 @@ configurations {
     }
 }
 
+configurations.configureEach {
+    resolutionStrategy {
+        force 'io.swagger.core.v3:swagger-annotations-jakarta:2.2.30'
+    }
+}
+
 repositories {
     mavenCentral()
 }
@@ -61,11 +67,14 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
 
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+    // springdoc-openapi 사용 시 swagger-annotations 2.2.25 제외
+    implementation('org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9') {
+        exclude group: 'io.swagger.core.v3', module: 'swagger-annotations'
+    }
+    implementation 'io.swagger.core.v3:swagger-annotations-jakarta:2.2.30'
 
     // Jackson (ObjectMapper)
     implementation 'com.fasterxml.jackson.core:jackson-databind'
-    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
 
     // OkHttp
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
