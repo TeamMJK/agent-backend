@@ -39,7 +39,7 @@ public class SecurityConfig {
     private static final String[] PERMIT_ALL_PATTERNS = {
             "/swagger-ui/**",
             "/actuator/**",
-            "/v3/api-docs/**",
+            "api/v3/api-docs/**",
             "/login/**",
             "/oauth2/**",
             "/members",
