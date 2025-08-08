@@ -24,17 +24,17 @@ public class SwaggerConfig {
     private static final String SECURITY_SCHEME_NAME = "JWT";
 
     private static final Map<String, String> PROFILE_SERVER_URL_MAP = Map.of(
-            "local", "http://localhost:8080",
-            "dev", "https://mjk.ai.kr/api"
+        "local", "http://localhost:8080",
+        "dev", "https://mjk.ai.kr/api"
     );
 
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI()
-                .info(apiInfo())
-                .addSecurityItem(securityRequirement())
-                .servers(initializeServers())
-                .components(components());
+            .info(apiInfo())
+            .addSecurityItem(securityRequirement())
+            .servers(initializeServers())
+            .components(components());
     }
 
     private SecurityRequirement securityRequirement() {
@@ -43,14 +43,14 @@ public class SwaggerConfig {
 
     private Info apiInfo() {
         return new Info()
-                .title("MJK API")
-                .description(getDescription());
+            .title("MJK API")
+            .description(getDescription());
     }
 
     private List<Server> initializeServers() {
         return PROFILE_SERVER_URL_MAP.entrySet().stream()
-                .map(entry -> openApiServer(entry.getValue(), "MJK API " + entry.getKey().toUpperCase()))
-                .collect(Collectors.toList());
+            .map(entry -> openApiServer(entry.getValue(), "MJK API " + entry.getKey().toUpperCase()))
+            .collect(Collectors.toList());
     }
 
     private Server openApiServer(String url, String description) {
@@ -63,10 +63,12 @@ public class SwaggerConfig {
 
     private SecurityScheme securityScheme() {
         return new SecurityScheme()
+
                 .name(SECURITY_SCHEME_NAME)
                 .type(SecurityScheme.Type.HTTP)
                 .scheme("bearer")
                 .bearerFormat("JWT");
+
     }
 
     private String getDescription() {
