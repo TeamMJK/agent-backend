@@ -44,6 +44,7 @@ public class PromptService {
   public HotelList extractHotel(PromptRequest request) {
     String fullPrompt = """
         다음 문장에서 출장 정보를 추출해줘. 올해는 2025년이야. 예산은 숙박 일수 만큼 나눠.
+        출발일은 departure_date 에 저장하고 도착일은 arrival_date 에 저장해.
         문장을 파악해서 요청자와 같이 출장을 가는 사람 이름이면 그것에 맞춰 인원 수 추가
         문장 :
         """ + request.prompt();
