@@ -38,13 +38,15 @@ public class SecurityConfig {
 
     private static final String[] PERMIT_ALL_PATTERNS = {
             "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/v3/api-docs/**",
             "/actuator/**",
-            "api/v3/api-docs/**",
             "/login/**",
             "/oauth2/**",
             "/members",
             "/test"
     };
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
