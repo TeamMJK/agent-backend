@@ -43,7 +43,7 @@ public class CompanyService {
     Member member = memberRepository.findByMemberId(memberId)
         .orElseThrow(MemberNotFoundException::new);
 
-    Company company = Company.create(request.name(), member.getName(), request.workspace());
+    Company company = Company.create(request.name(), request.workspace());
     companyRepository.save(company);
     member.saveCompany(company);
     return company.getId();

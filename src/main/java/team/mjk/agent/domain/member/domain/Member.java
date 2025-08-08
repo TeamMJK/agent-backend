@@ -121,7 +121,7 @@ public class Member extends BaseTimeEntity {
     }
 
     public void update(MemberInfoUpdateRequest request, KmsUtil kmsUtil) {
-        String encryptName = kmsUtil.encrypt(request.name());
+        String encryptName = request.name();
         String encryptFirstName = kmsUtil.encrypt(request.firstName());
         String encryptLastName = kmsUtil.encrypt(request.lastName());
         String encryptPhoneNumber = kmsUtil.encrypt(request.phoneNumber());
@@ -144,7 +144,7 @@ public class Member extends BaseTimeEntity {
 
     public static MemberInfoGetResponse toMemberInfoGetResponse(Member member, KmsUtil kmsUtil) {
         return MemberInfoGetResponse.builder()
-                .name(kmsUtil.decrypt(member.getName()))
+                .name(member.getName())
                 .firstName(kmsUtil.decrypt(member.getFirstName()))
                 .email(member.getEmail())
                 .lastName(kmsUtil.decrypt(member.getLastName()))

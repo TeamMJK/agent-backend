@@ -48,7 +48,7 @@ public class MemberService {
     Member member = memberRepository.findByMemberId(memberId)
         .orElseThrow(MemberNotFoundException::new);
 
-    String encryptName = kmsUtil.encrypt(request.name());
+
     String encryptFirstName = kmsUtil.encrypt(request.firstName());
     String encryptLastName = kmsUtil.encrypt(request.lastName());
     String encryptPhoneNumber = kmsUtil.encrypt(request.phoneNumber());
@@ -57,7 +57,7 @@ public class MemberService {
     String encryptPassportExpireDate = kmsUtil.encrypt(request.passportExpireDate());
 
     member.saveMemberInfo(
-        encryptName,
+        request.name(),
         encryptFirstName,
         encryptLastName,
         encryptPhoneNumber,

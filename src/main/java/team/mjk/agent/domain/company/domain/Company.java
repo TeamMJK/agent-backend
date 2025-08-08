@@ -25,22 +25,18 @@ public class Company {
   @Column(unique = true, nullable = false)
   private String name;
 
-  private String founder;
-
   @Enumerated(STRING)
   private Workspace workspace;
 
   @Builder
-  private Company(String name, String founder, Workspace workspace) {
+  private Company(String name, Workspace workspace) {
     this.name = name;
-    this.founder = founder;
     this.workspace = workspace;
   }
 
-  public static Company create(String name, String founder, Workspace workspace) {
+  public static Company create(String name, Workspace workspace) {
     return Company.builder()
         .name(name)
-        .founder(founder)
         .workspace(workspace)
         .build();
   }

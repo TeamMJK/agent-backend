@@ -82,8 +82,10 @@ public class PromptService {
       nameList.names().remove("요청자");
     }
     for(String name : nameList.names()) {
+
       Member findMember = memberRepository.findByNameAndCompany(name,company)
           .orElseThrow(MemberNotFoundException::new);
+      System.out.println("name :" + findMember.getName());
       MemberInfoGetResponse findMemberInfo = Member.toMemberInfoGetResponse(findMember,kmsUtil);
       resultList.add(findMemberInfo);
     }
