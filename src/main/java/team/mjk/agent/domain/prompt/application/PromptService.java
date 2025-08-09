@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.ChatClient.Builder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.member.domain.Member;
@@ -26,14 +24,6 @@ public class PromptService {
   private final ChatClient chatClient;
   private final MemberRepository memberRepository;
   private final KmsUtil kmsUtil;
-
-  @Autowired
-  public PromptService(Builder chatClientBuilder, MemberRepository memberRepository,
-      KmsUtil kmsUtil) {
-    this.chatClient = chatClientBuilder.build();
-    this.memberRepository = memberRepository;
-    this.kmsUtil = kmsUtil;
-  }
 
   public HotelAndMemberInfoResponse extract(Long memberId, PromptRequest request) {
     HotelList hotelList = extractHotel(request);

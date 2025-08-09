@@ -7,7 +7,7 @@ public record Hotel(
     String arrival_date,
     String destination,
     int guests,
-    long budget,
+    int budget,
     List<String> requirements
 ) {
 
