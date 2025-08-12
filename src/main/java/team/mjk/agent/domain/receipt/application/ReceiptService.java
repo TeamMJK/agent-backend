@@ -28,17 +28,20 @@ import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Utilities;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value.Str;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import team.mjk.agent.domain.company.domain.Company;
+import team.mjk.agent.domain.company.domain.Workspace;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
 import team.mjk.agent.domain.receipt.domain.Receipt;
 import team.mjk.agent.domain.receipt.domain.ReceiptRepository;
+import team.mjk.agent.domain.receipt.dto.request.ReceiptMcpRequest;
 import team.mjk.agent.domain.receipt.dto.request.ReceiptSaveRequest;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptGetResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptSaveResponse;
@@ -49,6 +52,8 @@ import team.mjk.agent.domain.receipt.presentation.exception.NoFileExtensionExcep
 import team.mjk.agent.domain.receipt.presentation.exception.OnImageDeleteExceptionCode;
 import team.mjk.agent.domain.receipt.presentation.exception.OnImageUploadExceptionCode;
 import team.mjk.agent.domain.receipt.presentation.exception.PutObjectExceptionCode;
+import team.mjk.agent.global.mcp.McpService;
+import team.mjk.agent.global.mcp.McpServiceRegistry;
 
 @RequiredArgsConstructor
 @Service
@@ -58,6 +63,7 @@ public class ReceiptService {
   private final ReceiptRepository receiptRepository;
   private final MemberRepository memberRepository;
   private final ChatClient chatClient;
+  private final McpServiceRegistry registry;
 
   @Value("${cloud.aws.s3.bucketName}")
   private String bucketName;
@@ -105,19 +111,15 @@ public class ReceiptService {
     return imageUrl;
   }
 
-  @Transactional
-  public String getImageUrl(MultipartFile image) {
+
+  private String getImageUrl(MultipartFile image) {
     if (image.isEmpty() || Objects.isNull(image.getOriginalFilename())) {
       throw new EmptyFileExceptionCode();
     }
     return this.uploadImage(image);
   }
 
-  @Transactional
-  public ReceiptSaveResponse ocr(Long memberId, MultipartFile image) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
-
+  private ReceiptSaveRequest ocr(MultipartFile image) {
     String imageUrl = getImageUrl(image);
     String key = extractKeyFromUrl(imageUrl);
 
@@ -136,20 +138,29 @@ public class ReceiptService {
         paymentDate, approvalNumber, storeAddress, totalAmount
         """;
 
-    ReceiptSaveRequest entity = chatClient.prompt()
+    return chatClient.prompt()
         .user(p -> p
             .text(fullPrompt)
             .media(media)
         )
         .call()
         .entity(ReceiptSaveRequest.class);
+  }
+
+  @Transactional
+  public ReceiptSaveResponse saveOcrInfo(Long memberId, MultipartFile file) {
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(MemberNotFoundException::new);
+
+    ReceiptSaveRequest request = ocr(file);
+    String imageUrl = getImageUrl(file);
 
     Receipt receipt = Receipt.builder()
         .member(member)
-        .paymentDate(entity.paymentDate())
-        .approvalNumber(entity.approvalNumber())
-        .storeAddress(entity.storeAddress())
-        .totalAmount(entity.totalAmount())
+        .paymentDate(request.paymentDate())
+        .approvalNumber(request.approvalNumber())
+        .storeAddress(request.storeAddress())
+        .totalAmount(request.totalAmount())
         .company(member.getCompany())
         .url(imageUrl)
         .build();
@@ -159,6 +170,32 @@ public class ReceiptService {
     return ReceiptSaveResponse.builder()
         .receiptId(receipt.getId())
         .build();
+  }
+
+  @Transactional
+  public Workspace saveMcp(Long memberId, MultipartFile file) {
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(MemberNotFoundException::new);
+
+    Company company = member.getCompany();
+    Workspace workspace = company.getWorkspace();
+
+    String imageUrl = getImageUrl(file);
+    ReceiptSaveRequest request = ocr(file);
+
+    ReceiptMcpRequest mcpRequest = ReceiptMcpRequest.builder()
+        .name(member.getName())
+        .approvalNumber(request.approvalNumber())
+        .storeAddress(request.storeAddress())
+        .totalAmount(request.totalAmount())
+        .imageUrl(imageUrl)
+        .paymentDate(request.paymentDate())
+        .build();
+
+    McpService mcpService = registry.getService(workspace);
+    mcpService.createReceipt(mcpRequest, company.getId());
+
+    return company.getWorkspace();
   }
 
   private String extractKeyFromUrl(String url) {

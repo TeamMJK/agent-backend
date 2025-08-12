@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import team.mjk.agent.domain.company.domain.Workspace;
 import team.mjk.agent.domain.receipt.application.ReceiptService;
 import team.mjk.agent.domain.receipt.dto.request.ReceiptSaveRequest;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptGetResponse;
@@ -41,11 +42,11 @@ public class ReceiptController implements ReceiptDocsController {
   }
 
   @PostMapping(value = "/i/ocr", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<ReceiptSaveResponse> ocr(
+  public ResponseEntity<Workspace> ocr(
       @MemberId Long memberId,
       @RequestPart(value = "image", required = false) MultipartFile image
   ) {
-    ReceiptSaveResponse response = receiptService.ocr(memberId, image);
+    Workspace response = receiptService.saveMcp(memberId, image);
     return new ResponseEntity<>(response, HttpStatus.CREATED);
 
   }

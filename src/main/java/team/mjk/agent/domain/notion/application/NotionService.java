@@ -12,7 +12,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import software.amazon.awssdk.services.s3.endpoints.internal.Value.Str;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
 import team.mjk.agent.domain.company.domain.Workspace;
 import team.mjk.agent.domain.member.domain.Member;
@@ -23,6 +22,7 @@ import team.mjk.agent.domain.notion.domain.NotionRepository;
 import team.mjk.agent.domain.notion.dto.request.NotionTokenRequest;
 import team.mjk.agent.domain.notion.dto.request.NotionTokenUpdateRequest;
 import team.mjk.agent.domain.notion.presentation.exception.NotionAPIException;
+import team.mjk.agent.domain.receipt.dto.request.ReceiptMcpRequest;
 import team.mjk.agent.global.mcp.McpService;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -43,9 +43,10 @@ public class NotionService implements McpService {
     Long companyId = member.getCompany().getId();
 
     String encryptToken = kmsUtil.encrypt(request.token());
-    String encryptDatabaseId = kmsUtil.encrypt(request.databaseId());
+    String encryptBusinessTripDatabaseId = kmsUtil.encrypt(request.businessTripDatabaseId());
+    String encryptReceiptDatabaseId = kmsUtil.encrypt(request.receiptDatabaseId());
 
-    Notion notion = Notion.create(encryptToken, encryptDatabaseId, companyId);
+    Notion notion = Notion.create(encryptToken, encryptBusinessTripDatabaseId, companyId, encryptReceiptDatabaseId);
     notionRepository.save(notion);
     return notion.getId();
   }
@@ -57,7 +58,9 @@ public class NotionService implements McpService {
     Long companyId = member.getCompany().getId();
 
     Notion notion = notionRepository.findByCompanyId(companyId);
-    notion.update(request.token(), request.databaseId(), kmsUtil);
+    notion.update(request.token(), request.businessTripDatabaseId(),
+        kmsUtil,
+        request.receiptDatabaseId());
     return notion.getId();
   }
 
@@ -73,7 +76,7 @@ public class NotionService implements McpService {
         .toList();
 
     Map<String, Object> payload = Map.of(
-        "parent", Map.of("database_id", kmsUtil.decrypt(notion.getDatabaseId())),
+        "parent", Map.of("database_id", kmsUtil.decrypt(notion.getBusinessTripDatabaseId())),
         "properties", Map.of(
             "이름", Map.of("title", nameBlocks),
             "도착일자", Map.of("rich_text", List.of(
@@ -118,7 +121,68 @@ public class NotionService implements McpService {
   }
 
   @Override
+  public void createReceipt(ReceiptMcpRequest request ,Long companyId) {
+    Notion notion = notionRepository.findByCompanyId(companyId);
+
+    String url = "https://api.notion.com/v1/pages";
+    OkHttpClient client = new OkHttpClient();
+
+    Map<String, Object> payload = Map.of(
+        "parent", Map.of("database_id", kmsUtil.decrypt(notion.getReceiptDatabaseId())),
+        "properties", Map.of(
+            "이름", Map.of("rich_text", List.of(
+                Map.of("text", Map.of("content", request.name()))
+            )),
+            "승인번호", Map.of("rich_text", List.of(
+                Map.of("text", Map.of("content", request.approvalNumber()))
+            )),
+            "주소", Map.of("rich_text", List.of(
+                Map.of("text", Map.of("content", request.storeAddress()))
+            )),
+            "총금액", Map.of("rich_text", List.of(
+                Map.of("text", Map.of("content", request.totalAmount().toString()))
+            ))
+            ,"이미지", Map.of("url", request.imageUrl())
+            ,
+            "거래일자", Map.of("rich_text", List.of(
+                Map.of("text", Map.of("content", request.paymentDate().toString()))
+            ))
+        )
+    );
+
+    String json = null;
+    try {
+      json = objectMapper.writeValueAsString(payload);
+    } catch (JsonProcessingException e) {
+      throw new NotionAPIException(e);
+    }
+
+    RequestBody body = RequestBody.create(
+        json,
+        MediaType.get("application/json; charset=utf-8")
+    );
+
+    Request httpRequest = new Request.Builder()
+        .url(url)
+        .addHeader("Authorization", "Bearer " + kmsUtil.decrypt(notion.getToken()))
+        .addHeader("Content-Type", "application/json")
+        .addHeader("Notion-Version", "2022-06-28")
+        .post(body)
+        .build();
+
+    try (Response response = client.newCall(httpRequest).execute()) {
+      if (!response.isSuccessful()) {
+        System.out.println(response.body().string());
+      }
+    } catch (IOException e) {
+      throw new NotionAPIException(e);
+    }
+  }
+
+
+  @Override
   public Workspace getWorkspace() {
     return Workspace.NOTION;
   }
+
 }

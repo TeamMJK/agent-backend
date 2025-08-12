@@ -10,7 +10,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.aspectj.weaver.ast.Not;
 import team.mjk.agent.global.util.KmsUtil;
 
 @Entity
@@ -26,36 +25,48 @@ public class Notion {
   private String token;
 
   @Column(columnDefinition = "TEXT")
-  private String databaseId;
+  private String businessTripDatabaseId;
+
+  @Column(columnDefinition = "TEXT")
+  private String receiptDatabaseId;
 
   private Long companyId;
 
   @Builder
   private Notion(
       String token,
-      String databaseId,
+      String BusinessTripDatabaseId,
+      String receiptDatabaseId,
       Long companyId
   ) {
     this.token = token;
-    this.databaseId = databaseId;
+    this.businessTripDatabaseId = BusinessTripDatabaseId;
     this.companyId = companyId;
+    this.receiptDatabaseId = receiptDatabaseId;
   }
 
   public static Notion create(
       String token,
-      String databaseId,
-      Long companyId
+      String businessTripDatabaseId,
+      Long companyId,
+      String receiptDatabaseId
   ) {
     return Notion.builder()
         .token(token)
-        .databaseId(databaseId)
+        .BusinessTripDatabaseId(businessTripDatabaseId)
         .companyId(companyId)
+        .receiptDatabaseId(receiptDatabaseId)
         .build();
   }
 
-  public void update(String token, String databaseId, KmsUtil kmsUtil) {
+  public void update(String token
+      ,String businessTripDatabaseId
+      ,KmsUtil kmsUtil
+      ,String receiptDatabaseId
+  ) {
     this.token = kmsUtil.encrypt(token);
-    this.databaseId = kmsUtil.encrypt(databaseId);
+    this.businessTripDatabaseId = kmsUtil.encrypt(businessTripDatabaseId);
+    this.receiptDatabaseId = kmsUtil.encrypt(receiptDatabaseId);
   }
 
 }
