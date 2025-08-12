@@ -179,6 +179,10 @@ public class ReceiptService {
 
     Company company = member.getCompany();
     Workspace workspace = company.getWorkspace();
+    if(workspace == Workspace.NONE) {
+      saveOcrInfo(memberId,file);
+      return workspace;
+    }
 
     String imageUrl = getImageUrl(file);
     ReceiptSaveRequest request = ocr(file);

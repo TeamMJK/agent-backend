@@ -55,6 +55,10 @@ public class BusinessTripService {
 
     Company company = member.getCompany();
     Workspace workspace = company.getWorkspace();
+    if (workspace == Workspace.NONE){
+      save(memberId, request);
+      return workspace;
+    }
 
     McpService mcpService = registry.getService(workspace);
     mcpService.createBusinessTrip(request, company.getId());

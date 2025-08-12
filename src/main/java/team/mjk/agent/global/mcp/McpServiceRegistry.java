@@ -22,4 +22,5 @@ public class McpServiceRegistry {
     return Optional.ofNullable(mcpServiceMap.get(workspace))
         .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 워크스페이스입니다."));
   }
+
 }
