@@ -62,7 +62,7 @@ public class NotionService implements McpService {
   }
 
   @Override
-  public void create(BusinessTripSaveRequest request, Long companyId) {
+  public void createBusinessTrip(BusinessTripSaveRequest request, Long companyId) {
     Notion notion = notionRepository.findByCompanyId(companyId);
 
     String url = "https://api.notion.com/v1/pages";
