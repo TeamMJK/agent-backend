@@ -1,6 +1,7 @@
 package team.mjk.agent.domain.notion.domain;
 
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.aspectj.weaver.ast.Not;
+import team.mjk.agent.global.util.KmsUtil;
 
 @Entity
 @Getter
@@ -20,8 +22,10 @@ public class Notion {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(columnDefinition = "TEXT")
   private String token;
 
+  @Column(columnDefinition = "TEXT")
   private String databaseId;
 
   private Long companyId;
@@ -49,9 +53,9 @@ public class Notion {
         .build();
   }
 
-  public void update(String token, String databaseId) {
-    this.token = token;
-    this.databaseId = databaseId;
+  public void update(String token, String databaseId, KmsUtil kmsUtil) {
+    this.token = kmsUtil.encrypt(token);
+    this.databaseId = kmsUtil.encrypt(databaseId);
   }
 
 }

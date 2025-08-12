@@ -12,6 +12,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value.Str;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
 import team.mjk.agent.domain.company.domain.Workspace;
 import team.mjk.agent.domain.member.domain.Member;
@@ -25,6 +26,7 @@ import team.mjk.agent.domain.notion.presentation.exception.NotionAPIException;
 import team.mjk.agent.global.mcp.McpService;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import team.mjk.agent.global.util.KmsUtil;
 
 @RequiredArgsConstructor
 @Service
@@ -33,13 +35,17 @@ public class NotionService implements McpService {
   private final NotionRepository notionRepository;
   private final MemberRepository memberRepository;
   private final ObjectMapper objectMapper;
+  private final KmsUtil kmsUtil;
 
   public Long save(Long memberId, NotionTokenRequest request) {
     Member member = memberRepository.findByMemberId(memberId)
         .orElseThrow(MemberNotFoundException::new);
     Long companyId = member.getCompany().getId();
 
-    Notion notion = Notion.create(request.token(), request.databaseId(), companyId);
+    String encryptToken = kmsUtil.encrypt(request.token());
+    String encryptDatabaseId = kmsUtil.encrypt(request.databaseId());
+
+    Notion notion = Notion.create(encryptToken, encryptDatabaseId, companyId);
     notionRepository.save(notion);
     return notion.getId();
   }
@@ -51,7 +57,7 @@ public class NotionService implements McpService {
     Long companyId = member.getCompany().getId();
 
     Notion notion = notionRepository.findByCompanyId(companyId);
-    notion.update(request.token(),request.databaseId());
+    notion.update(request.token(), request.databaseId(), kmsUtil);
     return notion.getId();
   }
 
@@ -67,7 +73,7 @@ public class NotionService implements McpService {
         .toList();
 
     Map<String, Object> payload = Map.of(
-        "parent", Map.of("database_id", notion.getDatabaseId()),
+        "parent", Map.of("database_id", kmsUtil.decrypt(notion.getDatabaseId())),
         "properties", Map.of(
             "이름", Map.of("title", nameBlocks),
             "도착일자", Map.of("rich_text", List.of(
@@ -96,7 +102,7 @@ public class NotionService implements McpService {
 
     Request httpRequest = new Request.Builder()
         .url(url)
-        .addHeader("Authorization", "Bearer " + notion.getToken())
+        .addHeader("Authorization", "Bearer " + kmsUtil.decrypt(notion.getToken()))
         .addHeader("Content-Type", "application/json")
         .addHeader("Notion-Version", "2022-06-28")
         .post(body)
