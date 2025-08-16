@@ -8,7 +8,8 @@ public record Hotel(
     String destination,
     int guests,
     int budget,
-    List<String> requirements
+    List<String> requirements,
+    List<String> names
 ) {
 
 }
