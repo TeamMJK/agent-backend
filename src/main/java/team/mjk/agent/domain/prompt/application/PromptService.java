@@ -12,6 +12,8 @@ import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
 import team.mjk.agent.domain.member.dto.response.MemberInfoList;
 import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
 import team.mjk.agent.domain.prompt.dto.request.PromptRequest;
+import team.mjk.agent.domain.prompt.dto.response.BusinessTripAndMemberInfoResponse;
+import team.mjk.agent.domain.prompt.dto.response.BusinessTripList;
 import team.mjk.agent.domain.prompt.dto.response.HotelAndMemberInfoResponse;
 import team.mjk.agent.domain.prompt.dto.response.HotelList;
 import team.mjk.agent.domain.prompt.dto.response.NameList;
@@ -25,10 +27,19 @@ public class PromptService {
   private final MemberRepository memberRepository;
   private final KmsUtil kmsUtil;
 
-  public HotelAndMemberInfoResponse extract(Long memberId, PromptRequest request) {
+  public HotelAndMemberInfoResponse extractHotel(Long memberId, PromptRequest request) {
     HotelList hotelList = extractHotel(request);
-    MemberInfoList memberInfoList = extractNames(memberId,request);
-    return new HotelAndMemberInfoResponse(hotelList,memberInfoList);
+    MemberInfoList memberInfoList = extractNames(memberId, request);
+
+    return new HotelAndMemberInfoResponse(hotelList, memberInfoList);
+  }
+
+  public BusinessTripAndMemberInfoResponse extractBusinessTrip(Long memberId,
+      PromptRequest request) {
+    BusinessTripList businessTripList = extractBusinessTrip(request);
+    MemberInfoList memberInfoList = extractNames(memberId, request);
+
+    return new BusinessTripAndMemberInfoResponse(businessTripList,memberInfoList);
   }
 
   public HotelList extractHotel(PromptRequest request) {
@@ -40,44 +51,58 @@ public class PromptService {
         """ + request.prompt();
 
     return chatClient.prompt()
-        .user(p->p.text(fullPrompt))
+        .user(p -> p.text(fullPrompt))
         .call()
         .entity(HotelList.class);
   }
 
-  public MemberInfoList extractNames(Long memberId,PromptRequest request) {
+  public BusinessTripList extractBusinessTrip(PromptRequest request) {
+    String fullPrompt = """
+        다음 문장에서 출장 정보를 추출해줘. 올해는 2025년이야.
+        출발지는 depart_date 에 저장하고 도착지은 return_date 에 저장해.
+        문장을 파악해서 요청자와 같이 출장을 가는 사람 이름이면 그것에 맞춰 인원 수 추가
+        문장 :
+        """ + request.prompt();
+
+    return chatClient.prompt()
+        .user(p -> p.text(fullPrompt))
+        .call()
+        .entity(BusinessTripList.class);
+  }
+
+  private MemberInfoList extractNames(Long memberId, PromptRequest request) {
     String fullPrompt = """
         다음 문장에서 사람 이름을 추출해줘. 만약 프롬프트 요청한 사람이 있으면 '요청자' 라고 저장해줘.
         문장 :
         """ + request.prompt();
 
     NameList nameList = chatClient.prompt()
-        .user(p->p.text(fullPrompt))
+        .user(p -> p.text(fullPrompt))
         .call()
         .entity(NameList.class);
 
-    return extractMemberInfo(memberId,nameList);
+    return extractMemberInfo(memberId, nameList);
   }
 
-  public MemberInfoList extractMemberInfo(Long memberId, NameList nameList) {
+  private MemberInfoList extractMemberInfo(Long memberId, NameList nameList) {
     Member member = memberRepository.findByMemberId(memberId)
         .orElseThrow(MemberNotFoundException::new);
-    MemberInfoGetResponse memberInfoGetResponse = Member.toMemberInfoGetResponse(member,kmsUtil);
+    MemberInfoGetResponse memberInfoGetResponse = Member.toMemberInfoGetResponse(member, kmsUtil);
 
     Company company = member.getCompany();
 
     List<MemberInfoGetResponse> resultList = new ArrayList<>();
 
-    if(nameList.names().contains("요청자")) {
+    if (nameList.names().contains("요청자")) {
       resultList.add(memberInfoGetResponse);
       nameList.names().remove("요청자");
     }
-    for(String name : nameList.names()) {
+    for (String name : nameList.names()) {
 
-      Member findMember = memberRepository.findByNameAndCompany(name,company)
+      Member findMember = memberRepository.findByNameAndCompany(name, company)
           .orElseThrow(MemberNotFoundException::new);
       System.out.println("name :" + findMember.getName());
-      MemberInfoGetResponse findMemberInfo = Member.toMemberInfoGetResponse(findMember,kmsUtil);
+      MemberInfoGetResponse findMemberInfo = Member.toMemberInfoGetResponse(findMember, kmsUtil);
       resultList.add(findMemberInfo);
     }
 
