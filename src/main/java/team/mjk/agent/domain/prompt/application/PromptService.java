@@ -36,7 +36,7 @@ public class PromptService {
 
   public BusinessTripAndMemberInfoResponse extractBusinessTrip(Long memberId,
       PromptRequest request) {
-    BusinessTripList businessTripList = extractBusinessTrip(request);
+    BusinessTripList businessTripList = extractBusinessTripInfo(memberId,request);
     MemberInfoList memberInfoList = extractNames(memberId, request);
 
     return new BusinessTripAndMemberInfoResponse(businessTripList,memberInfoList);
@@ -63,14 +63,20 @@ public class PromptService {
         .entity(HotelList.class);
   }
 
-  public BusinessTripList extractBusinessTrip(PromptRequest request) {
-    String fullPrompt = """
-        다음 문장에서 출장 정보를 추출해줘. 올해는 2025년이야.
-        출발지는 depart_date 에 저장하고 도착지은 return_date 에 저장해.
-        문장을 파악해서 요청자와 같이 출장을 가는 사람 이름이면 그것에 맞춰 인원 수 추가
-        문장 :
-        """ + request.prompt();
+  public BusinessTripList extractBusinessTripInfo(Long memberId,PromptRequest request) {
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(MemberNotFoundException::new);
 
+    String fullPrompt = String.format(
+        "다음 문장에서 출장 정보를 추출해줘. 올해는 2025년이야. 예산은 숙박 일수 만큼 나눠.\n" +
+            "출발지는 depart_date 에 저장하고 도착지은 return_date 에 저장해.\n" +
+            "문장을 파악해서 요청자와 같이 출장을 가는 사람 이름이면 그것에 맞춰 인원 수 추가.\n" +
+            "출장 정보 한 개당 최소 한 명의 이름 필요.\n" +
+            "만약 이름이 출장 정보에 없다면 %s 이름 추가.\n" +
+            "문장 :\n%s",
+        member.getName(),
+        request.prompt()
+    );
     return chatClient.prompt()
         .user(p -> p.text(fullPrompt))
         .call()
