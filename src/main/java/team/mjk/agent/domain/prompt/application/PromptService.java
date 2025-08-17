@@ -16,6 +16,7 @@ import team.mjk.agent.domain.prompt.dto.response.BusinessTripAndMemberInfoRespon
 import team.mjk.agent.domain.prompt.dto.response.BusinessTripList;
 import team.mjk.agent.domain.prompt.dto.response.HotelAndMemberInfoResponse;
 import team.mjk.agent.domain.prompt.dto.response.HotelList;
+import team.mjk.agent.domain.prompt.dto.response.IntegrationResponse;
 import team.mjk.agent.domain.prompt.dto.response.NameList;
 import team.mjk.agent.global.util.KmsUtil;
 
@@ -28,7 +29,7 @@ public class PromptService {
   private final KmsUtil kmsUtil;
 
   public HotelAndMemberInfoResponse extractHotel(Long memberId, PromptRequest request) {
-    HotelList hotelList = extractHotelInfo(memberId,request);
+    HotelList hotelList = extractHotelInfo(memberId, request);
     MemberInfoList memberInfoList = extractNames(memberId, request);
 
     return new HotelAndMemberInfoResponse(hotelList, memberInfoList);
@@ -36,13 +37,21 @@ public class PromptService {
 
   public BusinessTripAndMemberInfoResponse extractBusinessTrip(Long memberId,
       PromptRequest request) {
-    BusinessTripList businessTripList = extractBusinessTripInfo(memberId,request);
+    BusinessTripList businessTripList = extractBusinessTripInfo(memberId, request);
     MemberInfoList memberInfoList = extractNames(memberId, request);
 
-    return new BusinessTripAndMemberInfoResponse(businessTripList,memberInfoList);
+    return new BusinessTripAndMemberInfoResponse(businessTripList, memberInfoList);
   }
 
-  public HotelList extractHotelInfo(Long memberId,PromptRequest request) {
+  public IntegrationResponse extractIntegration(Long memberId, PromptRequest request) {
+    BusinessTripList businessTripList = extractBusinessTripInfo(memberId, request);
+    HotelList hotelList = extractHotelInfo(memberId, request);
+    MemberInfoList memberInfoList = extractNames(memberId, request);
+
+    return new IntegrationResponse(businessTripList, hotelList, memberInfoList);
+  }
+
+  public HotelList extractHotelInfo(Long memberId, PromptRequest request) {
     Member member = memberRepository.findByMemberId(memberId)
         .orElseThrow(MemberNotFoundException::new);
 
@@ -63,7 +72,7 @@ public class PromptService {
         .entity(HotelList.class);
   }
 
-  public BusinessTripList extractBusinessTripInfo(Long memberId,PromptRequest request) {
+  public BusinessTripList extractBusinessTripInfo(Long memberId, PromptRequest request) {
     Member member = memberRepository.findByMemberId(memberId)
         .orElseThrow(MemberNotFoundException::new);
 

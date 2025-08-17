@@ -11,6 +11,7 @@ import team.mjk.agent.domain.prompt.application.PromptService;
 import team.mjk.agent.domain.prompt.dto.request.PromptRequest;
 import team.mjk.agent.domain.prompt.dto.response.BusinessTripAndMemberInfoResponse;
 import team.mjk.agent.domain.prompt.dto.response.HotelAndMemberInfoResponse;
+import team.mjk.agent.domain.prompt.dto.response.IntegrationResponse;
 import team.mjk.agent.global.annotation.MemberId;
 
 @RestController
@@ -38,11 +39,24 @@ public class PromptController {
       @MemberId Long memberId,
       @Valid @RequestBody PromptRequest request
   ) {
-    BusinessTripAndMemberInfoResponse response = promptService.extractBusinessTrip(memberId,request);
+    BusinessTripAndMemberInfoResponse response = promptService.extractBusinessTrip(memberId,
+        request);
 
     String pythonUrl = "http://localhost:8000/business-trip-data";
 
-    restTemplate.postForObject(pythonUrl,response, String.class);
+    restTemplate.postForObject(pythonUrl, response, String.class);
+  }
+
+  @PostMapping("/integration")
+  public void extractIntegration(
+      @MemberId Long memberId,
+      @Valid @RequestBody PromptRequest request
+  ) {
+    IntegrationResponse response = promptService.extractIntegration(memberId, request);
+
+    String pythonUrl = "http://localhost:8000/integration";
+
+    restTemplate.postForObject(pythonUrl, response, String.class);
   }
 
 }
