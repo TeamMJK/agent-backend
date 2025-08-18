@@ -61,7 +61,9 @@ public class PromptService {
             "문장을 파악해서 요청자와 같이 출장을 가는 사람 이름이면 그것에 맞춰 인원 수 추가.\n" +
             "출장 정보 한 개당 최소 한 명의 이름 필요.\n" +
             "만약 이름이 출장 정보에 없다면 %s 이름 추가.\n" +
+            "프롬프트 요청자로 예상되면 %s 이름 추가.\n" +
             "문장 :\n%s",
+        member.getName(),
         member.getName(),
         request.prompt()
     );
@@ -82,7 +84,9 @@ public class PromptService {
             "문장을 파악해서 요청자와 같이 출장을 가는 사람 이름이면 그것에 맞춰 인원 수 추가.\n" +
             "출장 정보 한 개당 최소 한 명의 이름 필요.\n" +
             "만약 이름이 출장 정보에 없다면 %s 이름 추가.\n" +
+            "프롬프트 요청자로 예상되면 %s 이름 추가.\n" +
             "문장 :\n%s",
+        member.getName(),
         member.getName(),
         request.prompt()
     );

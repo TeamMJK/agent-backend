@@ -30,7 +30,7 @@ public class PromptController {
     HotelAndMemberInfoResponse response = promptService.extractHotel(memberId, request);
 
     String pythonUrl = "http://localhost:8000/hotel-data";
-
+    System.out.println(response);
     restTemplate.postForObject(pythonUrl, response, String.class);
   }
 
