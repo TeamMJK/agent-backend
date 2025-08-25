@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.member.dto.request.MemberInfoUpdateRequest;
+import team.mjk.agent.domain.member.dto.response.EncryptedMemberInfoResponse;
 import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
 import team.mjk.agent.domain.member.presentation.exception.EmailOrPasswordNotInvalidException;
 import team.mjk.agent.domain.passport.domain.Passport;
@@ -120,25 +121,17 @@ public class Member extends BaseTimeEntity {
         this.company = company;
     }
 
-    public void update(MemberInfoUpdateRequest request, KmsUtil kmsUtil) {
-        String encryptName = request.name();
-        String encryptFirstName = kmsUtil.encrypt(request.firstName());
-        String encryptLastName = kmsUtil.encrypt(request.lastName());
-        String encryptPhoneNumber = kmsUtil.encrypt(request.phoneNumber());
-        String encryptBirthDate = kmsUtil.encrypt(request.birthDate());
-        String encryptedPassportNumber = kmsUtil.encrypt(request.passportNumber());
-        String encryptedPassportExpireDate = kmsUtil.encrypt(request.passportExpireDate());
-
-        this.name = encryptName;
-        this.firstName = encryptFirstName;
-        this.lastName = encryptLastName;
-        this.phoneNumber = encryptPhoneNumber;
-        this.gender = Gender.valueOf(request.gender());
-        this.birthDate = encryptBirthDate;
+    public void update(EncryptedMemberInfoResponse response) {
+        this.name = response.name();
+        this.firstName = response.firstName();
+        this.lastName = response.lastName();
+        this.phoneNumber = response.phoneNumber();
+        this.gender = Gender.valueOf(response.gender());
+        this.birthDate = response.birthDate();
 
         this.passport.update(
-                encryptedPassportNumber,
-                encryptedPassportExpireDate
+                response.passportNumber(),
+                response.passportExpireDate()
         );
     }
 

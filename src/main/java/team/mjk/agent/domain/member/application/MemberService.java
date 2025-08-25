@@ -10,10 +10,7 @@ import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.member.dto.request.MemberInfoSaveRequest;
 import team.mjk.agent.domain.member.dto.request.MemberInfoUpdateRequest;
 import team.mjk.agent.domain.member.dto.request.MemberSaveRequest;
-import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
-import team.mjk.agent.domain.member.dto.response.MemberInfoSaveResponse;
-import team.mjk.agent.domain.member.dto.response.MemberInfoUpdateResponse;
-import team.mjk.agent.domain.member.dto.response.MemberSaveResponse;
+import team.mjk.agent.domain.member.dto.response.*;
 import team.mjk.agent.domain.member.presentation.exception.EmailAlreadyExistsException;
 import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
 import team.mjk.agent.domain.passport.domain.Passport;
@@ -48,26 +45,20 @@ public class MemberService {
     Member member = memberRepository.findByMemberId(memberId)
         .orElseThrow(MemberNotFoundException::new);
 
-
-    String encryptFirstName = kmsUtil.encrypt(request.firstName());
-    String encryptLastName = kmsUtil.encrypt(request.lastName());
-    String encryptPhoneNumber = kmsUtil.encrypt(request.phoneNumber());
-    String encryptBirthDate = kmsUtil.encrypt(request.birthDate());
-    String encryptPassportNumber = kmsUtil.encrypt(request.passportNumber());
-    String encryptPassportExpireDate = kmsUtil.encrypt(request.passportExpireDate());
+    EncryptedMemberInfoResponse response = request.encryptWith(kmsUtil);
 
     member.saveMemberInfo(
-        request.name(),
-        encryptFirstName,
-        encryptLastName,
-        encryptPhoneNumber,
-        Gender.valueOf(request.gender()),
-        encryptBirthDate
+            response.name(),
+            response.firstName(),
+            response.lastName(),
+            response.phoneNumber(),
+            Gender.valueOf(response.gender()),
+            response.birthDate()
     );
 
     Passport passport = Passport.create(
-        encryptPassportNumber,
-        encryptPassportExpireDate
+        response.passportNumber(),
+        response.passportExpireDate()
     );
     passportRepository.save(passport);
 
@@ -89,7 +80,8 @@ public class MemberService {
     Member member = memberRepository.findByMemberId(memberId)
         .orElseThrow(MemberNotFoundException::new);
 
-    member.update(request, kmsUtil);
+    EncryptedMemberInfoResponse response = request.encryptWith(kmsUtil);
+    member.update(response);
 
     return MemberInfoUpdateResponse.builder()
         .memberId(member.getId())
