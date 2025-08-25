@@ -2,6 +2,9 @@ package team.mjk.agent.domain.member.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import team.mjk.agent.domain.member.dto.response.EncryptedMemberInfoResponse;
+import team.mjk.agent.global.util.KmsUtil;
+
 import java.time.LocalDate;
 
 public record MemberInfoUpdateRequest(
@@ -29,4 +32,16 @@ public record MemberInfoUpdateRequest(
     String passportExpireDate
 
 ) {
+    public EncryptedMemberInfoResponse encryptWith(KmsUtil kmsUtil) {
+        return EncryptedMemberInfoResponse.builder()
+                .name(name)
+                .firstName(kmsUtil.encrypt(firstName))
+                .lastName(kmsUtil.encrypt(lastName))
+                .phoneNumber(kmsUtil.encrypt(phoneNumber))
+                .gender(gender)
+                .birthDate(kmsUtil.encrypt(birthDate))
+                .passportNumber(kmsUtil.encrypt(passportNumber))
+                .passportExpireDate(kmsUtil.encrypt(passportExpireDate))
+                .build();
+    }
 }
