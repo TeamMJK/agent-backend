@@ -5,6 +5,7 @@ import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
+import team.mjk.agent.domain.email.presentation.exception.EmailSendFailedException;
 
 @Component
 public class EmailSender {
@@ -25,7 +26,7 @@ public class EmailSender {
             helper.setText(content, true);
             mailSender.send(message);
         } catch (MessagingException e) {
-            throw new IllegalStateException("이메일 전송 실패", e);
+            throw new EmailSendFailedException();
         }
     }
 
