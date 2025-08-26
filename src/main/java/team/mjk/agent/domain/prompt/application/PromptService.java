@@ -76,25 +76,69 @@ public class PromptService {
         );
 
         // POST 요청 실행
-        String result = restTemplate.postForObject(
-            pythonUrl,
-            payload,
-            String.class
-        );
-        try {
-          JsonNode rootNode = objectMapper.readTree(result);
-          JsonNode detailNode = rootNode.get("detail");
-          String detailJson = detailNode.toString();
-          System.out.println("result :" + result);
-          BusinessTripAgentRequest agentRequest = objectMapper.readValue(detailJson,
-              BusinessTripAgentRequest.class);
-
-          System.out.println("names" + agentRequest.names());
-          businessTripService.saveAgentMcp(memberId, agentRequest);
-        } catch (JsonProcessingException e) {
-          System.out.println(e.getMessage());
-        }
+        agentResponse(memberId, pythonUrl, payload);
       }
+    }
+  }
+
+  public void handleFlight(Long memberId, PromptRequest request) {
+    FlightAndMemberInfoResponse response = extractFlight(memberId,request);
+    System.out.println("response:"+response);
+    String pythonUrl = "http://localhost:8000/flight-data";
+    for (var flight : response.flightList().flights()) {
+      List<MemberInfoGetResponse> matchedMembers = response.memberInfoList()
+          .memberInfoGetResponseList().stream()
+          .filter(member -> flight.names().stream()
+              .anyMatch(flightName -> member.name().contains(flightName)))
+          .toList();
+      System.out.println("flightNames: "+flight.names());
+      List<Map<String, String>> memberPayloads = matchedMembers.stream().map(member -> Map.of(
+          "name", member.name(),
+          "firstName", member.firstName(),
+          "lastName", member.lastName(),
+          "email", member.email(),
+          "phoneNumber", member.phoneNumber(),
+          "gender", member.gender(),
+          "birthDate", member.birthDate(),
+          "passportNumber", member.passportNumber(),
+          "passportExpireDate", member.passportExpireDate()
+      )).toList();
+
+      Map<String, Object> payload = Map.of(
+          "flight", Map.of(
+              "depart_date", flight.depart_date(),
+              "return_date", flight.return_date(),
+              "departure", flight.departure(),
+              "arrival", flight.arrival(),
+              "guests", flight.guests(),
+              "requirements", flight.requirements(),
+              "names", flight.names(),
+              "budget", flight.budget()
+          ),
+          "memberInfoList", memberPayloads
+      );
+
+      agentResponse(memberId, pythonUrl, payload);
+    }
+  }
+
+  private void agentResponse(Long memberId, String pythonUrl, Map<String, Object> payload) {
+    String result = restTemplate.postForObject(
+        pythonUrl,
+        payload,
+        String.class
+    );
+    try {
+      JsonNode rootNode = objectMapper.readTree(result);
+      JsonNode detailNode = rootNode.get("detail");
+      String detailJson = detailNode.toString();
+      System.out.println("result :" + result);
+      BusinessTripAgentRequest agentRequest = objectMapper.readValue(detailJson, BusinessTripAgentRequest.class);
+
+      System.out.println("names" + agentRequest.names());
+      businessTripService.saveAgentMcp(memberId, agentRequest);
+    } catch (JsonProcessingException e) {
+      System.out.println(e.getMessage());
     }
   }
 
@@ -106,12 +150,12 @@ public class PromptService {
     return new HotelAndMemberInfoResponse(hotelList, memberInfoList);
   }
 
-  public void extractFlight(Long memberId,
+  public FlightAndMemberInfoResponse extractFlight(Long memberId,
       PromptRequest request) {
     FlightList flightList = extractFlightInfo(memberId, request);
     MemberInfoList memberInfoList = extractNames(memberId, request);
 
-    new FlightAndMemberInfoResponse(flightList, memberInfoList);
+    return new FlightAndMemberInfoResponse(flightList, memberInfoList);
   }
 
   public IntegrationResponse extractIntegration(Long memberId, PromptRequest request) {
@@ -127,13 +171,16 @@ public class PromptService {
         .orElseThrow(MemberNotFoundException::new);
 
     String fullPrompt = String.format(
-        "다음 문장에서 출장 정보를 추출해줘. 올해는 2025년이야. 예산은 숙박 일수 만큼 나눠.\n" +
-            "출발일은 departure_date 에 저장하고 도착일은 arrival_date 에 저장해.\n" +
-            "문장을 파악해서 요청자와 같이 출장을 가는 사람 이름이면 그것에 맞춰 인원 수 추가.\n" +
-            "출장 정보 한 개당 최소 한 명의 이름 필요.\n" +
-            "만약 이름이 출장 정보에 없다면 %s 이름 추가.\n" +
-            "프롬프트 요청자로 예상되면 %s 이름 추가.\n" +
-            "문장 :\n%s",
+        """
+            다음 문장에서 출장 정보를 추출해줘. 올해는 2025년이야. 예산은 숙박 일수 만큼 나눠.
+            출발일은 departure_date 에 저장하고 도착일은 arrival_date 에 저장해.
+            문장을 파악해서 요청자와 같이 출장을 가는 사람 이름이면 그것에 맞춰 인원 수 추가.
+            만약 9월 23일부터 4박 5일이면 depart_date = 2025-09-23, return_date = 2025-09-27.
+            출장 정보 한 개당 최소 한 명의 이름 필요.
+            만약 이름이 출장 정보에 없다면 %s 이름 추가.
+            프롬프트 요청자로 예상되면 %s 이름 추가.
+            문장 :
+            %s""",
         member.getName(),
         member.getName(),
         request.prompt()
@@ -150,13 +197,16 @@ public class PromptService {
         .orElseThrow(MemberNotFoundException::new);
 
     String fullPrompt = String.format(
-        "다음 문장에서 출장 정보를 추출해줘. 올해는 2025년이야. 예산은 숙박 일수 만큼 나눠.\n" +
-            "출발지는 depart_date 에 저장하고 도착지은 return_date 에 저장해.\n" +
-            "문장을 파악해서 요청자와 같이 출장을 가는 사람 이름이면 그것에 맞춰 인원 수 추가.\n" +
-            "출장 정보 한 개당 최소 한 명의 이름 필요.\n" +
-            "만약 이름이 출장 정보에 없다면 %s 이름 추가.\n" +
-            "프롬프트 요청자로 예상되면 %s 이름 추가.\n" +
-            "문장 :\n%s",
+        """
+            다음 문장에서 출장 정보를 추출해줘. 올해는 2025년이야. 예산은 숙박 일수 만큼 나눠.
+            출발지는 depart_date 에 저장하고 도착지은 return_date 에 저장해.
+            문장을 파악해서 요청자와 같이 출장을 가는 사람 이름이면 그것에 맞춰 인원 수 추가.
+            만약 9월 23일부터 4박 5일이면 depart_date = 2025-09-23, return_date = 2025-09-27.
+            출장 정보 한 개당 최소 한 명의 이름 필요.
+            만약 이름이 출장 정보에 없다면 %s 이름 추가.
+            프롬프트 요청자로 예상되면 %s 이름 추가.
+            문장 :
+            %s""",
         member.getName(),
         member.getName(),
         request.prompt()

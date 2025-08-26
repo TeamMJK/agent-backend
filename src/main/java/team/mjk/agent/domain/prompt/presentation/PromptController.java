@@ -31,7 +31,7 @@ public class PromptController {
       @MemberId Long memberId,
       @Valid @RequestBody PromptRequest request
   ) {
-    promptService.extractFlight(memberId,
+    promptService.handleFlight(memberId,
         request);
   }
 
