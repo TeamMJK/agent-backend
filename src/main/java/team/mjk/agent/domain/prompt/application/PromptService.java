@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import team.mjk.agent.domain.businessTrip.application.BusinessTripService;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
-import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
@@ -20,8 +19,8 @@ import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
 import team.mjk.agent.domain.member.dto.response.MemberInfoList;
 import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
 import team.mjk.agent.domain.prompt.dto.request.PromptRequest;
-import team.mjk.agent.domain.prompt.dto.response.BusinessTripAndMemberInfoResponse;
-import team.mjk.agent.domain.prompt.dto.response.BusinessTripList;
+import team.mjk.agent.domain.prompt.dto.response.FlightAndMemberInfoResponse;
+import team.mjk.agent.domain.prompt.dto.response.FlightList;
 import team.mjk.agent.domain.prompt.dto.response.HotelAndMemberInfoResponse;
 import team.mjk.agent.domain.prompt.dto.response.HotelList;
 import team.mjk.agent.domain.prompt.dto.response.IntegrationResponse;
@@ -107,20 +106,20 @@ public class PromptService {
     return new HotelAndMemberInfoResponse(hotelList, memberInfoList);
   }
 
-  public void extractBusinessTrip(Long memberId,
+  public void extractFlight(Long memberId,
       PromptRequest request) {
-    BusinessTripList businessTripList = extractBusinessTripInfo(memberId, request);
+    FlightList flightList = extractFlightInfo(memberId, request);
     MemberInfoList memberInfoList = extractNames(memberId, request);
 
-    new BusinessTripAndMemberInfoResponse(businessTripList, memberInfoList);
+    new FlightAndMemberInfoResponse(flightList, memberInfoList);
   }
 
   public IntegrationResponse extractIntegration(Long memberId, PromptRequest request) {
-    BusinessTripList businessTripList = extractBusinessTripInfo(memberId, request);
+    FlightList flightList = extractFlightInfo(memberId, request);
     HotelList hotelList = extractHotelInfo(memberId, request);
     MemberInfoList memberInfoList = extractNames(memberId, request);
 
-    return new IntegrationResponse(businessTripList, hotelList, memberInfoList);
+    return new IntegrationResponse(flightList, hotelList, memberInfoList);
   }
 
   public HotelList extractHotelInfo(Long memberId, PromptRequest request) {
@@ -146,7 +145,7 @@ public class PromptService {
         .entity(HotelList.class);
   }
 
-  public BusinessTripList extractBusinessTripInfo(Long memberId, PromptRequest request) {
+  public FlightList extractFlightInfo(Long memberId, PromptRequest request) {
     Member member = memberRepository.findByMemberId(memberId)
         .orElseThrow(MemberNotFoundException::new);
 
@@ -165,7 +164,7 @@ public class PromptService {
     return chatClient.prompt()
         .user(p -> p.text(fullPrompt))
         .call()
-        .entity(BusinessTripList.class);
+        .entity(FlightList.class);
   }
 
   private MemberInfoList extractNames(Long memberId, PromptRequest request) {

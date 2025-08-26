@@ -26,12 +26,12 @@ public class PromptController {
     promptService.handleHotel(memberId, request);
   }
 
-  @PostMapping("/business-trip")
-  public void extractBusinessTripPrompt(
+  @PostMapping("/flight")
+  public void extractFlightPrompt(
       @MemberId Long memberId,
       @Valid @RequestBody PromptRequest request
   ) {
-    promptService.extractBusinessTrip(memberId,
+    promptService.extractFlight(memberId,
         request);
   }
 

@@ -2,7 +2,7 @@ package team.mjk.agent.domain.prompt.dto.response;
 
 import java.util.List;
 
-public record BusinessTripInfo(
+public record FlightInfo(
   String departure,
   String arrival,
   String depart_date,
