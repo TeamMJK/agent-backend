@@ -1,4 +1,4 @@
-package team.mjk.agent.domain.prompt.dto.response;
+package team.mjk.agent.domain.hotel.dto;
 
 import java.util.List;
 

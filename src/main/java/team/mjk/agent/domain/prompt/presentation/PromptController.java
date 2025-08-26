@@ -23,7 +23,7 @@ public class PromptController {
       @MemberId Long memberId,
       @Valid @RequestBody PromptRequest request
   ) {
-    promptService.handleHotel(memberId, request);
+    promptService.extractHotel(memberId, request);
   }
 
   @PostMapping("/flight")
@@ -31,7 +31,7 @@ public class PromptController {
       @MemberId Long memberId,
       @Valid @RequestBody PromptRequest request
   ) {
-    promptService.handleFlight(memberId,
+    promptService.extractFlight(memberId,
         request);
   }
 
@@ -40,10 +40,7 @@ public class PromptController {
       @MemberId Long memberId,
       @Valid @RequestBody PromptRequest request
   ) {
-    IntegrationResponse response = promptService.extractIntegration(memberId, request);
-
-    String pythonUrl = "http://localhost:8000/integration";
-
+    promptService.handleIntegration(memberId, request);
   }
 
 }

@@ -1,29 +1,24 @@
 package team.mjk.agent.domain.prompt.application;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import team.mjk.agent.domain.businessTrip.application.BusinessTripService;
-import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
 import team.mjk.agent.domain.company.domain.Company;
+import team.mjk.agent.domain.flight.application.FlightService;
+import team.mjk.agent.domain.flight.dto.FlightAndMemberInfoResponse;
+import team.mjk.agent.domain.flight.dto.FlightList;
+import team.mjk.agent.domain.hotel.application.HotelService;
+import team.mjk.agent.domain.hotel.dto.HotelAndMemberInfoResponse;
+import team.mjk.agent.domain.hotel.dto.HotelList;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
 import team.mjk.agent.domain.member.dto.response.MemberInfoList;
 import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
 import team.mjk.agent.domain.prompt.dto.request.PromptRequest;
-import team.mjk.agent.domain.prompt.dto.response.FlightAndMemberInfoResponse;
-import team.mjk.agent.domain.prompt.dto.response.FlightList;
-import team.mjk.agent.domain.prompt.dto.response.HotelAndMemberInfoResponse;
-import team.mjk.agent.domain.prompt.dto.response.HotelList;
-import team.mjk.agent.domain.prompt.dto.response.IntegrationResponse;
 import team.mjk.agent.domain.prompt.dto.response.NameList;
 import team.mjk.agent.global.util.KmsUtil;
 
@@ -34,139 +29,34 @@ public class PromptService {
   private final ChatClient chatClient;
   private final MemberRepository memberRepository;
   private final KmsUtil kmsUtil;
-  private final RestTemplate restTemplate = new RestTemplate();
-  private final BusinessTripService businessTripService;
-  private final ObjectMapper objectMapper;
+  private final FlightService flightService;
+  private final HotelService hotelService;
 
-  public void handleHotel(Long memberId, PromptRequest request) {
-    HotelAndMemberInfoResponse response = extractHotel(memberId, request);
-
-    String pythonUrl = "http://localhost:8000/hotel-data";
-    for (var hotel : response.hotelList().hotels()) {
-      List<MemberInfoGetResponse> matchedMembers = response.memberInfoList()
-          .memberInfoGetResponseList().stream()
-          .filter(member -> hotel.names().stream()
-              .anyMatch(hotelName -> member.name().contains(hotelName)))
-          .toList();
-
-      if (!matchedMembers.isEmpty()) {
-        MemberInfoGetResponse firstMember = matchedMembers.get(0);
-
-        Map<String, Object> payload = Map.of(
-            "hotel", Map.of(
-                "departure_date", hotel.departure_date(),
-                "arrival_date", hotel.arrival_date(),
-                "destination", hotel.destination(),
-                "guests", hotel.guests(),
-                "budget", hotel.budget(),
-                "requirements", hotel.requirements(),
-                "names", hotel.names()
-            ),
-            "memberInfo", Map.of(    // 단일 멤버 정보
-                "name", firstMember.name(),
-                "firstName", firstMember.firstName(),
-                "lastName", firstMember.lastName(),
-                "email", firstMember.email(),
-                "phoneNumber", firstMember.phoneNumber(),
-                "gender", firstMember.gender(),
-                "birthDate", firstMember.birthDate(),
-                "passportNumber", firstMember.passportNumber(),
-                "passportExpireDate", firstMember.passportExpireDate()
-            )
-        );
-
-        // POST 요청 실행
-        agentResponse(memberId, pythonUrl, payload);
-      }
-    }
+  public void handleIntegration(Long memberId, PromptRequest request) {
+    extractFlight(memberId, request);
+    extractHotel(memberId, request);
   }
 
-  public void handleFlight(Long memberId, PromptRequest request) {
-    FlightAndMemberInfoResponse response = extractFlight(memberId,request);
-    System.out.println("response:"+response);
-    String pythonUrl = "http://localhost:8000/flight-data";
-    for (var flight : response.flightList().flights()) {
-      List<MemberInfoGetResponse> matchedMembers = response.memberInfoList()
-          .memberInfoGetResponseList().stream()
-          .filter(member -> flight.names().stream()
-              .anyMatch(flightName -> member.name().contains(flightName)))
-          .toList();
-      System.out.println("flightNames: "+flight.names());
-      List<Map<String, String>> memberPayloads = matchedMembers.stream().map(member -> Map.of(
-          "name", member.name(),
-          "firstName", member.firstName(),
-          "lastName", member.lastName(),
-          "email", member.email(),
-          "phoneNumber", member.phoneNumber(),
-          "gender", member.gender(),
-          "birthDate", member.birthDate(),
-          "passportNumber", member.passportNumber(),
-          "passportExpireDate", member.passportExpireDate()
-      )).toList();
-
-      Map<String, Object> payload = Map.of(
-          "flight", Map.of(
-              "depart_date", flight.depart_date(),
-              "return_date", flight.return_date(),
-              "departure", flight.departure(),
-              "arrival", flight.arrival(),
-              "guests", flight.guests(),
-              "requirements", flight.requirements(),
-              "names", flight.names(),
-              "budget", flight.budget()
-          ),
-          "memberInfoList", memberPayloads
-      );
-
-      agentResponse(memberId, pythonUrl, payload);
-    }
-  }
-
-  private void agentResponse(Long memberId, String pythonUrl, Map<String, Object> payload) {
-    String result = restTemplate.postForObject(
-        pythonUrl,
-        payload,
-        String.class
-    );
-    try {
-      JsonNode rootNode = objectMapper.readTree(result);
-      JsonNode detailNode = rootNode.get("detail");
-      String detailJson = detailNode.toString();
-      System.out.println("result :" + result);
-      BusinessTripAgentRequest agentRequest = objectMapper.readValue(detailJson, BusinessTripAgentRequest.class);
-
-      System.out.println("names" + agentRequest.names());
-      businessTripService.saveAgentMcp(memberId, agentRequest);
-    } catch (JsonProcessingException e) {
-      System.out.println(e.getMessage());
-    }
-  }
-
-
-  public HotelAndMemberInfoResponse extractHotel(Long memberId, PromptRequest request) {
+  public void extractHotel(Long memberId, PromptRequest request) {
     HotelList hotelList = extractHotelInfo(memberId, request);
     MemberInfoList memberInfoList = extractNames(memberId, request);
 
-    return new HotelAndMemberInfoResponse(hotelList, memberInfoList);
+    HotelAndMemberInfoResponse response = new HotelAndMemberInfoResponse(hotelList, memberInfoList);
+
+    hotelService.handleHotel(memberId,response);
   }
 
-  public FlightAndMemberInfoResponse extractFlight(Long memberId,
+  public void extractFlight(Long memberId,
       PromptRequest request) {
     FlightList flightList = extractFlightInfo(memberId, request);
     MemberInfoList memberInfoList = extractNames(memberId, request);
 
-    return new FlightAndMemberInfoResponse(flightList, memberInfoList);
+    FlightAndMemberInfoResponse response = new FlightAndMemberInfoResponse(flightList, memberInfoList);
+
+    flightService.handleFlight(memberId,response);
   }
 
-  public IntegrationResponse extractIntegration(Long memberId, PromptRequest request) {
-    FlightList flightList = extractFlightInfo(memberId, request);
-    HotelList hotelList = extractHotelInfo(memberId, request);
-    MemberInfoList memberInfoList = extractNames(memberId, request);
-
-    return new IntegrationResponse(flightList, hotelList, memberInfoList);
-  }
-
-  public HotelList extractHotelInfo(Long memberId, PromptRequest request) {
+  private HotelList extractHotelInfo(Long memberId, PromptRequest request) {
     Member member = memberRepository.findByMemberId(memberId)
         .orElseThrow(MemberNotFoundException::new);
 
@@ -192,7 +82,7 @@ public class PromptService {
         .entity(HotelList.class);
   }
 
-  public FlightList extractFlightInfo(Long memberId, PromptRequest request) {
+  private FlightList extractFlightInfo(Long memberId, PromptRequest request) {
     Member member = memberRepository.findByMemberId(memberId)
         .orElseThrow(MemberNotFoundException::new);
 

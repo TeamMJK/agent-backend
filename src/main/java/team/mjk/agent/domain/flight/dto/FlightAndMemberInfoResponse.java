@@ -1,4 +1,4 @@
-package team.mjk.agent.domain.prompt.dto.response;
+package team.mjk.agent.domain.flight.dto;
 
 import team.mjk.agent.domain.member.dto.response.MemberInfoList;
 
