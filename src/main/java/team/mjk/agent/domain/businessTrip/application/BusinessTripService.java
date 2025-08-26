@@ -1,11 +1,14 @@
 package team.mjk.agent.domain.businessTrip.application;
 
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.mjk.agent.domain.businessTrip.domain.BusinessTrip;
 import team.mjk.agent.domain.businessTrip.domain.BusinessTripRepository;
+import team.mjk.agent.domain.businessTrip.domain.ServiceType;
+import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripUpdateRequest;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetAllResponse;
@@ -28,6 +31,7 @@ public class BusinessTripService {
   private final BusinessTripRepository businessTripRepository;
   private final McpServiceRegistry registry;
 
+  //사용자 직접 저장 메서드
   @Transactional
   public BusinessTripSaveResponse save(Long memberId, BusinessTripSaveRequest request) {
     Member member = memberRepository.findByMemberId(memberId)
@@ -39,7 +43,8 @@ public class BusinessTripService {
         request.destination(),
         request.names(),
         member.getName(),
-        member.getCompany().getId()
+        member.getCompany().getId(),
+        request.serviceType()
     );
     businessTripRepository.save(businessTrip);
 
@@ -48,6 +53,29 @@ public class BusinessTripService {
         .build();
   }
 
+  //Agent 통한 저장 메서드
+  @Transactional
+  public BusinessTripSaveResponse save(Long memberId, BusinessTripAgentRequest request) {
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(MemberNotFoundException::new);
+
+    BusinessTrip businessTrip = BusinessTrip.create(
+        LocalDate.parse(request.departDate()),
+        LocalDate.parse(request.arriveDate()),
+        request.destination(),
+        request.names(),
+        member.getName(),
+        member.getCompany().getId(),
+        ServiceType.fromCategory(request.serviceType())
+    );
+    businessTripRepository.save(businessTrip);
+
+    return BusinessTripSaveResponse.builder()
+        .businessTripId(businessTrip.getId())
+        .build();
+  }
+
+  //Controller(저장) -> saveMcp 호출 -> save 호출
   @Transactional
   public Workspace saveMcp(Long memberId, BusinessTripSaveRequest request) {
     Member member = memberRepository.findByMemberId(memberId)
@@ -66,6 +94,23 @@ public class BusinessTripService {
     return company.getWorkspace();
   }
 
+  //Agent(저장) -> saveAgentMcp 호출 -> save 호출
+  @Transactional
+  public void saveAgentMcp(Long memberId, BusinessTripAgentRequest request) {
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(MemberNotFoundException::new);
+
+    Company company = member.getCompany();
+    Workspace workspace = company.getWorkspace();
+    if (workspace == Workspace.NONE){
+      save(memberId, request);
+      return;
+    }
+
+    McpService mcpService = registry.getService(workspace);
+    mcpService.createBusinessTripAgent(request, company.getId());
+  }
+
   @Transactional(readOnly = true)
   public BusinessTripGetResponse getBusinessTrip(Long memberId, Long businessTripId) {
     Member member = memberRepository.findByMemberId(memberId)
@@ -82,6 +127,7 @@ public class BusinessTripService {
         .destination(businessTrip.getDestination())
         .names(businessTrip.getNames())
         .writer(businessTrip.getWriter())
+        .serviceType(businessTrip.getServiceType())
         .build();
   }
 

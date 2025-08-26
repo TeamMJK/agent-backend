@@ -12,6 +12,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
 import team.mjk.agent.domain.company.domain.Workspace;
 import team.mjk.agent.domain.member.domain.Member;
@@ -87,6 +88,68 @@ public class NotionService implements McpService {
             )),
             "출장지", Map.of("rich_text", List.of(
                 Map.of("text", Map.of("content", request.destination()))
+            )),
+            "카테고리", Map.of("rich_text", List.of(
+                Map.of("text", Map.of("content", request.serviceType()))
+            ))
+        )
+    );
+
+    String json = null;
+    try {
+      json = objectMapper.writeValueAsString(payload);
+    } catch (JsonProcessingException e) {
+      throw new NotionAPIException(e);
+    }
+
+    RequestBody body = RequestBody.create(
+        json,
+        MediaType.get("application/json; charset=utf-8")
+    );
+
+    Request httpRequest = new Request.Builder()
+        .url(url)
+        .addHeader("Authorization", "Bearer " + kmsUtil.decrypt(notion.getToken()))
+        .addHeader("Content-Type", "application/json")
+        .addHeader("Notion-Version", "2022-06-28")
+        .post(body)
+        .build();
+
+    try (Response response = client.newCall(httpRequest).execute()) {
+      if (!response.isSuccessful()) {
+        throw new NotionAPIException();
+      }
+    } catch (IOException e) {
+      throw new NotionAPIException(e);
+    }
+  }
+
+  @Override
+  public void createBusinessTripAgent(BusinessTripAgentRequest request, Long companyId) {
+    Notion notion = notionRepository.findByCompanyId(companyId);
+
+    String url = "https://api.notion.com/v1/pages";
+    OkHttpClient client = new OkHttpClient();
+
+    List<Map<String, Map<String, String>>> nameBlocks = request.names().stream()
+        .map(name -> Map.of("text", Map.of("content", name)))
+        .toList();
+
+    Map<String, Object> payload = Map.of(
+        "parent", Map.of("database_id", kmsUtil.decrypt(notion.getBusinessTripDatabaseId())),
+        "properties", Map.of(
+            "이름", Map.of("title", nameBlocks),
+            "도착일자", Map.of("rich_text", List.of(
+                Map.of("text", Map.of("content", request.arriveDate()))
+            )),
+            "출발일자", Map.of("rich_text", List.of(
+                Map.of("text", Map.of("content", request.departDate()))
+            )),
+            "출장지", Map.of("rich_text", List.of(
+                Map.of("text", Map.of("content", request.destination()))
+            )),
+            "카테고리", Map.of("rich_text", List.of(
+                Map.of("text", Map.of("content", request.serviceType()))
             ))
         )
     );

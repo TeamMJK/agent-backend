@@ -1,10 +1,18 @@
 package team.mjk.agent.domain.prompt.application;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import team.mjk.agent.domain.businessTrip.application.BusinessTripService;
+import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
+import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
@@ -27,6 +35,70 @@ public class PromptService {
   private final ChatClient chatClient;
   private final MemberRepository memberRepository;
   private final KmsUtil kmsUtil;
+  private final RestTemplate restTemplate = new RestTemplate();
+  private final BusinessTripService businessTripService;
+  private final ObjectMapper objectMapper;
+
+  public void handleHotel(Long memberId, PromptRequest request) {
+    HotelAndMemberInfoResponse response = extractHotel(memberId, request);
+
+    String pythonUrl = "http://localhost:8000/hotel-data";
+    for (var hotel : response.hotelList().hotels()) {
+      List<MemberInfoGetResponse> matchedMembers = response.memberInfoList()
+          .memberInfoGetResponseList().stream()
+          .filter(member -> hotel.names().stream()
+              .anyMatch(hotelName -> member.name().contains(hotelName)))
+          .toList();
+
+      if (!matchedMembers.isEmpty()) {
+        MemberInfoGetResponse firstMember = matchedMembers.get(0);
+
+        Map<String, Object> payload = Map.of(
+            "hotel", Map.of(
+                "departure_date", hotel.departure_date(),
+                "arrival_date", hotel.arrival_date(),
+                "destination", hotel.destination(),
+                "guests", hotel.guests(),
+                "budget", hotel.budget(),
+                "requirements", hotel.requirements(),
+                "names", hotel.names()
+            ),
+            "memberInfo", Map.of(    // 단일 멤버 정보
+                "name", firstMember.name(),
+                "firstName", firstMember.firstName(),
+                "lastName", firstMember.lastName(),
+                "email", firstMember.email(),
+                "phoneNumber", firstMember.phoneNumber(),
+                "gender", firstMember.gender(),
+                "birthDate", firstMember.birthDate(),
+                "passportNumber", firstMember.passportNumber(),
+                "passportExpireDate", firstMember.passportExpireDate()
+            )
+        );
+
+        // POST 요청 실행
+        String result = restTemplate.postForObject(
+            pythonUrl,
+            payload,
+            String.class
+        );
+        try {
+          JsonNode rootNode = objectMapper.readTree(result);
+          JsonNode detailNode = rootNode.get("detail");
+          String detailJson = detailNode.toString();
+          System.out.println("result :" + result);
+          BusinessTripAgentRequest agentRequest = objectMapper.readValue(detailJson,
+              BusinessTripAgentRequest.class);
+
+          System.out.println("names" + agentRequest.names());
+          businessTripService.saveAgentMcp(memberId, agentRequest);
+        } catch (JsonProcessingException e) {
+          System.out.println(e.getMessage());
+        }
+      }
+    }
+  }
+
 
   public HotelAndMemberInfoResponse extractHotel(Long memberId, PromptRequest request) {
     HotelList hotelList = extractHotelInfo(memberId, request);
@@ -35,12 +107,12 @@ public class PromptService {
     return new HotelAndMemberInfoResponse(hotelList, memberInfoList);
   }
 
-  public BusinessTripAndMemberInfoResponse extractBusinessTrip(Long memberId,
+  public void extractBusinessTrip(Long memberId,
       PromptRequest request) {
     BusinessTripList businessTripList = extractBusinessTripInfo(memberId, request);
     MemberInfoList memberInfoList = extractNames(memberId, request);
 
-    return new BusinessTripAndMemberInfoResponse(businessTripList, memberInfoList);
+    new BusinessTripAndMemberInfoResponse(businessTripList, memberInfoList);
   }
 
   public IntegrationResponse extractIntegration(Long memberId, PromptRequest request) {

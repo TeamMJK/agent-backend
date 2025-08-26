@@ -22,7 +22,7 @@ import team.mjk.agent.domain.company.domain.Workspace;
 @RequestMapping("/business-trips")
 public interface BusinessTripDocsController {
 
-    @Operation(summary = "출장 등록", description = "출장 신청 정보를 등록합니다.")
+    @Operation(summary = "출장 등록", description = "사용자가 WorkSpace 상관없이 MJK 워크스페이스에 저장할 때 출장 신청 정보를 등록합니다.")
     @ApiResponses({
             @ApiResponse(
                     responseCode = "201",
@@ -35,7 +35,7 @@ public interface BusinessTripDocsController {
             @RequestBody(description = "출장 등록 요청 DTO", required = true) BusinessTripSaveRequest request
     );
 
-    @Operation(summary = "출장 MCP 등록", description = "출장 신청 정보를 회사 MCP 에 등록하니다.")
+    @Operation(summary = "출장 MCP 등록", description = "사용자가 출장 정보를 생성할 때 출장 신청 정보를 회사 MCP 에 등록하니다.(MJK 워크스페이스 포함)")
     @ApiResponses({
         @ApiResponse(
             responseCode = "201",
@@ -86,4 +86,5 @@ public interface BusinessTripDocsController {
     ResponseEntity<BusinessTripGetAllResponse> getAllBusinessTrip(
             @Parameter(hidden = true) Long memberId
     );
+
 }

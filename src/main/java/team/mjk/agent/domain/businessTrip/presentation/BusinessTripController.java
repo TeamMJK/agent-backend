@@ -27,6 +27,7 @@ public class BusinessTripController implements BusinessTripDocsController{
 
   private final BusinessTripService businessTripService;
 
+  //사용자가 WorkSpace 상관없이 MJK 워크스페이스에 저장할 때
   @PostMapping
   public ResponseEntity<BusinessTripSaveResponse> saveBusinessTrip(
       @MemberId Long memberId,
@@ -36,6 +37,7 @@ public class BusinessTripController implements BusinessTripDocsController{
     return new ResponseEntity<>(response, HttpStatus.CREATED);
   }
 
+  //사용자가 출장 정보를 생성할 때
   @PostMapping("/mcp")
   public ResponseEntity<Workspace> saveBusinessTripMcp(
       @MemberId Long memberId,

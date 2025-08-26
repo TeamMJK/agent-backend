@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
+import team.mjk.agent.domain.businessTrip.domain.ServiceType;
 
 public record BusinessTripUpdateRequest(
     @NotNull(message = "출발일을 선택해주세요.")
@@ -16,7 +17,10 @@ public record BusinessTripUpdateRequest(
     String destination,
 
     @NotBlank(message = "출장 가는 인원들의 성명을 입력해주세요.")
-    List<String> names
+    List<String> names,
+
+    @NotBlank(message = "항공/숙박 을 선택해주세요.")
+    ServiceType serviceType
 ) {
 
 }

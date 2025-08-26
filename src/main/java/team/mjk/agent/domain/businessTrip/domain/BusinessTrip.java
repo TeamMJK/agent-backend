@@ -30,6 +30,8 @@ public class BusinessTrip {
 
   private String destination;
 
+  private ServiceType serviceType;
+
   private String writer;
 
   private Long companyId;
@@ -44,7 +46,8 @@ public class BusinessTrip {
       String destination,
       List<String> names,
       String writer,
-      Long companyId
+      Long companyId,
+      ServiceType serviceType
   ) {
     this.destination = destination;
     this.departDate = departDate;
@@ -52,6 +55,7 @@ public class BusinessTrip {
     this.names = names;
     this.writer = writer;
     this.companyId = companyId;
+    this.serviceType = serviceType;
   }
 
   public void update(BusinessTripUpdateRequest request) {
@@ -59,6 +63,7 @@ public class BusinessTrip {
     this.arriveDate =  request.arriveDate();
     this.destination = request.destination();
     this.names = request.names();
+    this.serviceType = request.serviceType();
   }
 
   public static BusinessTrip create(
@@ -67,7 +72,8 @@ public class BusinessTrip {
       String destination,
       List<String> names,
       String writer,
-      Long companyId
+      Long companyId,
+      ServiceType serviceType
   ) {
     return BusinessTrip.builder()
         .arriveDate(arriveDate)
@@ -76,6 +82,7 @@ public class BusinessTrip {
         .names(names)
         .writer(writer)
         .companyId(companyId)
+        .serviceType(serviceType)
         .build();
   }
 
