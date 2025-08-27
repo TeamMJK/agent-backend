@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import team.mjk.agent.domain.company.dto.request.CompanyInvitationCodeRequest;
 import team.mjk.agent.domain.company.dto.request.CompanySaveRequest;
+import team.mjk.agent.domain.company.dto.response.CompanyJoinResponse;
 
 @Tag(name = "Company", description = "회사 관련 API")
 @RequestMapping("/companies")
@@ -50,7 +51,7 @@ public interface CompanyDocsController {
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
       )
   })
-  ResponseEntity<String> joinCompany(
+  ResponseEntity<CompanyJoinResponse> joinCompany(
       @Parameter(hidden = true) Long memberId,
       @RequestBody(description = "회사 초대 코드 요청 DTO", required = true) CompanyInvitationCodeRequest request
   );

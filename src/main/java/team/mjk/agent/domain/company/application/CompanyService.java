@@ -7,6 +7,7 @@ import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.company.domain.CompanyRepository;
 import team.mjk.agent.domain.company.dto.request.CompanyInvitationCodeRequest;
 import team.mjk.agent.domain.company.dto.request.CompanySaveRequest;
+import team.mjk.agent.domain.company.dto.response.CompanyJoinResponse;
 import team.mjk.agent.domain.company.presentation.exception.CompanyNotFoundException;
 import team.mjk.agent.domain.company.presentation.exception.InvalidInvitationCode;
 import team.mjk.agent.domain.invitation.InvitationCodeProvider;
@@ -50,7 +51,7 @@ public class CompanyService {
   }
 
   @Transactional
-  public String join(Long memberId, CompanyInvitationCodeRequest request) {
+  public CompanyJoinResponse join(Long memberId, CompanyInvitationCodeRequest request) {
     Member member = memberRepository.findByMemberId(memberId)
         .orElseThrow(MemberNotFoundException::new);
 
@@ -66,7 +67,9 @@ public class CompanyService {
 
     invitationRepository.delete(invitation);
 
-    return company.getName();
+    return CompanyJoinResponse.builder()
+            .companyName(company.getName())
+            .build();
   }
 
   @Transactional(readOnly = true)
