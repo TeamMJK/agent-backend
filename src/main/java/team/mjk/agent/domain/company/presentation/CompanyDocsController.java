@@ -11,23 +11,30 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import team.mjk.agent.domain.company.dto.request.CompanyInvitationCodeRequest;
+import team.mjk.agent.domain.company.dto.request.CompanyInvitationEmailRequest;
 import team.mjk.agent.domain.company.dto.request.CompanySaveRequest;
+import team.mjk.agent.domain.company.dto.response.CompanyInvitationEmailResponse;
 import team.mjk.agent.domain.company.dto.response.CompanyJoinResponse;
 
 @Tag(name = "Company", description = "회사 관련 API")
 @RequestMapping("/companies")
 public interface CompanyDocsController {
 
-  @Operation(summary = "초대 코드 생성", description = "회사 초대 코드를 생성합니다.")
+  @Operation(summary = "초대 코드 생성 및 이메일 발송", description = "이메일로 회사 초대 코드를 발송합니다.")
   @ApiResponses({
-      @ApiResponse(
-          responseCode = "201",
-          description = "초대 코드 생성 성공",
-          content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
-      )
+          @ApiResponse(
+                  responseCode = "201",
+                  description = "초대 코드 생성 및 발송 성공",
+                  content = @Content(
+                          mediaType = "application/json",
+                          schema = @Schema(implementation = CompanyInvitationEmailResponse.class)
+                  )
+          )
   })
-  ResponseEntity<String> createInvitationCode(
-      @Parameter(hidden = true) Long memberID
+  ResponseEntity<CompanyInvitationEmailResponse> sendInvitationCode(
+          @Parameter(hidden = true) Long memberID,
+          @RequestBody(description = "초대 코드 발송 요청 DTO", required = true)
+          CompanyInvitationEmailRequest request
   );
 
   @Operation(summary = "회사 생성", description = "새로운 회사를 생성합니다.")

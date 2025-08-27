@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import team.mjk.agent.domain.company.application.CompanyService;
 import team.mjk.agent.domain.company.dto.request.CompanyInvitationCodeRequest;
+import team.mjk.agent.domain.company.dto.request.CompanyInvitationEmailRequest;
 import team.mjk.agent.domain.company.dto.request.CompanySaveRequest;
+import team.mjk.agent.domain.company.dto.response.CompanyInvitationEmailResponse;
 import team.mjk.agent.domain.company.dto.response.CompanyJoinResponse;
 import team.mjk.agent.domain.invitation.domain.Invitation;
 import team.mjk.agent.global.annotation.MemberId;
@@ -25,13 +27,14 @@ public class CompanyController implements CompanyDocsController {
 
   private final CompanyService companyService;
 
-  @GetMapping("/invitation")
-  public ResponseEntity<String> createInvitationCode(
-      @MemberId Long memberId
-      ) {
-    Invitation invitationCode = companyService.createInvitationCode(memberId);
-
-    return new ResponseEntity<>(invitationCode.getCode(), HttpStatus.CREATED);
+  @PostMapping("/invitation/send")
+  public ResponseEntity<CompanyInvitationEmailResponse> sendInvitationCode(
+          @MemberId Long memberId,
+          @Valid @RequestBody CompanyInvitationEmailRequest request
+  ) {
+    CompanyInvitationEmailResponse response =
+            companyService.createInvitationCodeAndSendEmail(memberId, request);
+    return ResponseEntity.ok(response);
   }
 
   @PostMapping

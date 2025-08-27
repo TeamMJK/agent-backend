@@ -15,4 +15,16 @@ public class EmailMessageBuilder {
         return "회원 가입 인증 이메일 입니다.";
     }
 
+    public String buildInvitationMessage(String code) {
+        return """
+            <p>안녕하세요,</p>
+            <p>아래 초대 코드를 사용해 가입을 완료해 주세요.</p>
+            <b>초대 코드: %s</b>
+        """.formatted(code);
+    }
+
+    public String buildInvitationSubject() {
+        return "회사 초대 코드 안내";
+    }
+
 }
