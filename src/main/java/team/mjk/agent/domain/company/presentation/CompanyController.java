@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import team.mjk.agent.domain.company.application.CompanyService;
 import team.mjk.agent.domain.company.dto.request.CompanyInvitationCodeRequest;
 import team.mjk.agent.domain.company.dto.request.CompanySaveRequest;
+import team.mjk.agent.domain.company.dto.response.CompanyJoinResponse;
 import team.mjk.agent.domain.invitation.domain.Invitation;
 import team.mjk.agent.global.annotation.MemberId;
 
@@ -44,13 +45,13 @@ public class CompanyController implements CompanyDocsController {
   }
 
   @PostMapping("/join")
-  public ResponseEntity<String> joinCompany(
+  public ResponseEntity<CompanyJoinResponse> joinCompany(
       @MemberId Long memberId,
       @RequestBody CompanyInvitationCodeRequest request
   ) {
-    String companyName = companyService.join(memberId,request);
+    CompanyJoinResponse response = companyService.join(memberId,request);
 
-    return new ResponseEntity<>(companyName, HttpStatus.OK);
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   @GetMapping
