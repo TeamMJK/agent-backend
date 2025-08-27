@@ -40,13 +40,13 @@ public class CompanyService {
     Member member = memberRepository.findByMemberId(memberId)
         .orElseThrow(MemberNotFoundException::new);
 
-    Long companyId = member.getCompany().getId();
-
-    if (companyRepository.findById(companyId).isEmpty()) {
+    if (member.getCompany() == null) {
       throw new CompanyNotFoundException();
     }
 
-    Invitation invitation = invitationCodeProvider.create(companyId);
+    Company company = companyRepository.findById(member.getCompany().getId());
+
+    Invitation invitation = invitationCodeProvider.create(company.getId());
 
     String subject = emailMessageBuilder.buildInvitationSubject();
     String content = emailMessageBuilder.buildInvitationMessage(invitation.getCode());
@@ -80,8 +80,7 @@ public class CompanyService {
 
     Long companyId = invitation.getCompanyId();
 
-    Company company = companyRepository.findById(companyId)
-        .orElseThrow(CompanyNotFoundException::new);
+    Company company = companyRepository.findById(companyId);
 
     member.saveCompany(company);
 

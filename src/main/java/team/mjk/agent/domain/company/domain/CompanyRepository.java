@@ -4,7 +4,7 @@ import java.util.Optional;
 
 public interface CompanyRepository {
 
-    Optional<Company> findById(Long id);
+    Company findById(Long id);
     Company save(Company company);
 
 }
