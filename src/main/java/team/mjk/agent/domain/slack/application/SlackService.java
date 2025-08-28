@@ -73,14 +73,29 @@ public class SlackService implements McpService {
     return slack.getId();
   }
 
+  private void sendSlackMessage(String token, String channelId, String message) {
+    String uri = "/chat.postMessage";
+
+    slackWebClient.post()
+        .uri(uri)
+        .header("Authorization", "Bearer " + token)
+        .header("Content-Type", "application/json; charset=utf-8")
+        .bodyValue(Map.of(
+            "channel", channelId,
+            "text", message
+        ))
+        .retrieve()
+        .bodyToMono(String.class)
+        .doOnError(e -> System.err.println("Slack API 호출 실패: " + e.getMessage()))
+        .subscribe(response -> System.out.println("Slack API 응답: " + response));
+  }
+
   @Override
   public void createBusinessTrip(BusinessTripSaveRequest request, Long companyId) {
     Slack slack = slackRepository.findByCompanyId(companyId);
 
     String token = kmsUtil.decrypt(slack.getToken());
     String channelId = kmsUtil.decrypt(slack.getChannelId());
-
-    String uri = "/chat.postMessage";
 
     List<String> members = request.names();
     String memberStr = String.join(", ", members);
@@ -93,18 +108,7 @@ public class SlackService implements McpService {
         memberStr
     );
 
-    slackWebClient.post()
-        .uri(uri)
-        .header("Authorization","Bearer "+token)
-        .header("Content-Type", "application/json; charset=utf-8")
-        .bodyValue(Map.of(
-            "channel", channelId,
-            "text", message
-        ))
-        .retrieve()
-        .bodyToMono(String.class)
-        .doOnError(e -> System.err.println("Slack API 호출 실패: " + e.getMessage()))
-        .subscribe(response -> System.out.println("Slack API 응답: " + response));
+    sendSlackMessage(token, channelId, message);
   }
 
   @Override
@@ -113,8 +117,6 @@ public class SlackService implements McpService {
 
     String token = kmsUtil.decrypt(slack.getToken());
     String channelId = kmsUtil.decrypt(slack.getChannelId());
-
-    String uri = "/chat.postMessage";
 
     List<String> members = request.names();
     String memberStr = String.join(", ", members);
@@ -127,18 +129,7 @@ public class SlackService implements McpService {
         memberStr
     );
 
-    slackWebClient.post()
-        .uri(uri)
-        .header("Authorization","Bearer "+token)
-        .header("Content-Type", "application/json; charset=utf-8")
-        .bodyValue(Map.of(
-            "channel", channelId,
-            "text", message
-        ))
-        .retrieve()
-        .bodyToMono(String.class)
-        .doOnError(e -> System.err.println("Slack API 호출 실패: " + e.getMessage()))
-        .subscribe(response -> System.out.println("Slack API 응답: " + response));
+    sendSlackMessage(token, channelId, message);
   }
 
   @Override
@@ -147,7 +138,6 @@ public class SlackService implements McpService {
 
     String token = kmsUtil.decrypt(slack.getToken());
     String channelId = kmsUtil.decrypt(slack.getChannelId());
-    String uri = "/chat.postMessage";
 
     String message = String.format(
         "날짜: %s\n주문번호: %s\n주소: %s\n총금액: %s\n이름: %s\n이미지 주소: %s",
@@ -159,23 +149,11 @@ public class SlackService implements McpService {
         request.imageUrl()
     );
 
-    slackWebClient.post()
-        .uri(uri)
-        .header("Authorization","Bearer "+token)
-        .header("Content-Type", "application/json; charset=utf-8")
-        .bodyValue(Map.of(
-            "channel", channelId,
-            "text", message
-        ))
-        .retrieve()
-        .bodyToMono(String.class)
-        .doOnError(e -> System.err.println("Slack API 호출 실패: " + e.getMessage()))
-        .subscribe(response -> System.out.println("Slack API 응답: " + response));
+    sendSlackMessage(token, channelId, message);
   }
 
   @Override
   public Workspace getWorkspace() {
     return Workspace.SLACK;
   }
-
 }

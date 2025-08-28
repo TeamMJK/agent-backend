@@ -19,4 +19,12 @@ public class WebClientConfig {
         .build();
   }
 
+  @Bean
+  public WebClient notionWebClient() {
+    return WebClient.builder()
+        .baseUrl("https://api.notion.com/v1")
+        .defaultHeader("Notion-Version", "2022-06-28")
+        .build();
+  }
+
 }
