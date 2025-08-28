@@ -1,5 +1,4 @@
-package team.mjk.agent.domain.notion.presentation;
-
+package team.mjk.agent.domain.slack.presentation;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,42 +10,42 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import team.mjk.agent.domain.notion.application.NotionService;
-import team.mjk.agent.domain.notion.dto.request.NotionTokenRequest;
-import team.mjk.agent.domain.notion.dto.request.NotionTokenUpdateRequest;
+import team.mjk.agent.domain.slack.application.SlackService;
+import team.mjk.agent.domain.slack.dto.request.SlackSaveRequest;
+import team.mjk.agent.domain.slack.dto.request.SlackUpdateRequest;
 import team.mjk.agent.global.annotation.MemberId;
 
 @RequiredArgsConstructor
-@RequestMapping("/notions")
+@RequestMapping("/slacks")
 @RestController
-public class NotionController {
+public class SlackController {
 
-  private final NotionService notionService;
+  private final SlackService slackService;
 
   @PostMapping
-  public ResponseEntity<Long> saveNotion(
+  public ResponseEntity<Long> saveSlack(
       @MemberId Long memberId,
-      @Valid @RequestBody NotionTokenRequest request
+      @Valid @RequestBody SlackSaveRequest request
   ) {
-    Long response = notionService.save(memberId, request);
+    Long response = slackService.save(memberId, request);
     return new ResponseEntity<>(response, HttpStatus.CREATED);
   }
 
   @PatchMapping
-  public ResponseEntity<Long> updateNotion(
+  public ResponseEntity<Long> updateSlack(
       @MemberId Long memberId,
-      @Valid @RequestBody NotionTokenUpdateRequest request
+      @Valid @RequestBody SlackUpdateRequest request
   ) {
-    Long response = notionService.update(memberId, request);
+    Long response = slackService.update(memberId, request);
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   @DeleteMapping
-  public ResponseEntity<Long> deleteNotion(
+  public ResponseEntity<Long> deleteSlack(
       @MemberId Long memberId
   ) {
-    Long response = notionService.delete(memberId);
-    return new ResponseEntity<>(response,HttpStatus.NO_CONTENT);
+    Long response = slackService.delete(memberId);
+    return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
   }
 
 }

@@ -45,4 +45,8 @@ public class Company {
     this.name = name;
   }
 
+  public void updateWorkspace(Workspace workspace) {
+    this.workspace = workspace;
+  }
+
 }

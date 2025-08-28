@@ -24,4 +24,9 @@ public class NotionRepositoryImpl implements NotionRepository {
     return notionJpaRepository.findByCompanyId(companyId)
         .orElseThrow(NotionNotFoundException::new);
   }
+
+  @Override
+  public void delete(Notion notion) {
+    notionJpaRepository.delete(notion);
+  }
 }

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
+import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.company.domain.Workspace;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
@@ -47,7 +48,13 @@ public class NotionService implements McpService {
     String encryptBusinessTripDatabaseId = kmsUtil.encrypt(request.businessTripDatabaseId());
     String encryptReceiptDatabaseId = kmsUtil.encrypt(request.receiptDatabaseId());
 
-    Notion notion = Notion.create(encryptToken, encryptBusinessTripDatabaseId, companyId, encryptReceiptDatabaseId);
+    Notion notion = Notion.create(
+        encryptToken,
+        encryptBusinessTripDatabaseId,
+        companyId,
+        encryptReceiptDatabaseId
+    );
+
     notionRepository.save(notion);
     return notion.getId();
   }
@@ -62,6 +69,19 @@ public class NotionService implements McpService {
     notion.update(request.token(), request.businessTripDatabaseId(),
         kmsUtil,
         request.receiptDatabaseId());
+    return notion.getId();
+  }
+
+  @Transactional
+  public Long delete(Long memberId) {
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(MemberNotFoundException::new);
+    Company company = member.getCompany();
+
+    Notion notion = notionRepository.findByCompanyId(company.getId());
+    notionRepository.delete(notion);
+
+    company.updateWorkspace(Workspace.NONE);
     return notion.getId();
   }
 
