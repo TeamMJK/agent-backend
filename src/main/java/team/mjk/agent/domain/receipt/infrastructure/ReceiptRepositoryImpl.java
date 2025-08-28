@@ -45,9 +45,9 @@ public class ReceiptRepositoryImpl implements ReceiptRepository {
     }
 
     @Override
-  public Receipt findByReceiptId(Long receiptId) {
-      return receiptJpaRepository.findById(receiptId)
-              .orElseThrow(ReceiptNotFoundExceptionCode::new);
-    }
+    public Receipt findByReceiptId(Long receiptId) {
+          return receiptJpaRepository.findById(receiptId)
+                  .orElseThrow(ReceiptNotFoundExceptionCode::new);
+        }
 
 }

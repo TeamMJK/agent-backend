@@ -1,5 +1,6 @@
 package team.mjk.agent.domain.member.infrastructure;
 
+import io.jsonwebtoken.security.Jwks.OP;
 import org.springframework.data.jpa.repository.JpaRepository;
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.member.domain.Member;

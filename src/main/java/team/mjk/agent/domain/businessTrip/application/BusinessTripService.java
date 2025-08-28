@@ -16,6 +16,7 @@ import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetResponse;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripSaveResponse;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripUpdateResponse;
 import team.mjk.agent.domain.company.domain.Company;
+import team.mjk.agent.domain.company.domain.CompanyRepository;
 import team.mjk.agent.domain.company.domain.Workspace;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
@@ -34,8 +35,8 @@ public class BusinessTripService {
   //사용자 직접 저장 메서드
   @Transactional
   public BusinessTripSaveResponse save(Long memberId, BusinessTripSaveRequest request) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
+    Member member = memberRepository.findByMemberId(memberId);
+    Company company = member.getCompany();
 
     BusinessTrip businessTrip = BusinessTrip.create(
         request.departDate(),
@@ -43,7 +44,7 @@ public class BusinessTripService {
         request.destination(),
         request.names(),
         member.getName(),
-        member.getCompany().getId(),
+        company.getId(),
         request.serviceType()
     );
     businessTripRepository.save(businessTrip);
@@ -56,8 +57,8 @@ public class BusinessTripService {
   //Agent 통한 저장 메서드
   @Transactional
   public BusinessTripSaveResponse save(Long memberId, BusinessTripAgentRequest request) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
+    Member member = memberRepository.findByMemberId(memberId);
+    Company company = member.getCompany();
 
     BusinessTrip businessTrip = BusinessTrip.create(
         LocalDate.parse(request.departDate()),
@@ -65,7 +66,7 @@ public class BusinessTripService {
         request.destination(),
         request.names(),
         member.getName(),
-        member.getCompany().getId(),
+        company.getId(),
         ServiceType.fromCategory(request.serviceType())
     );
     businessTripRepository.save(businessTrip);
@@ -78,11 +79,10 @@ public class BusinessTripService {
   //Controller(저장) -> saveMcp 호출 -> save 호출
   @Transactional
   public Workspace saveMcp(Long memberId, BusinessTripSaveRequest request) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
-
+    Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getCompany();
     Workspace workspace = company.getWorkspace();
+
     if (workspace == Workspace.NONE){
       save(memberId, request);
       return workspace;
@@ -97,11 +97,10 @@ public class BusinessTripService {
   //Agent(저장) -> saveAgentMcp 호출 -> save 호출
   @Transactional
   public void saveAgentMcp(Long memberId, BusinessTripAgentRequest request) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
-
+    Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getCompany();
     Workspace workspace = company.getWorkspace();
+
     if (workspace == Workspace.NONE){
       save(memberId, request);
       return;
@@ -113,13 +112,11 @@ public class BusinessTripService {
 
   @Transactional(readOnly = true)
   public BusinessTripGetResponse getBusinessTrip(Long memberId, Long businessTripId) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
-
-    Long companyId = member.getCompany().getId();
+    Member member = memberRepository.findByMemberId(memberId);
+    Company company = member.getCompany();
 
     BusinessTrip businessTrip = businessTripRepository.findByIdAndCompanyId(businessTripId,
-        companyId);
+        company.getId());
 
     return BusinessTripGetResponse.builder()
         .departDate(businessTrip.getDepartDate())
@@ -137,13 +134,11 @@ public class BusinessTripService {
       Long businessTripId,
       BusinessTripUpdateRequest request
   ) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
-
-    Long companyId = member.getCompany().getId();
+    Member member = memberRepository.findByMemberId(memberId);
+    Company company = member.getCompany();
 
     BusinessTrip businessTrip = businessTripRepository.findByIdAndCompanyId(businessTripId,
-        companyId);
+        company.getId());
     businessTrip.update(request);
 
     return BusinessTripUpdateResponse.builder()
@@ -153,12 +148,10 @@ public class BusinessTripService {
 
   @Transactional(readOnly = true)
   public BusinessTripGetAllResponse getAllBusinessTrip(Long memberId) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
+    Member member = memberRepository.findByMemberId(memberId);
+    Company company = member.getCompany();
 
-    Long companyId = member.getCompany().getId();
-
-    List<BusinessTrip> businessTripList = businessTripRepository.findAllByCompanyId(companyId);
+    List<BusinessTrip> businessTripList = businessTripRepository.findAllByCompanyId(company.getId());
 
     return BusinessTripGetAllResponse.builder()
         .businessTripList(businessTripList)

@@ -7,6 +7,7 @@ import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
 
 import java.util.Optional;
+import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
 
 @RequiredArgsConstructor
 @Repository
@@ -25,8 +26,9 @@ public class MemberRepositoryImpl implements MemberRepository {
   }
 
   @Override
-  public Optional<Member> findByMemberId(Long memberId) {
-    return memberJpaRepository.findById(memberId);
+  public Member findByMemberId(Long memberId) {
+    return memberJpaRepository.findById(memberId)
+        .orElseThrow(MemberNotFoundException::new);
   }
 
   @Override

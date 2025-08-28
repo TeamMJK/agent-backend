@@ -14,7 +14,8 @@ public class CompanyRepositoryImpl implements CompanyRepository {
     private final CompanyJpaRepository companyJpaRepository;
     @Override
     public Company findById(Long id) {
-        return companyJpaRepository.findById(id).orElseThrow(CompanyNotFoundException::new);
+        return companyJpaRepository.findById(id)
+            .orElseThrow(CompanyNotFoundException::new);
     }
 
     @Override

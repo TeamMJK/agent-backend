@@ -12,13 +12,11 @@ import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.company.domain.Workspace;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
-import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
 import team.mjk.agent.domain.receipt.dto.request.ReceiptMcpRequest;
 import team.mjk.agent.domain.slack.domain.Slack;
 import team.mjk.agent.domain.slack.domain.SlackRepository;
 import team.mjk.agent.domain.slack.dto.request.SlackSaveRequest;
 import team.mjk.agent.domain.slack.dto.request.SlackUpdateRequest;
-import team.mjk.agent.domain.slack.presentation.exception.SlackAPIException;
 import team.mjk.agent.global.mcp.McpService;
 import team.mjk.agent.global.util.KmsUtil;
 
@@ -32,9 +30,8 @@ public class SlackService implements McpService {
   private final WebClient slackWebClient;
 
   public Long save(Long memberId, SlackSaveRequest request) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
-    Long companyId = member.getCompany().getId();
+    Member member = memberRepository.findByMemberId(memberId);
+    Company company = member.getCompany();
 
     String encryptToken = kmsUtil.encrypt(request.token());
     String channelId = kmsUtil.encrypt(request.channelId());
@@ -42,7 +39,7 @@ public class SlackService implements McpService {
     Slack slack = Slack.create(
         encryptToken,
         channelId,
-        companyId
+        company.getId()
     );
 
     slackRepository.save(slack);
@@ -51,11 +48,10 @@ public class SlackService implements McpService {
 
   @Transactional
   public Long update(Long memberId, SlackUpdateRequest request) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
-    Long companyId = member.getCompany().getId();
+    Member member = memberRepository.findByMemberId(memberId);
+    Company company = member.getCompany();
 
-    Slack slack = slackRepository.findByCompanyId(companyId);
+    Slack slack = slackRepository.findByCompanyId(company.getId());
     slack.update(
         request.token(),
         request.channelId(),
@@ -67,8 +63,7 @@ public class SlackService implements McpService {
 
   @Transactional
   public Long delete(Long memberId) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
+    Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getCompany();
 
     Slack slack = slackRepository.findByCompanyId(company.getId());

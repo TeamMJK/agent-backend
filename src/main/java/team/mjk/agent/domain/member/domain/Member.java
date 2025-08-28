@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import team.mjk.agent.domain.company.domain.Company;
+import team.mjk.agent.domain.company.presentation.exception.CompanyNotFoundException;
 import team.mjk.agent.domain.member.dto.request.MemberInfoUpdateRequest;
 import team.mjk.agent.domain.member.dto.response.EncryptedMemberInfoResponse;
 import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
@@ -133,6 +134,13 @@ public class Member extends BaseTimeEntity {
                 response.passportNumber(),
                 response.passportExpireDate()
         );
+    }
+
+    public Company getCompany(){
+        if(this.company == null) {
+            throw new CompanyNotFoundException();
+        }
+        return this.company;
     }
 
     public static MemberInfoGetResponse toMemberInfoGetResponse(Member member, KmsUtil kmsUtil) {

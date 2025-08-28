@@ -30,6 +30,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import team.mjk.agent.domain.company.domain.Company;
+import team.mjk.agent.domain.company.domain.CompanyRepository;
 import team.mjk.agent.domain.company.domain.Workspace;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
@@ -64,8 +65,8 @@ public class ReceiptService {
 
   @Transactional
   public ReceiptSaveResponse saveReceipt(Long memberId, ReceiptSaveRequest request) {
-    Member member = memberRepository.findByMemberId(memberId)
-            .orElseThrow(MemberNotFoundException::new);
+    Member member = memberRepository.findByMemberId(memberId);
+    Company company = member.getCompany();
 
     Receipt receipt = Receipt.builder()
             .member(member)
@@ -73,7 +74,7 @@ public class ReceiptService {
             .approvalNumber(request.approvalNumber())
             .storeAddress(request.storeAddress())
             .totalAmount(request.totalAmount())
-            .company(member.getCompany())
+            .company(company)
             .build();
 
     receiptRepository.save(receipt);
@@ -85,8 +86,9 @@ public class ReceiptService {
 
   @Transactional
   public String upload(Long memberId, MultipartFile image) {
-    Member member = memberRepository.findByMemberId(memberId)
-            .orElseThrow(MemberNotFoundException::new);
+    Member member = memberRepository.findByMemberId(memberId);
+    Company company = member.getCompany();
+
     if (image.isEmpty() || Objects.isNull(image.getOriginalFilename())) {
       throw new EmptyFileExceptionCode();
     }
@@ -95,7 +97,7 @@ public class ReceiptService {
 
     Receipt receipt = Receipt.builder()
             .member(member)
-            .company(member.getCompany())
+            .company(company)
             .url(imageUrl)
             .build();
 
@@ -106,8 +108,8 @@ public class ReceiptService {
 
   @Transactional
   public ReceiptSaveResponse saveOcrInfo(Long memberId, MultipartFile file) {
-    Member member = memberRepository.findByMemberId(memberId)
-            .orElseThrow(MemberNotFoundException::new);
+    Member member = memberRepository.findByMemberId(memberId);
+    Company company = member.getCompany();
 
     String imageUrl = uploadImage(file);
     ReceiptSaveRequest request = ocr(file);
@@ -118,7 +120,7 @@ public class ReceiptService {
             .approvalNumber(request.approvalNumber())
             .storeAddress(request.storeAddress())
             .totalAmount(request.totalAmount())
-            .company(member.getCompany())
+            .company(company)
             .url(imageUrl)
             .build();
 
@@ -131,10 +133,9 @@ public class ReceiptService {
 
   @Transactional
   public Workspace saveMcp(Long memberId, MultipartFile file) {
-    Member member = memberRepository.findByMemberId(memberId)
-            .orElseThrow(MemberNotFoundException::new);
-
+    Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getCompany();
+
     Workspace workspace = company.getWorkspace();
     if (workspace == Workspace.NONE) {
       saveOcrInfo(memberId, file);
@@ -176,8 +177,7 @@ public class ReceiptService {
 
   @Transactional(readOnly = true)
   public List<ReceiptGetResponse> getAllReceipt(Long memberId) {
-    Member member = memberRepository.findByMemberId(memberId)
-            .orElseThrow(MemberNotFoundException::new);
+    Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getCompany();
 
     return receiptRepository.findAllByCompany(company).stream()
@@ -193,9 +193,7 @@ public class ReceiptService {
 
   @Transactional(readOnly = true)
   public ReceiptGetResponse getReceipt(Long memberId, Long receiptId) {
-    Member member = memberRepository.findByMemberId(memberId)
-            .orElseThrow(MemberNotFoundException::new);
-
+    Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getCompany();
     Receipt receipt = receiptRepository.findByIdAndCompany(receiptId, company);
 

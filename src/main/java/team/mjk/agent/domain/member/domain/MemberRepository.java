@@ -9,7 +9,7 @@ public interface MemberRepository {
 
     boolean existsByEmail(String email);
 
-    Optional<Member> findByMemberId(Long memberId);
+    Member findByMemberId(Long memberId);
 
     Optional<Member> findByEmail(String email);
 

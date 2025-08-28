@@ -30,8 +30,7 @@ public class PassportService {
 
   @Transactional
   public PassportInfoSaveResponse savePassportInfo(Long memberId, PassportInfoSaveRequest request) {
-    Member member = memberRepository.findByMemberId(memberId)
-            .orElseThrow(MemberNotFoundException::new);
+    Member member = memberRepository.findByMemberId(memberId);
 
     String encryptedPassportNumber = kmsUtil.encrypt(request.passportNumber());
     String encryptedPassportExpireDate = kmsUtil.encrypt(request.passportExpireDate());

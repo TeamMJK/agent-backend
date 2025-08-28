@@ -37,14 +37,8 @@ public class CompanyService {
   private String senderEmail;
 
   public CompanyInvitationEmailResponse createInvitationCodeAndSendEmail(Long memberId, CompanyInvitationEmailRequest request) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
-
-    if (member.getCompany() == null) {
-      throw new CompanyNotFoundException();
-    }
-
-    Company company = companyRepository.findById(member.getCompany().getId());
+    Member member = memberRepository.findByMemberId(memberId);
+    Company company = member.getCompany();
 
     Invitation invitation = invitationCodeProvider.create(company.getId());
 
@@ -61,8 +55,7 @@ public class CompanyService {
 
   @Transactional
   public Long create(CompanySaveRequest request, Long memberId) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
+    Member member = memberRepository.findByMemberId(memberId);
 
     Company company = Company.create(request.name(), request.workspace());
     companyRepository.save(company);
@@ -72,8 +65,7 @@ public class CompanyService {
 
   @Transactional
   public CompanyJoinResponse join(Long memberId, CompanyInvitationCodeRequest request) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
+    Member member = memberRepository.findByMemberId(memberId);
 
     Invitation invitation = invitationRepository.findByCode(request.invitationCode())
         .orElseThrow(InvalidInvitationCode::new);
@@ -93,10 +85,10 @@ public class CompanyService {
 
   @Transactional(readOnly = true)
   public String getCompanyName(Long memberId) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
+    Member member = memberRepository.findByMemberId(memberId);
+    Company company = member.getCompany();
 
-    return member.getCompany().getName();
+    return company.getName();
   }
 
 }

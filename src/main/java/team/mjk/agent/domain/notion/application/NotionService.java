@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
 import team.mjk.agent.domain.company.domain.Company;
+import team.mjk.agent.domain.company.domain.CompanyRepository;
 import team.mjk.agent.domain.company.domain.Workspace;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
@@ -40,9 +41,8 @@ public class NotionService implements McpService {
   private final KmsUtil kmsUtil;
 
   public Long save(Long memberId, NotionTokenRequest request) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
-    Long companyId = member.getCompany().getId();
+    Member member = memberRepository.findByMemberId(memberId);
+    Company company = member.getCompany();
 
     String encryptToken = kmsUtil.encrypt(request.token());
     String encryptBusinessTripDatabaseId = kmsUtil.encrypt(request.businessTripDatabaseId());
@@ -51,7 +51,7 @@ public class NotionService implements McpService {
     Notion notion = Notion.create(
         encryptToken,
         encryptBusinessTripDatabaseId,
-        companyId,
+        company.getId(),
         encryptReceiptDatabaseId
     );
 
@@ -61,11 +61,10 @@ public class NotionService implements McpService {
 
   @Transactional
   public Long update(Long memberId, NotionTokenUpdateRequest request) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
-    Long companyId = member.getCompany().getId();
+    Member member = memberRepository.findByMemberId(memberId);
+    Company company = member.getCompany();
 
-    Notion notion = notionRepository.findByCompanyId(companyId);
+    Notion notion = notionRepository.findByCompanyId(company.getId());
     notion.update(request.token(), request.businessTripDatabaseId(),
         kmsUtil,
         request.receiptDatabaseId());
@@ -74,8 +73,7 @@ public class NotionService implements McpService {
 
   @Transactional
   public Long delete(Long memberId) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
+    Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getCompany();
 
     Notion notion = notionRepository.findByCompanyId(company.getId());

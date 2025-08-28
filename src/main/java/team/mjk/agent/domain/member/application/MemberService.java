@@ -42,8 +42,7 @@ public class MemberService {
 
   @Transactional
   public MemberInfoSaveResponse saveMemberInfo(Long memberId, MemberInfoSaveRequest request) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
+    Member member = memberRepository.findByMemberId(memberId);
 
     EncryptedMemberInfoResponse response = request.encryptWith(kmsUtil);
 
@@ -69,16 +68,14 @@ public class MemberService {
   }
 
   public MemberInfoGetResponse getMemberInfo(Long memberId) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
+    Member member = memberRepository.findByMemberId(memberId);
 
     return Member.toMemberInfoGetResponse(member, kmsUtil);
   }
 
   @Transactional
   public MemberInfoUpdateResponse updateMemberInfo(Long memberId, MemberInfoUpdateRequest request) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
+    Member member = memberRepository.findByMemberId(memberId);
 
     EncryptedMemberInfoResponse response = request.encryptWith(kmsUtil);
     member.update(response);

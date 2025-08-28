@@ -7,6 +7,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import team.mjk.agent.domain.company.domain.Company;
+import team.mjk.agent.domain.company.domain.CompanyRepository;
 import team.mjk.agent.domain.flight.application.FlightService;
 import team.mjk.agent.domain.flight.dto.FlightAndMemberInfoResponse;
 import team.mjk.agent.domain.flight.dto.FlightList;
@@ -57,8 +58,7 @@ public class PromptService {
   }
 
   private HotelList extractHotelInfo(Long memberId, PromptRequest request) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
+    Member member = memberRepository.findByMemberId(memberId);
 
     String fullPrompt = String.format(
         """
@@ -83,8 +83,7 @@ public class PromptService {
   }
 
   private FlightList extractFlightInfo(Long memberId, PromptRequest request) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
+    Member member = memberRepository.findByMemberId(memberId);
 
     String fullPrompt = String.format(
         """
@@ -123,10 +122,8 @@ public class PromptService {
   }
 
   private MemberInfoList extractMemberInfo(Long memberId, NameList nameList) {
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(MemberNotFoundException::new);
+    Member member = memberRepository.findByMemberId(memberId);
     MemberInfoGetResponse memberInfoGetResponse = Member.toMemberInfoGetResponse(member, kmsUtil);
-
     Company company = member.getCompany();
 
     List<MemberInfoGetResponse> resultList = new ArrayList<>();
