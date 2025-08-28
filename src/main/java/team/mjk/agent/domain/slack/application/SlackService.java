@@ -1,8 +1,11 @@
 package team.mjk.agent.domain.slack.application;
 
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
 import team.mjk.agent.domain.company.domain.Company;
@@ -15,6 +18,7 @@ import team.mjk.agent.domain.slack.domain.Slack;
 import team.mjk.agent.domain.slack.domain.SlackRepository;
 import team.mjk.agent.domain.slack.dto.request.SlackSaveRequest;
 import team.mjk.agent.domain.slack.dto.request.SlackUpdateRequest;
+import team.mjk.agent.domain.slack.presentation.exception.SlackAPIException;
 import team.mjk.agent.global.mcp.McpService;
 import team.mjk.agent.global.util.KmsUtil;
 
@@ -25,6 +29,7 @@ public class SlackService implements McpService {
   private final SlackRepository slackRepository;
   private final MemberRepository memberRepository;
   private final KmsUtil kmsUtil;
+  private final WebClient slackWebClient;
 
   public Long save(Long memberId, SlackSaveRequest request) {
     Member member = memberRepository.findByMemberId(memberId)
@@ -75,11 +80,74 @@ public class SlackService implements McpService {
 
   @Override
   public void createBusinessTrip(BusinessTripSaveRequest request, Long companyId) {
+    Slack slack = slackRepository.findByCompanyId(companyId);
 
+    String token = kmsUtil.decrypt(slack.getToken());
+    String channelId = kmsUtil.decrypt(slack.getChannelId());
+
+    String uri = "/chat.postMessage";
+
+    List<String> members = request.names();
+    String memberStr = String.join(", ", members);
+    String message = String.format(
+        "출장 예약: %s ~ %s\n장소: %s\n숙박/항공: %s\n출장 인원: %s",
+        request.departDate(),
+        request.arriveDate(),
+        request.destination(),
+        request.serviceType().getCategory(),
+        memberStr
+    );
+
+    slackWebClient.post()
+        .uri(uri)
+        .header("Authorization","Bearer "+token)
+        .header("Content-Type", "application/json; charset=utf-8")
+        .bodyValue(Map.of(
+            "channel", channelId,
+            "text", message
+        ))
+        .retrieve()
+        .bodyToMono(String.class)
+        .doOnError(e -> System.err.println("Slack API 호출 실패: " + e.getMessage()))
+        .subscribe(response -> System.out.println("Slack API 응답: " + response));
   }
 
   @Override
   public void createBusinessTripAgent(BusinessTripAgentRequest request, Long companyId) {
+    Slack slack = slackRepository.findByCompanyId(companyId);
+
+    String token = kmsUtil.decrypt(slack.getToken());
+    String channelId = kmsUtil.decrypt(slack.getChannelId());
+
+    String uri = "/chat.postMessage";
+
+    List<String> members = request.names();
+    String memberStr = String.join(", ", members);
+    String message = String.format(
+        "출장 예약: %s ~ %s\n장소: %s\n숙박/항공: %s\n출장 인원: %s",
+        request.departDate(),
+        request.arriveDate(),
+        request.destination(),
+        request.serviceType(),
+        memberStr
+    );
+
+    slackWebClient.post()
+        .uri(uri)
+        .header("Authorization","Bearer "+token)
+        .header("Content-Type", "application/json; charset=utf-8")
+        .bodyValue(Map.of(
+            "channel", channelId,
+            "text", message
+        ))
+        .retrieve()
+        .bodyToMono(String.class)
+        .doOnError(e -> System.err.println("Slack API 호출 실패: " + e.getMessage()))
+        .subscribe(response -> System.out.println("Slack API 응답: " + response));
+  }
+
+  @Override
+  public void createReceipt(ReceiptMcpRequest request, Long companyId) {
 
   }
 
@@ -88,8 +156,5 @@ public class SlackService implements McpService {
     return Workspace.SLACK;
   }
 
-  @Override
-  public void createReceipt(ReceiptMcpRequest request, Long companyId) {
 
-  }
 }

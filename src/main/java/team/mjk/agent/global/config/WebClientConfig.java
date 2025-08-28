@@ -12,4 +12,11 @@ public class WebClientConfig {
     return WebClient.builder().build();
   }
 
+  @Bean
+  public WebClient slackWebClient() {
+    return WebClient.builder()
+        .baseUrl("https://slack.com/api")
+        .build();
+  }
+
 }
