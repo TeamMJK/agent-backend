@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import team.mjk.agent.domain.businessTrip.application.BusinessTripService;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
 
@@ -14,28 +14,32 @@ import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
 @Component
 public class AgentResponseUtil {
 
-  private final RestTemplate restTemplate;
+  private final WebClient webClient;
   private final ObjectMapper objectMapper;
   private final BusinessTripService businessTripService;
 
   public void agentResponse(Long memberId, String pythonUrl, Map<String, Object> payload) {
-    String result = restTemplate.postForObject(
-        pythonUrl,
-        payload,
-        String.class
-    );
-    try {
-      JsonNode rootNode = objectMapper.readTree(result);
-      JsonNode detailNode = rootNode.get("detail");
-      String detailJson = detailNode.toString();
-      System.out.println("result :" + result);
-      BusinessTripAgentRequest agentRequest = objectMapper.readValue(detailJson, BusinessTripAgentRequest.class);
+    webClient.post()
+        .uri(pythonUrl)
+        .bodyValue(payload)
+        .retrieve()
+        .bodyToMono(String.class)
+        .subscribe(responseResult -> {
+          try {
+            JsonNode rootNode = objectMapper.readTree(responseResult);
+            JsonNode detailNode = rootNode.get("detail");
+            String detailJson = detailNode.toString();
+            System.out.println("result :" + responseResult);
+            BusinessTripAgentRequest agentRequest = objectMapper.readValue(detailJson, BusinessTripAgentRequest.class);
 
-      System.out.println("names" + agentRequest.names());
-      businessTripService.saveAgentMcp(memberId, agentRequest);
-    } catch (JsonProcessingException e) {
-      System.out.println(e.getMessage());
-    }
+            System.out.println("names" + agentRequest.names());
+            businessTripService.saveAgentMcp(memberId, agentRequest);
+          } catch (JsonProcessingException e) {
+            System.out.println(e.getMessage());
+          }
+        }, error -> {
+          System.out.println("WebClient error: " + error.getMessage());
+        });
   }
 
 }
