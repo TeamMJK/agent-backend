@@ -9,4 +9,5 @@ import team.mjk.agent.domain.businessTrip.domain.BusinessTrip;
 public interface BusinessJpaRepository extends JpaRepository<BusinessTrip, Long> {
   Optional<BusinessTrip> findByIdAndCompanyId(Long businessTripId, Long companyId);
   List<BusinessTrip> findAllByCompanyId(Long companyId);
+
 }

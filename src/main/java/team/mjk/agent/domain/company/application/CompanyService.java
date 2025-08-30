@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import team.mjk.agent.domain.businessTrip.domain.BusinessTripRepository;
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.company.domain.CompanyRepository;
 import team.mjk.agent.domain.company.dto.request.CompanyInvitationCodeRequest;
@@ -20,6 +21,7 @@ import team.mjk.agent.domain.invitation.domain.Invitation;
 import team.mjk.agent.domain.invitation.domain.InvitationRepository;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
+import team.mjk.agent.domain.receipt.domain.ReceiptRepository;
 import team.mjk.agent.global.util.EmailMessageBuilder;
 
 @RequiredArgsConstructor
@@ -32,6 +34,8 @@ public class CompanyService {
   private final MemberRepository memberRepository;
   private final EmailSender emailSender;
   private final EmailMessageBuilder emailMessageBuilder;
+  private final BusinessTripRepository businessTripRepository;
+  private final ReceiptRepository receiptRepository;
 
   @Value("${spring.mail.username}")
   private String senderEmail;
@@ -59,6 +63,7 @@ public class CompanyService {
 
     Company company = Company.create(request.name(), request.workspaces());
     companyRepository.save(company);
+
     member.saveCompany(company);
     return company.getId();
   }
@@ -101,6 +106,15 @@ public class CompanyService {
     Company company = member.getCompany();
 
     company.update(request.name(), request.workspaces());
+    return company.getId();
+  }
+
+  @Transactional
+  public Long delete(Long memberId) {
+    Member member = memberRepository.findByMemberId(memberId);
+    Company company = member.getCompany();
+
+    companyRepository.delete(company);
     return company.getId();
   }
 

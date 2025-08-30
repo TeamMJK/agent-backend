@@ -4,9 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record BusinessTripSaveResponse(
-
     Long businessTripId
-
 ) {
 
 }

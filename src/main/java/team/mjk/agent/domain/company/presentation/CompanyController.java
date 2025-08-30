@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -72,6 +73,14 @@ public class CompanyController implements CompanyDocsController {
       @Valid @RequestBody CompanyUpdateRequest request
   ) {
     Long companyId = companyService.update(memberId,request);
+    return new ResponseEntity<>(companyId,HttpStatus.OK);
+  }
+
+  @DeleteMapping
+  public ResponseEntity<Long> deleteCompany(
+      @MemberId Long memberId
+  ) {
+    Long companyId = companyService.delete(memberId);
     return new ResponseEntity<>(companyId,HttpStatus.OK);
   }
 

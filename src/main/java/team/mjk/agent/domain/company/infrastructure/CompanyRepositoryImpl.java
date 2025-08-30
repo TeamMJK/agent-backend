@@ -23,4 +23,9 @@ public class CompanyRepositoryImpl implements CompanyRepository {
         return companyJpaRepository.save(company);
     }
 
+    @Override
+    public void delete(Company company) {
+        companyJpaRepository.delete(company);
+    }
+
 }

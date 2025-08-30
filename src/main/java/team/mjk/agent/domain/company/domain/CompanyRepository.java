@@ -7,4 +7,5 @@ public interface CompanyRepository {
     Company findById(Long id);
     Company save(Company company);
 
+    void delete(Company company);
 }
