@@ -66,7 +66,6 @@ public class NoneService implements McpService {
         .build();
 
     receiptRepository.save(receipt);
-    System.out.println("RECEIPT: ID" + receipt.getId());
   }
 
   @Override

@@ -14,8 +14,6 @@ public record ReceiptMcpRequest(
 
     BigDecimal totalAmount,
 
-    String name,
-
     String imageUrl
 ) {
 

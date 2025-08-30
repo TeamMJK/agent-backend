@@ -106,7 +106,7 @@ public class NotionService implements McpService {
     Map<String, Object> payload = Map.of(
         "parent", Map.of("database_id", kmsUtil.decrypt(notion.getBusinessTripDatabaseId())),
         "properties", Map.of(
-            "이름", Map.of("title", nameBlocks),
+            "출장인원", Map.of("title", nameBlocks),
             "도착일자", Map.of("rich_text", List.of(
                 Map.of("text", Map.of("content", request.arriveDate().toString()))
             )),
@@ -118,6 +118,9 @@ public class NotionService implements McpService {
             )),
             "카테고리", Map.of("rich_text", List.of(
                 Map.of("text", Map.of("content", request.serviceType().getCategory()))
+            )),
+            "작성자", Map.of("rich_text", List.of(
+                Map.of("text", Map.of("content", requester))
             ))
         )
     );
@@ -136,7 +139,7 @@ public class NotionService implements McpService {
     Map<String, Object> payload = Map.of(
         "parent", Map.of("database_id", kmsUtil.decrypt(notion.getBusinessTripDatabaseId())),
         "properties", Map.of(
-            "이름", Map.of("title", nameBlocks),
+            "출장인원", Map.of("title", nameBlocks),
             "도착일자", Map.of("rich_text", List.of(
                 Map.of("text", Map.of("content", request.arriveDate()))
             )),
@@ -148,6 +151,9 @@ public class NotionService implements McpService {
             )),
             "카테고리", Map.of("rich_text", List.of(
                 Map.of("text", Map.of("content", request.serviceType()))
+            )),
+            "작성자", Map.of("rich_text", List.of(
+                Map.of("text", Map.of("content", requester))
             ))
         )
     );
@@ -162,8 +168,8 @@ public class NotionService implements McpService {
     Map<String, Object> payload = Map.of(
         "parent", Map.of("database_id", kmsUtil.decrypt(notion.getReceiptDatabaseId())),
         "properties", Map.of(
-            "이름", Map.of("rich_text", List.of(
-                Map.of("text", Map.of("content", request.name()))
+            "작성자", Map.of("rich_text", List.of(
+                Map.of("text", Map.of("content", member.getName()))
             )),
             "승인번호", Map.of("rich_text", List.of(
                 Map.of("text", Map.of("content", request.approvalNumber()))

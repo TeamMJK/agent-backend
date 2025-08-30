@@ -36,7 +36,7 @@ public class BusinessTrip {
 
   private Long companyId;
 
-  @ElementCollection
+  @Convert(converter = NameListConverter.class)
   private List<String> names;
 
   @Builder

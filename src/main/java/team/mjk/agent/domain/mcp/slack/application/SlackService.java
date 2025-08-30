@@ -149,13 +149,12 @@ public class SlackService implements McpService {
     String channelId = kmsUtil.decrypt(slack.getChannelId());
 
     String message = String.format(
-        "작성자: %s\n날짜: %s\n주문번호: %s\n주소: %s\n총금액: %s\n이름: %s\n이미지 주소: %s",
+        "작성자: %s\n날짜: %s\n주문번호: %s\n주소: %s\n총금액: %s\n이미지 주소: %s",
         member.getName(),
         request.paymentDate(),
         request.approvalNumber(),
         request.storeAddress(),
         request.totalAmount(),
-        request.name(),
         request.imageUrl()
     );
 

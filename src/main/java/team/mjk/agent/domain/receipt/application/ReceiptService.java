@@ -115,7 +115,6 @@ public class ReceiptService {
     ReceiptSaveRequest request = ocr(file);
 
     ReceiptMcpRequest mcpRequest = ReceiptMcpRequest.builder()
-            .name(member.getName())
             .approvalNumber(request.approvalNumber())
             .storeAddress(request.storeAddress())
             .totalAmount(request.totalAmount())
