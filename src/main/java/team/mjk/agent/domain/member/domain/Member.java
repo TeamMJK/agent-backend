@@ -93,11 +93,6 @@ public class Member extends BaseTimeEntity {
         return Objects.equals(this.email, email) && !Objects.equals(this.externalId, externalId);
     }
 
-    //정적 메서드로 뺄 수 있을듯?
-    /*
-    public static
-
-    * */
     public void saveMemberInfo(
             String name,
             String firstName,
