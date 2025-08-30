@@ -1,5 +1,7 @@
 package team.mjk.agent.domain.company.application;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import team.mjk.agent.domain.company.dto.request.CompanyUpdateRequest;
 import team.mjk.agent.domain.company.dto.response.CompanyInfoResponse;
 import team.mjk.agent.domain.company.dto.response.CompanyInvitationEmailResponse;
 import team.mjk.agent.domain.company.dto.response.CompanyJoinResponse;
+import team.mjk.agent.domain.company.dto.response.CompanyMemberListResponse;
 import team.mjk.agent.domain.company.presentation.exception.InvalidInvitationCode;
 import team.mjk.agent.domain.email.infrastructure.EmailSender;
 import team.mjk.agent.domain.invitation.InvitationCodeProvider;
@@ -21,8 +24,10 @@ import team.mjk.agent.domain.invitation.domain.Invitation;
 import team.mjk.agent.domain.invitation.domain.InvitationRepository;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
+import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
 import team.mjk.agent.domain.receipt.domain.ReceiptRepository;
 import team.mjk.agent.global.util.EmailMessageBuilder;
+import team.mjk.agent.global.util.KmsUtil;
 
 @RequiredArgsConstructor
 @Service
@@ -34,8 +39,7 @@ public class CompanyService {
   private final MemberRepository memberRepository;
   private final EmailSender emailSender;
   private final EmailMessageBuilder emailMessageBuilder;
-  private final BusinessTripRepository businessTripRepository;
-  private final ReceiptRepository receiptRepository;
+  private final KmsUtil kmsUtil;
 
   @Value("${spring.mail.username}")
   private String senderEmail;
@@ -116,6 +120,21 @@ public class CompanyService {
 
     companyRepository.delete(company);
     return company.getId();
+  }
+
+  @Transactional(readOnly = true)
+  public CompanyMemberListResponse getMembersInfo(Long memberId) {
+    Member member = memberRepository.findByMemberId(memberId);
+    Company company = member.getCompany();
+
+    List<Member> members = memberRepository.findAllByCompanyId(company.getId());
+    List<MemberInfoGetResponse> memberInfoGetResponses = members.stream()
+        .map(m -> Member.toMemberInfoGetResponse(m,kmsUtil))
+        .collect(Collectors.toList());
+
+    return CompanyMemberListResponse.builder()
+        .members(memberInfoGetResponses)
+        .build();
   }
 
 }

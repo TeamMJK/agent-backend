@@ -56,10 +56,11 @@ public class NoneService implements McpService {
     Company company = member.getCompany();
 
     Receipt receipt = Receipt.builder()
-        .member(member)
+        .writer(member.getName())
         .paymentDate(request.paymentDate())
         .approvalNumber(request.approvalNumber())
         .storeAddress(request.storeAddress())
+        .memberId(member.getId())
         .totalAmount(request.totalAmount())
         .company(company)
         .url(request.imageUrl())

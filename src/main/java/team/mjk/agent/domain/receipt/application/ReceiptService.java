@@ -67,12 +67,13 @@ public class ReceiptService {
     Company company = member.getCompany();
 
     Receipt receipt = Receipt.builder()
-            .member(member)
+            .writer(member.getName())
             .paymentDate(request.paymentDate())
             .approvalNumber(request.approvalNumber())
             .storeAddress(request.storeAddress())
             .totalAmount(request.totalAmount())
             .company(company)
+            .memberId(memberId)
             .build();
 
     receiptRepository.save(receipt);
@@ -94,7 +95,7 @@ public class ReceiptService {
     String imageUrl = uploadImage(image);
 
     Receipt receipt = Receipt.builder()
-            .member(member)
+            .writer(member.getName())
             .company(company)
             .url(imageUrl)
             .build();
@@ -134,7 +135,7 @@ public class ReceiptService {
 
   public void deleteImageFromS3(Long memberId, String imageAddress) {
     Receipt receipt = receiptRepository.findByUrl(imageAddress);
-    validateForbidden(memberId, receipt.getMember().getId());
+    validateForbidden(memberId, receipt.getMemberId());
 
     String key = getKeyFromImageAddress(imageAddress);
     try {
@@ -181,7 +182,7 @@ public class ReceiptService {
   @Transactional
   public void deleteReceipt(Long memberId, Long receiptId) {
     Receipt receipt = receiptRepository.findByReceiptId(receiptId);
-    validateForbidden(memberId, receipt.getMember().getId());
+    validateForbidden(memberId, receipt.getMemberId());
     receiptRepository.delete(receipt);
   }
 

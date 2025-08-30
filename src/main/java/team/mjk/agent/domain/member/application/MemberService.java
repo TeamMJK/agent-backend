@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import team.mjk.agent.domain.company.domain.Company;
+import team.mjk.agent.domain.company.domain.CompanyRepository;
 import team.mjk.agent.domain.member.domain.Gender;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
@@ -24,6 +26,7 @@ public class MemberService {
   private final MemberRepository memberRepository;
   private final PasswordEncoder passwordEncoder;
   private final PassportRepository passportRepository;
+  private final CompanyRepository companyRepository;
   private final KmsUtil kmsUtil;
 
   public MemberSaveResponse signUp(MemberSaveRequest request) {
@@ -83,6 +86,20 @@ public class MemberService {
     return MemberInfoUpdateResponse.builder()
         .memberId(member.getId())
         .build();
+  }
+
+  @Transactional
+  public Long delete(Long memberId) {
+    Member member = memberRepository.findByMemberId(memberId);
+    Company company = member.getCompany();
+
+    memberRepository.delete(memberId);
+
+    long remainCount = memberRepository.countByCompanyId(company.getId());
+    if (remainCount == 0) {
+      companyRepository.delete(company);
+    }
+    return memberId;
   }
 
   private void validateEmail(String email) {

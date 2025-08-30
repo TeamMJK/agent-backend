@@ -1,5 +1,6 @@
 package team.mjk.agent.domain.member.infrastructure;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import team.mjk.agent.domain.company.domain.Company;
@@ -41,5 +42,20 @@ public class MemberRepositoryImpl implements MemberRepository {
     return memberJpaRepository.findByNameAndCompany(name, company);
   }
 
+  @Override
+  public List<Member> findAllByCompanyId(Long companyId) {
+    return memberJpaRepository.findAllByCompanyId(companyId)
+        .orElseThrow(MemberNotFoundException::new);
+  }
+
+  @Override
+  public void delete(Long memberId) {
+    memberJpaRepository.deleteById(memberId);
+  }
+
+  @Override
+  public long countByCompanyId(Long companyId) {
+    return memberJpaRepository.countByCompanyId(companyId);
+  }
 
 }

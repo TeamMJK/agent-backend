@@ -19,6 +19,7 @@ import team.mjk.agent.domain.company.dto.request.CompanyUpdateRequest;
 import team.mjk.agent.domain.company.dto.response.CompanyInfoResponse;
 import team.mjk.agent.domain.company.dto.response.CompanyInvitationEmailResponse;
 import team.mjk.agent.domain.company.dto.response.CompanyJoinResponse;
+import team.mjk.agent.domain.company.dto.response.CompanyMemberListResponse;
 import team.mjk.agent.global.annotation.MemberId;
 
 @RequiredArgsConstructor
@@ -81,7 +82,15 @@ public class CompanyController implements CompanyDocsController {
       @MemberId Long memberId
   ) {
     Long companyId = companyService.delete(memberId);
-    return new ResponseEntity<>(companyId,HttpStatus.OK);
+    return new ResponseEntity<>(companyId,HttpStatus.NO_CONTENT);
+  }
+
+  @GetMapping("/members")
+  public ResponseEntity<CompanyMemberListResponse> getMembersCompany(
+      @MemberId Long memberId
+  ) {
+    CompanyMemberListResponse response = companyService.getMembersInfo(memberId);
+    return new ResponseEntity<>(response,HttpStatus.OK);
   }
 
 }

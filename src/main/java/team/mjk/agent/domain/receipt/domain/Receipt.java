@@ -21,9 +21,7 @@ public class Receipt extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    private String writer;
 
     private LocalDate paymentDate;
 
@@ -33,6 +31,8 @@ public class Receipt extends BaseTimeEntity {
 
     private BigDecimal totalAmount;
 
+    private Long memberId;
+
     private String url;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -41,21 +41,23 @@ public class Receipt extends BaseTimeEntity {
 
     @Builder
     private Receipt(
-            Member member,
+            String writer,
             LocalDate paymentDate,
             String approvalNumber,
             String storeAddress,
             BigDecimal totalAmount,
             String url,
-            Company company
+            Company company,
+            Long memberId
     ) {
-        this.member = member;
+        this.writer = writer;
         this.paymentDate = paymentDate;
         this.approvalNumber = approvalNumber;
         this.storeAddress = storeAddress;
         this.totalAmount = totalAmount;
         this.url = url;
         this.company = company;
+        this.memberId = memberId;
     }
 
 }

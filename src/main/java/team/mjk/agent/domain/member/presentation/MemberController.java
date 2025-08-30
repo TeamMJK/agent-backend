@@ -54,4 +54,12 @@ public class MemberController implements MemberDocsController {
     return new ResponseEntity<>(response,HttpStatus.OK);
   }
 
+  @DeleteMapping
+  public ResponseEntity<Long> deleteMember(
+      @MemberId Long memberId
+  ) {
+    Long deleteMemberId = memberService.delete(memberId);
+    return new ResponseEntity<>(deleteMemberId,HttpStatus.NO_CONTENT);
+  }
+
 }
