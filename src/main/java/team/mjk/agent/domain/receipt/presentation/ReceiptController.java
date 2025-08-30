@@ -42,11 +42,11 @@ public class ReceiptController implements ReceiptDocsController {
   }
 
   @PostMapping(value = "/i/ocr", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<Workspace> ocr(
+  public ResponseEntity<List<Workspace>> ocr(
       @MemberId Long memberId,
       @RequestPart(value = "image", required = false) MultipartFile image
   ) {
-    Workspace response = receiptService.saveMcp(memberId, image);
+    List<Workspace> response = receiptService.saveMcp(memberId, image);
     return new ResponseEntity<>(response, HttpStatus.CREATED);
 
   }

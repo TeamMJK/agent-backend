@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
@@ -43,7 +44,7 @@ public interface BusinessTripDocsController {
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = BusinessTripSaveResponse.class))
         )
     })
-    ResponseEntity<Workspace> saveBusinessTripMcp(
+    ResponseEntity<List<Workspace>> saveBusinessTripMcp(
         @Parameter(hidden = true) Long memberId,
         @RequestBody(description = "출장 등록 요청 DTO", required = true) BusinessTripSaveRequest request
     );

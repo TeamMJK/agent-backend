@@ -1,5 +1,6 @@
 package team.mjk.agent.domain.businessTrip.presentation;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,11 +40,11 @@ public class BusinessTripController implements BusinessTripDocsController{
 
   //사용자가 출장 정보를 생성할 때
   @PostMapping("/mcp")
-  public ResponseEntity<Workspace> saveBusinessTripMcp(
+  public ResponseEntity<List<Workspace>> saveBusinessTripMcp(
       @MemberId Long memberId,
       @RequestBody BusinessTripSaveRequest request
   ) {
-    Workspace workspace =  businessTripService.saveMcp(memberId, request);
+    List<Workspace> workspace =  businessTripService.saveMcp(memberId, request);
     return new ResponseEntity<>(workspace,HttpStatus.CREATED);
   }
 

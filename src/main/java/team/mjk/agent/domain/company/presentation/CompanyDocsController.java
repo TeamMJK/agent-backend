@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import team.mjk.agent.domain.company.dto.request.CompanyInvitationCodeRequest;
 import team.mjk.agent.domain.company.dto.request.CompanyInvitationEmailRequest;
 import team.mjk.agent.domain.company.dto.request.CompanySaveRequest;
+import team.mjk.agent.domain.company.dto.response.CompanyInfoResponse;
 import team.mjk.agent.domain.company.dto.response.CompanyInvitationEmailResponse;
 import team.mjk.agent.domain.company.dto.response.CompanyJoinResponse;
 
@@ -71,7 +72,7 @@ public interface CompanyDocsController {
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
       )
   })
-  ResponseEntity<String> getCompany(
+  ResponseEntity<CompanyInfoResponse> getCompany(
       @Parameter(hidden = true) Long memberId
   );
 

@@ -16,13 +16,11 @@ import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetResponse;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripSaveResponse;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripUpdateResponse;
 import team.mjk.agent.domain.company.domain.Company;
-import team.mjk.agent.domain.company.domain.CompanyRepository;
 import team.mjk.agent.domain.company.domain.Workspace;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
-import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
-import team.mjk.agent.global.mcp.McpService;
-import team.mjk.agent.global.mcp.McpServiceRegistry;
+import team.mjk.agent.domain.mcp.McpService;
+import team.mjk.agent.domain.mcp.McpServiceRegistry;
 
 @RequiredArgsConstructor
 @Service
@@ -54,42 +52,19 @@ public class BusinessTripService {
         .build();
   }
 
-  //Agent 통한 저장 메서드
-  @Transactional
-  public BusinessTripSaveResponse save(Long memberId, BusinessTripAgentRequest request) {
-    Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
-
-    BusinessTrip businessTrip = BusinessTrip.create(
-        LocalDate.parse(request.departDate()),
-        LocalDate.parse(request.arriveDate()),
-        request.destination(),
-        request.names(),
-        member.getName(),
-        company.getId(),
-        ServiceType.fromCategory(request.serviceType())
-    );
-    businessTripRepository.save(businessTrip);
-
-    return BusinessTripSaveResponse.builder()
-        .businessTripId(businessTrip.getId())
-        .build();
-  }
-
   //Controller(저장) -> saveMcp 호출 -> save 호출
   @Transactional
-  public Workspace saveMcp(Long memberId, BusinessTripSaveRequest request) {
+  public List<Workspace> saveMcp(Long memberId, BusinessTripSaveRequest request) {
     Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getCompany();
-    Workspace workspace = company.getWorkspace();
+    List<Workspace> workspaces = company.getWorkspace();
 
-    if (workspace == Workspace.NONE){
-      save(memberId, request);
-      return workspace;
+    for (Workspace workspace : workspaces) {
+      List<McpService> mcpServices = registry.getServices(workspace);
+      for (McpService mcpService : mcpServices) {
+        mcpService.createBusinessTrip(request, company.getId(), member.getName());
+      }
     }
-
-    McpService mcpService = registry.getService(workspace);
-    mcpService.createBusinessTrip(request, company.getId());
 
     return company.getWorkspace();
   }
@@ -99,15 +74,15 @@ public class BusinessTripService {
   public void saveAgentMcp(Long memberId, BusinessTripAgentRequest request) {
     Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getCompany();
-    Workspace workspace = company.getWorkspace();
+    List<Workspace> workspaces = company.getWorkspace();
 
-    if (workspace == Workspace.NONE){
-      save(memberId, request);
-      return;
+    for (Workspace workspace : workspaces) {
+      List<McpService> mcpServices = registry.getServices(workspace);
+      for (McpService mcpService : mcpServices) {
+        mcpService.createBusinessTripAgent(request, company.getId(), member.getName());
+      }
     }
 
-    McpService mcpService = registry.getService(workspace);
-    mcpService.createBusinessTripAgent(request, company.getId());
   }
 
   @Transactional(readOnly = true)

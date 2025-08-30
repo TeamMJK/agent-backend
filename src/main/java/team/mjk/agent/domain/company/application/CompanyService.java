@@ -9,9 +9,10 @@ import team.mjk.agent.domain.company.domain.CompanyRepository;
 import team.mjk.agent.domain.company.dto.request.CompanyInvitationCodeRequest;
 import team.mjk.agent.domain.company.dto.request.CompanyInvitationEmailRequest;
 import team.mjk.agent.domain.company.dto.request.CompanySaveRequest;
+import team.mjk.agent.domain.company.dto.request.CompanyUpdateRequest;
+import team.mjk.agent.domain.company.dto.response.CompanyInfoResponse;
 import team.mjk.agent.domain.company.dto.response.CompanyInvitationEmailResponse;
 import team.mjk.agent.domain.company.dto.response.CompanyJoinResponse;
-import team.mjk.agent.domain.company.presentation.exception.CompanyNotFoundException;
 import team.mjk.agent.domain.company.presentation.exception.InvalidInvitationCode;
 import team.mjk.agent.domain.email.infrastructure.EmailSender;
 import team.mjk.agent.domain.invitation.InvitationCodeProvider;
@@ -19,7 +20,6 @@ import team.mjk.agent.domain.invitation.domain.Invitation;
 import team.mjk.agent.domain.invitation.domain.InvitationRepository;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
-import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
 import team.mjk.agent.global.util.EmailMessageBuilder;
 
 @RequiredArgsConstructor
@@ -57,7 +57,7 @@ public class CompanyService {
   public Long create(CompanySaveRequest request, Long memberId) {
     Member member = memberRepository.findByMemberId(memberId);
 
-    Company company = Company.create(request.name(), request.workspace());
+    Company company = Company.create(request.name(), request.workspaces());
     companyRepository.save(company);
     member.saveCompany(company);
     return company.getId();
@@ -84,11 +84,24 @@ public class CompanyService {
   }
 
   @Transactional(readOnly = true)
-  public String getCompanyName(Long memberId) {
+  public CompanyInfoResponse getCompanyInfo(Long memberId) {
     Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getCompany();
 
-    return company.getName();
+
+    return CompanyInfoResponse.builder()
+        .workspaces(company.getWorkspace())
+        .name(company.getName())
+        .build();
+  }
+
+  @Transactional
+  public Long update(Long memberId, CompanyUpdateRequest request) {
+    Member member = memberRepository.findByMemberId(memberId);
+    Company company = member.getCompany();
+
+    company.update(request.name(), request.workspaces());
+    return company.getId();
   }
 
 }

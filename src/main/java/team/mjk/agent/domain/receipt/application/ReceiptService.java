@@ -30,11 +30,9 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import team.mjk.agent.domain.company.domain.Company;
-import team.mjk.agent.domain.company.domain.CompanyRepository;
 import team.mjk.agent.domain.company.domain.Workspace;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
-import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
 import team.mjk.agent.domain.receipt.domain.Receipt;
 import team.mjk.agent.domain.receipt.domain.ReceiptRepository;
 import team.mjk.agent.domain.receipt.dto.request.ReceiptMcpRequest;
@@ -42,8 +40,8 @@ import team.mjk.agent.domain.receipt.dto.request.ReceiptSaveRequest;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptGetResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptSaveResponse;
 import team.mjk.agent.domain.receipt.presentation.exception.*;
-import team.mjk.agent.global.mcp.McpService;
-import team.mjk.agent.global.mcp.McpServiceRegistry;
+import team.mjk.agent.domain.mcp.McpService;
+import team.mjk.agent.domain.mcp.McpServiceRegistry;
 
 @RequiredArgsConstructor
 @Service
@@ -107,40 +105,11 @@ public class ReceiptService {
   }
 
   @Transactional
-  public ReceiptSaveResponse saveOcrInfo(Long memberId, MultipartFile file) {
+  public List<Workspace> saveMcp(Long memberId, MultipartFile file) {
     Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getCompany();
 
-    String imageUrl = uploadImage(file);
-    ReceiptSaveRequest request = ocr(file);
-
-    Receipt receipt = Receipt.builder()
-            .member(member)
-            .paymentDate(request.paymentDate())
-            .approvalNumber(request.approvalNumber())
-            .storeAddress(request.storeAddress())
-            .totalAmount(request.totalAmount())
-            .company(company)
-            .url(imageUrl)
-            .build();
-
-    receiptRepository.save(receipt);
-
-    return ReceiptSaveResponse.builder()
-            .receiptId(receipt.getId())
-            .build();
-  }
-
-  @Transactional
-  public Workspace saveMcp(Long memberId, MultipartFile file) {
-    Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
-
-    Workspace workspace = company.getWorkspace();
-    if (workspace == Workspace.NONE) {
-      saveOcrInfo(memberId, file);
-      return workspace;
-    }
+    List<Workspace> workspaces = company.getWorkspace();
 
     String imageUrl = uploadImage(file);
     ReceiptSaveRequest request = ocr(file);
@@ -154,8 +123,12 @@ public class ReceiptService {
             .paymentDate(request.paymentDate())
             .build();
 
-    McpService mcpService = registry.getService(workspace);
-    mcpService.createReceipt(mcpRequest, company.getId());
+    for (Workspace workspace : workspaces) {
+      List<McpService> mcpServices = registry.getServices(workspace);
+      for (McpService mcpService : mcpServices) {
+        mcpService.createReceipt(mcpRequest, company.getId(), member);
+      }
+    }
 
     return company.getWorkspace();
   }
