@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 import team.mjk.agent.domain.company.domain.Workspace;
+import team.mjk.agent.global.mcp.exception.McpNotFoundException;
 
 @Component
 public class McpServiceRegistry {
@@ -20,7 +21,7 @@ public class McpServiceRegistry {
 
   public McpService getService(Workspace workspace) {
     return Optional.ofNullable(mcpServiceMap.get(workspace))
-        .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 워크스페이스입니다."));
+        .orElseThrow(McpNotFoundException::new);
   }
 
 }
