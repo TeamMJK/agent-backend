@@ -44,8 +44,7 @@ public class MemberRepositoryImpl implements MemberRepository {
 
   @Override
   public List<Member> findAllByCompanyId(Long companyId) {
-    return memberJpaRepository.findAllByCompanyId(companyId)
-        .orElseThrow(MemberNotFoundException::new);
+    return memberJpaRepository.findAllByCompanyId(companyId);
   }
 
   @Override

@@ -4,6 +4,8 @@ import io.jsonwebtoken.security.Jwks.OP;
 import java.util.List;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder.Op;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.member.domain.Member;
 
@@ -17,7 +19,8 @@ public interface MemberJpaRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByNameAndCompany(String name, Company company);
 
-    Optional<List<Member>> findAllByCompanyId(Long companyId);
+    @Query("select m from Member m join fetch m.company left join fetch m.passport where m.company.id = :companyId")
+    List<Member> findAllByCompanyId(@Param("companyId") Long companyId);
 
     long countByCompanyId(Long companyId);
 
