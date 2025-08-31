@@ -15,8 +15,10 @@ public interface MemberJpaRepository extends JpaRepository<Member, Long> {
 
     boolean existsByEmail(String email);
 
+    @Query("select m from Member m join fetch m.company left join fetch m.passport where m.email = :email")
     Optional<Member> findByEmail(String email);
 
+    @Query("select m from Member m join fetch m.company left join fetch m.passport where m.name = :name and m.company = :company")
     Optional<Member> findByNameAndCompany(String name, Company company);
 
     @Query("select m from Member m join fetch m.company left join fetch m.passport where m.company.id = :companyId")
