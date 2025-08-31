@@ -44,6 +44,8 @@ public class EmailService {
             throw new InvalidCodeException();
         }
 
+        authCodeService.deleteAuthCode(code);
+
         return VerifyEmailResponse.builder()
                 .success(isValid)
                 .build();

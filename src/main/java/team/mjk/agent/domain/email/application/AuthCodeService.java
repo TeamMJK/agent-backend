@@ -21,4 +21,8 @@ public class AuthCodeService {
         return email.equals(storedEmail);
     }
 
+    public void deleteAuthCode(String code) {
+        redisUtil.deleteData(code);
+    }
+
 }
