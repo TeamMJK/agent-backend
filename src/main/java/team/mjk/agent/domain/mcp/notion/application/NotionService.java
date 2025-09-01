@@ -19,6 +19,7 @@ import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.mcp.notion.dto.request.NotionTokenRequest;
 import team.mjk.agent.domain.mcp.notion.dto.request.NotionTokenUpdateRequest;
 import team.mjk.agent.domain.mcp.notion.presentation.exception.NotionAPIException;
+import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
 import team.mjk.agent.domain.receipt.dto.request.ReceiptMcpRequest;
 import team.mjk.agent.domain.mcp.McpService;
 import team.mjk.agent.global.util.KmsUtil;
@@ -33,7 +34,7 @@ public class NotionService implements McpService {
   private final WebClient notionWebClient;
 
   public Long save(Long memberId, NotionTokenRequest request) {
-    Member member = memberRepository.findByMemberId(memberId);
+      Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getCompany();
 
     String encryptToken = kmsUtil.encrypt(request.token());
@@ -53,7 +54,7 @@ public class NotionService implements McpService {
 
   @Transactional
   public Long update(Long memberId, NotionTokenUpdateRequest request) {
-    Member member = memberRepository.findByMemberId(memberId);
+      Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getCompany();
 
     Notion notion = notionRepository.findByCompanyId(company.getId());
@@ -65,7 +66,7 @@ public class NotionService implements McpService {
 
   @Transactional
   public Long delete(Long memberId) {
-    Member member = memberRepository.findByMemberId(memberId);
+      Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getCompany();
 
     Notion notion = notionRepository.findByCompanyId(company.getId());

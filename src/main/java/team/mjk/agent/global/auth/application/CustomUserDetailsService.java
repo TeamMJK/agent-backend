@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
+import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
 import team.mjk.agent.global.auth.domain.CustomUserDetails;
 
 @RequiredArgsConstructor

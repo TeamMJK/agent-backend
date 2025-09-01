@@ -33,6 +33,7 @@ import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.company.domain.Workspace;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
+import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
 import team.mjk.agent.domain.receipt.domain.Receipt;
 import team.mjk.agent.domain.receipt.domain.ReceiptRepository;
 import team.mjk.agent.domain.receipt.dto.request.ReceiptMcpRequest;

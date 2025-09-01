@@ -29,7 +29,7 @@ public class MemberRepositoryImpl implements MemberRepository {
   @Override
   public Member findByMemberId(Long memberId) {
     return memberJpaRepository.findById(memberId)
-        .orElseThrow(MemberNotFoundException::new);
+            .orElseThrow(MemberNotFoundException::new);
   }
 
   @Override
