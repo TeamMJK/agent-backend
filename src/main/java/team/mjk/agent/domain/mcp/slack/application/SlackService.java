@@ -16,6 +16,7 @@ import team.mjk.agent.domain.mcp.slack.dto.request.SlackSaveRequest;
 import team.mjk.agent.domain.mcp.slack.dto.request.SlackUpdateRequest;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
+import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
 import team.mjk.agent.domain.receipt.dto.request.ReceiptMcpRequest;
 import team.mjk.agent.domain.mcp.McpService;
 import team.mjk.agent.global.util.KmsUtil;

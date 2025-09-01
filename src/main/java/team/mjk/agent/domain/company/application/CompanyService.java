@@ -25,6 +25,7 @@ import team.mjk.agent.domain.invitation.domain.InvitationRepository;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
+import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
 import team.mjk.agent.domain.receipt.domain.ReceiptRepository;
 import team.mjk.agent.global.util.EmailMessageBuilder;
 import team.mjk.agent.global.util.KmsUtil;

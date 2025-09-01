@@ -21,6 +21,7 @@ import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.mcp.McpService;
 import team.mjk.agent.domain.mcp.McpServiceRegistry;
+import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
 
 @RequiredArgsConstructor
 @Service
