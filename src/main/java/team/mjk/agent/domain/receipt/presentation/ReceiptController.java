@@ -32,7 +32,7 @@ public class ReceiptController implements ReceiptDocsController {
     return new ResponseEntity<>(response, HttpStatus.CREATED);
   }
 
-  @PostMapping(value = "/i", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<String> s3Upload(
       @MemberId Long memberId,
       @RequestPart(value = "image", required = false) MultipartFile image
