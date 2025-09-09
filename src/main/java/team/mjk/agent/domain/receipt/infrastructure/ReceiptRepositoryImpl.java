@@ -50,4 +50,10 @@ public class ReceiptRepositoryImpl implements ReceiptRepository {
                   .orElseThrow(ReceiptNotFoundExceptionCode::new);
         }
 
+
+    @Override
+    public List<Receipt> findAll() {
+        return receiptJpaRepository.findAll();
+    }
+
 }

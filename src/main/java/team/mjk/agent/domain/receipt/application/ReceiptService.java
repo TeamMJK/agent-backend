@@ -281,4 +281,17 @@ public class ReceiptService {
     }
   }
 
+  @Transactional(readOnly = true)
+  public List<ReceiptGetResponse> getAllReceipts() {
+    return receiptRepository.findAll().stream()
+            .map(receipt -> ReceiptGetResponse.builder()
+                    .receiptId(receipt.getId())
+                    .approvalNumber(receipt.getApprovalNumber())
+                    .paymentDate(receipt.getPaymentDate())
+                    .storeAddress(receipt.getStoreAddress())
+                    .totalAmount(receipt.getTotalAmount())
+                    .build())
+            .toList();
+  }
+
 }

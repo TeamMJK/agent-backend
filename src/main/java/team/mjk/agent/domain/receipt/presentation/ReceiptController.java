@@ -88,4 +88,10 @@ public class ReceiptController implements ReceiptDocsController {
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
+  @GetMapping("/all")
+  public ResponseEntity<List<ReceiptGetResponse>> getAllReceipts() {
+    List<ReceiptGetResponse> receipts = receiptService.getAllReceipts();
+    return ResponseEntity.ok(receipts);
+  }
+
 }
