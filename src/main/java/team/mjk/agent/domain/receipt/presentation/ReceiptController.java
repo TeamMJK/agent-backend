@@ -33,7 +33,7 @@ public class ReceiptController implements ReceiptDocsController {
   }
 
   @PatchMapping(value = "/upload/{receiptId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<String> s3Upload(
+  public ResponseEntity<String> uploadImage(
           @MemberId Long memberId,
           @PathVariable Long receiptId,
           @RequestPart(value = "image", required = false) MultipartFile image
