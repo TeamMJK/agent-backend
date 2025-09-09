@@ -63,9 +63,14 @@ public class ReceiptService {
   private static final Set<String> ALLOWED_EXTENSIONS = Set.of("jpg", "jpeg", "png", "gif");
 
   @Transactional
-  public ReceiptSaveResponse saveReceipt(Long memberId, ReceiptSaveRequest request) {
+  public ReceiptSaveResponse saveReceipt(Long memberId, ReceiptSaveRequest request, MultipartFile image) {
     Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getCompany();
+
+    String imageUrl = null;
+    if (image != null && !image.isEmpty() && image.getOriginalFilename() != null) {
+      imageUrl = uploadImage(image);
+    }
 
     Receipt receipt = Receipt.builder()
             .writer(member.getName())
@@ -73,6 +78,7 @@ public class ReceiptService {
             .approvalNumber(request.approvalNumber())
             .storeAddress(request.storeAddress())
             .totalAmount(request.totalAmount())
+            .url(imageUrl)
             .company(company)
             .memberId(memberId)
             .build();
@@ -85,9 +91,9 @@ public class ReceiptService {
   }
 
   @Transactional
-  public String upload(Long memberId, MultipartFile image) {
-    Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+  public String upload(Long memberId, Long receiptId, MultipartFile image) {
+    memberRepository.findByMemberId(memberId);
+    Receipt receipt = receiptRepository.findByReceiptId(receiptId);
 
     if (image.isEmpty() || Objects.isNull(image.getOriginalFilename())) {
       throw new EmptyFileExceptionCode();
@@ -95,13 +101,7 @@ public class ReceiptService {
 
     String imageUrl = uploadImage(image);
 
-    Receipt receipt = Receipt.builder()
-            .writer(member.getName())
-            .company(company)
-            .url(imageUrl)
-            .build();
-
-    receiptRepository.save(receipt);
+    receipt.updateUrl(imageUrl);
 
     return imageUrl;
   }
@@ -184,6 +184,11 @@ public class ReceiptService {
   public void deleteReceipt(Long memberId, Long receiptId) {
     Receipt receipt = receiptRepository.findByReceiptId(receiptId);
     validateForbidden(memberId, receipt.getMemberId());
+
+    if (receipt.getUrl() != null) {
+      deleteImageFromS3(memberId, receipt.getUrl());
+    }
+
     receiptRepository.delete(receipt);
   }
 

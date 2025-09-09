@@ -60,4 +60,8 @@ public class Receipt extends BaseTimeEntity {
         this.memberId = memberId;
     }
 
+    public void updateUrl(String imageUrl) {
+        this.url = imageUrl;
+    }
+
 }

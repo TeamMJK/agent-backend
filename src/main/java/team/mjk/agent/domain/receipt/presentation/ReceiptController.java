@@ -1,6 +1,5 @@
 package team.mjk.agent.domain.receipt.presentation;
 
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,23 +22,26 @@ public class ReceiptController implements ReceiptDocsController {
 
   private final ReceiptService receiptService;
 
-  @PostMapping
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<ReceiptSaveResponse> saveReceipt(
-      @MemberId Long memberId,
-      @RequestBody ReceiptSaveRequest request
+          @MemberId Long memberId,
+          @RequestPart(value = "request") ReceiptSaveRequest request,
+          @RequestPart(value = "image", required = false) MultipartFile image
   ) {
-    ReceiptSaveResponse response = receiptService.saveReceipt(memberId, request);
+    ReceiptSaveResponse response = receiptService.saveReceipt(memberId, request, image);
     return new ResponseEntity<>(response, HttpStatus.CREATED);
   }
 
-  @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PatchMapping(value = "/upload/{receiptId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<String> s3Upload(
-      @MemberId Long memberId,
-      @RequestPart(value = "image", required = false) MultipartFile image
+          @MemberId Long memberId,
+          @PathVariable Long receiptId,
+          @RequestPart(value = "image", required = false) MultipartFile image
   ) {
-    String profileImage = receiptService.upload(memberId, image);
-    return ResponseEntity.ok(profileImage);
+    String imageUrl = receiptService.upload(memberId, receiptId, image);
+    return ResponseEntity.ok(imageUrl);
   }
+
 
   @PostMapping(value = "/i/ocr", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<List<Workspace>> ocr(

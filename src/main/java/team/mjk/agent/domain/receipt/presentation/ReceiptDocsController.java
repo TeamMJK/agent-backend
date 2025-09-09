@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,17 +32,26 @@ public interface ReceiptDocsController {
     })
     ResponseEntity<ReceiptSaveResponse> saveReceipt(
             @Parameter(hidden = true) Long memberId,
-            @RequestBody(description = "영수증 저장 요청 DTO", required = true)
-            ReceiptSaveRequest request
+            @RequestPart(value = "request") ReceiptSaveRequest request,
+            @RequestPart(value = "image", required = false) MultipartFile image
     );
 
-    @Operation(summary = "영수증 이미지 업로드", description = "S3에 영수증 이미지를 업로드합니다.")
+    @Operation(summary = "영수증 이미지 업로드", description = "이미 등록된 영수증에 이미지를 업로드합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "업로드 성공")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "이미지 업로드 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = String.class) // 단순히 URL 리턴
+                    )
+            ),
+            @ApiResponse(responseCode = "404", description = "영수증 또는 회원을 찾을 수 없음")
     })
-    ResponseEntity<String> s3Upload(
+    ResponseEntity<String> uploadImage(
             @Parameter(hidden = true) Long memberId,
-            @RequestPart(required = false) MultipartFile image
+            @Parameter(description = "이미지를 업로드할 영수증 ID", required = true) Long receiptId,
+            @RequestPart(value = "image", required = true) MultipartFile image
     );
 
     @Operation(summary = "영수증 이미지 삭제", description = "S3에서 영수증 이미지를 삭제합니다.")
@@ -95,6 +103,5 @@ public interface ReceiptDocsController {
             @Parameter(hidden = true) Long memberId,
             @Parameter(description = "삭제할 영수증 ID", required = true) Long receiptId
     );
-
 
 }
