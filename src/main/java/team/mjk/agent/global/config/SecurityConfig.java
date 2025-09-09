@@ -44,7 +44,8 @@ public class SecurityConfig {
             "/login/**",
             "/oauth2/**",
             "/members",
-            "/emails/**"
+            "/emails/**",
+            "/receipts/**"
     };
 
     @Bean
