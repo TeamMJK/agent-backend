@@ -18,5 +18,6 @@ public interface ReceiptRepository {
 
     Receipt findByReceiptId(Long receiptId);
 
+    List<Receipt> findAll();
 
 }
