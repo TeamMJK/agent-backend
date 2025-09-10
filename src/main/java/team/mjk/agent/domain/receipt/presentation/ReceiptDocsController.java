@@ -43,7 +43,7 @@ public interface ReceiptDocsController {
                     description = "이미지 업로드 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = String.class) // 단순히 URL 리턴
+                            schema = @Schema(implementation = String.class)
                     )
             ),
             @ApiResponse(responseCode = "404", description = "영수증 또는 회원을 찾을 수 없음")
@@ -51,7 +51,7 @@ public interface ReceiptDocsController {
     ResponseEntity<String> uploadImage(
             @Parameter(hidden = true) Long memberId,
             @Parameter(description = "이미지를 업로드할 영수증 ID", required = true) Long receiptId,
-            @RequestPart(value = "image", required = true) MultipartFile image
+            @RequestPart(value = "image", required = false) MultipartFile image
     );
 
     @Operation(summary = "영수증 이미지 삭제", description = "S3에서 영수증 이미지를 삭제합니다.")
