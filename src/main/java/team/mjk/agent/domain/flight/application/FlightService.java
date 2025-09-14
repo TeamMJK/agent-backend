@@ -20,6 +20,7 @@ public class FlightService {
 
     System.out.println("response:"+response);
     String pythonUrl = "http://localhost:8000/flight-data";
+
     for (var flight : response.flightList().flights()) {
       List<MemberInfoGetResponse> matchedMembers = response.memberInfoList()
           .memberInfoGetResponseList().stream()

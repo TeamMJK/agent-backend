@@ -21,6 +21,10 @@ import team.mjk.agent.domain.member.dto.response.MemberInfoList;
 import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
 import team.mjk.agent.domain.prompt.dto.request.PromptRequest;
 import team.mjk.agent.domain.prompt.dto.response.NameList;
+import team.mjk.agent.domain.prompt.presentation.exception.EmptyArrivalDateException;
+import team.mjk.agent.domain.prompt.presentation.exception.EmptyDepartureDateExceptionCode;
+import team.mjk.agent.domain.prompt.presentation.exception.EmptyDepartureException;
+import team.mjk.agent.domain.prompt.presentation.exception.EmptyDestinationException;
 import team.mjk.agent.global.util.KmsUtil;
 
 @RequiredArgsConstructor
@@ -76,10 +80,24 @@ public class PromptService {
         request.prompt()
     );
 
-    return chatClient.prompt()
+    HotelList hotelList = chatClient.prompt()
         .user(p -> p.text(fullPrompt))
         .call()
         .entity(HotelList.class);
+
+    hotelList.hotels().forEach(hotel -> {
+      if (hotel.destination() == null || hotel.destination().isBlank()) {
+        throw new EmptyDestinationException();
+      }
+      if (hotel.departure_date() == null) {
+        throw new EmptyDepartureDateExceptionCode();
+      }
+      if (hotel.arrival_date() == null) {
+        throw new EmptyArrivalDateException();
+      }
+    });
+
+    return hotelList;
   }
 
   private FlightList extractFlightInfo(Long memberId, PromptRequest request) {
@@ -90,6 +108,8 @@ public class PromptService {
             다음 문장에서 출장 정보를 추출해줘. 올해는 2025년이야. 예산은 숙박 일수 만큼 나눠.
             출발지는 depart_date 에 저장하고 도착지은 return_date 에 저장해.
             문장을 파악해서 요청자와 같이 출장을 가는 사람 이름이면 그것에 맞춰 인원 수 추가.
+            출발지랑 도착지는 항공으로 검색 가능하게 저장.
+            만약 도시 이름이라면 가장 가까운 항공으로 저장.
             만약 9월 23일부터 4박 5일이면 depart_date = 2025-09-23, return_date = 2025-09-27.
             출장 정보 한 개당 최소 한 명의 이름 필요.
             만약 이름이 출장 정보에 없다면 %s 이름 추가.
@@ -100,10 +120,27 @@ public class PromptService {
         member.getName(),
         request.prompt()
     );
-    return chatClient.prompt()
+    FlightList flightList = chatClient.prompt()
         .user(p -> p.text(fullPrompt))
         .call()
         .entity(FlightList.class);
+
+    flightList.flights().forEach(flight -> {
+      if (flight.departure() == null || flight.departure().isBlank()) {
+        throw new EmptyDepartureException();
+      }
+      if(flight.arrival() == null || flight.arrival().isBlank()) {
+        throw new EmptyDestinationException();
+      }
+      if (flight.depart_date() == null) {
+        throw new EmptyDepartureDateExceptionCode();
+      }
+      if (flight.return_date() == null) {
+        throw new EmptyArrivalDateException();
+      }
+    });
+
+    return flightList;
   }
 
   private MemberInfoList extractNames(Long memberId, PromptRequest request) {
