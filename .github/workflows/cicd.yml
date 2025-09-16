@@ -38,13 +38,13 @@ jobs:
           echo "::add-mask::${{ secrets.DOCKERHUB_PASSWORD }}"
           echo "::add-mask::${{ secrets.EC2_SSH_KEY }}"
 
-      - name: Build with Gradle (without test)
+      - name: Build with Gradle (skip tests)
         uses: gradle/gradle-build-action@v1
         with:
           arguments: clean build -x test
 
       - name: Docker image build
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/mjk_agent:latest .  
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/mjk_agent:latest .
 
       - name: Docker login
         uses: docker/login-action@v2
@@ -67,10 +67,16 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             mkdir -p ~/docker/mjk_agent
-            printf "%s" "${{ secrets.DOCKER_COMPOSE_YML }}" > ~/docker/mjk_agent/docker-compose.yml
-            printf "%s" "${{ secrets.YML_LOCAL }}" > ~/docker/mjk_agent/application-local.yml
-            sudo docker network create my-network || true
             cd ~/docker/mjk_agent
-            sudo docker-compose down --rmi all -v --remove-orphans
+
+            printf "%s" "${{ secrets.DOCKER_COMPOSE_YML }}" > docker-compose.yml
+            printf "%s" "${{ secrets.YML_LOCAL }}" > application-local.yml
+
+            sudo docker-compose down --remove-orphans || true
+
+            sudo docker network rm my-network || true
+            sudo docker network create my-network || true
+
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mjk_agent:latest
+
             sudo docker-compose up -d --build --force-recreate --remove-orphans
