@@ -38,11 +38,6 @@ jobs:
           echo "::add-mask::${{ secrets.DOCKERHUB_PASSWORD }}"
           echo "::add-mask::${{ secrets.EC2_SSH_KEY }}"
 
-      - name: Write application-local.yml safely
-        run: |
-          mkdir -p ./src/main/resources
-          printf "%s" "${{ secrets.YML_LOCAL }}" > ./src/main/resources/application-local.yml
-
       - name: Build with Gradle (without test)
         uses: gradle/gradle-build-action@v1
         with:
@@ -73,9 +68,9 @@ jobs:
           script: |
             mkdir -p ~/docker/mjk_agent
             printf "%s" "${{ secrets.DOCKER_COMPOSE_YML }}" > ~/docker/mjk_agent/docker-compose.yml
+            printf "%s" "${{ secrets.YML_LOCAL }}" > ~/docker/mjk_agent/application-local.yml
             sudo docker network create my-network || true
             cd ~/docker/mjk_agent
             sudo docker-compose down --rmi all -v --remove-orphans
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mjk_agent:latest
             sudo docker-compose up -d --build --force-recreate --remove-orphans
-
