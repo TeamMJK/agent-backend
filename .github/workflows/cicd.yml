@@ -68,15 +68,20 @@ jobs:
           script: |
             mkdir -p ~/docker/mjk_agent
             cd ~/docker/mjk_agent
-
-            printf "%s" "${{ secrets.DOCKER_COMPOSE_YML }}" > docker-compose.yml
-            printf "%s" "${{ secrets.YML_LOCAL }}" > application-local.yml
-
+  
+            cat <<'EOF' > docker-compose.yml
+              ${{ secrets.DOCKER_COMPOSE_YML }}
+              EOF
+  
+            cat <<'EOF' > application-local.yml
+              ${{ secrets.YML_LOCAL }}
+              EOF
+  
             sudo docker-compose down --remove-orphans || true
-
+  
             sudo docker network rm my-network || true
             sudo docker network create my-network || true
-
+  
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mjk_agent:latest
-
+  
             sudo docker-compose up -d --build --force-recreate --remove-orphans
