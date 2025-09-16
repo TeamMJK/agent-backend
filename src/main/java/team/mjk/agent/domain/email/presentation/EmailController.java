@@ -13,7 +13,7 @@ import team.mjk.agent.domain.email.dto.response.VerifyEmailResponse;
 @RequiredArgsConstructor
 @RequestMapping("/emails")
 @RestController
-public class EmailController {
+public class EmailController implements EmailDocsController {
 
     private final EmailService emailService;
 
