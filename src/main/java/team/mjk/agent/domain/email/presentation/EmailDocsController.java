@@ -12,7 +12,7 @@ import team.mjk.agent.domain.email.dto.request.VerifyEmailRequest;
 import team.mjk.agent.domain.email.dto.response.SendEmailResponse;
 import team.mjk.agent.domain.email.dto.response.VerifyEmailResponse;
 
-@Tag(name = "Email API", description = "이메일 인증 관련 API")
+@Tag(name = "Email", description = "이메일 인증 관련 API")
 @RequestMapping("/emails")
 public interface EmailDocsController {
 
