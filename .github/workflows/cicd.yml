@@ -81,8 +81,8 @@ jobs:
           script: |
             mkdir -p ~/docker/mjk_agent
             printf "%s" "${{ secrets.DOCKER_COMPOSE_YML }}" > ~/docker/mjk_agent/docker-compose.yml
-            docker network create my-network || true
+            sudo docker network create my-network || true
             cd ~/docker/mjk_agent
-            docker-compose down
-            docker-compose up -d --remove-orphans
-            docker system prune -f --volumes
+            sudo docker-compose down
+            sudo docker-compose up -d --remove-orphans
+            sudo docker system prune -f --volumes
