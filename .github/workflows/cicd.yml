@@ -82,6 +82,7 @@ jobs:
           sudo docker run -d \
             --name redis \
             --network my-network \
+            -p 6379:6379 \
             -v redis-data:/data \
             redis:latest
 
@@ -90,6 +91,7 @@ jobs:
           sudo docker run -d \
             --name mjk_agent \
             --network my-network \
+            -p 8080:8080 \
             -e REDIS_HOST=redis \
             ${{ secrets.DOCKERHUB_USERNAME }}/mjk_agent:latest
 
