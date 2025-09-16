@@ -76,6 +76,10 @@ jobs:
             cat <<'EOF' > application-local.yml
             ${{ secrets.YML_LOCAL }}
             EOF
+
+            cat <<'EOF' > prometheus/prometheus.yml
+            ${{ secrets.PROMETHEUS_YML }}
+            EOF
   
             sudo docker-compose down --remove-orphans || true
             sudo docker network rm my-network || true
