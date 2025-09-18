@@ -69,11 +69,11 @@ jobs:
             mkdir -p ~/docker/mjk_agent
             cd ~/docker/mjk_agent
   
-            cat <<'EOF' > docker-compose-service.yml
+            cat <<'EOF' | sudo tee docker-compose-service.yml > /dev/null
             ${{ secrets.DOCKER_COMPOSE_SERVICE_YML }}
             EOF
   
-            cat <<'EOF' > application-local.yml
+            cat <<'EOF' | sudo tee application-local.yml > /dev/null
             ${{ secrets.YML_LOCAL }}
             EOF
   
