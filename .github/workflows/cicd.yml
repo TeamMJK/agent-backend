@@ -32,7 +32,7 @@ jobs:
       - name: Mask secrets
         run: |
           echo "::add-mask::${{ secrets.YML_LOCAL }}"
-          echo "::add-mask::${{ secrets.DOCKER_COMPOSE_YML }}"
+          echo "::add-mask::${{ secrets.DOCKER_COMPOSE_SERVICE_YML }}"
           echo "::add-mask::${{ secrets.DOCKERHUB_PASSWORD }}"
           echo "::add-mask::${{ secrets.EC2_SSH_KEY }}"
 
