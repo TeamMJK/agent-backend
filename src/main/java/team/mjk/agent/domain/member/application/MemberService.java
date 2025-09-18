@@ -14,7 +14,6 @@ import team.mjk.agent.domain.member.dto.request.MemberInfoUpdateRequest;
 import team.mjk.agent.domain.member.dto.request.MemberSaveRequest;
 import team.mjk.agent.domain.member.dto.response.*;
 import team.mjk.agent.domain.member.presentation.exception.EmailAlreadyExistsException;
-import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
 import team.mjk.agent.domain.passport.domain.Passport;
 import team.mjk.agent.domain.passport.domain.PassportRepository;
 import team.mjk.agent.global.util.KmsUtil;
