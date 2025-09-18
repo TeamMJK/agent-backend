@@ -47,7 +47,7 @@ public class EmailService {
         authCodeService.deleteAuthCode(code);
 
         return VerifyEmailResponse.builder()
-                .success(isValid)
+                .success(true)
                 .build();
     }
 
