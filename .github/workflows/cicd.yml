@@ -66,29 +66,23 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            mkdir -p ~/docker/mjk_agent/prometheus
+            mkdir -p ~/docker/mjk_agent
             cd ~/docker/mjk_agent
   
-            cat <<'EOF' > docker-compose.yml
-            ${{ secrets.DOCKER_COMPOSE_YML }}
+            cat <<'EOF' > docker-compose-service.yml
+            ${{ secrets.DOCKER_COMPOSE_SERVICE_YML }}
             EOF
   
             cat <<'EOF' > application-local.yml
             ${{ secrets.YML_LOCAL }}
             EOF
   
-            cat <<'EOF' > prometheus/prometheus.yml
-            ${{ secrets.PROMETHEUS_YML }}
-            EOF
-  
-            sudo docker-compose down --remove-orphans || true
+            sudo docker-compose -f docker-compose-service.yml down --remove-orphans || true
             
-            if sudo docker network ls | grep -q my-network; then
-              sudo docker network rm my-network || true
+            if ! sudo docker network ls | grep -q my-network; then
+              sudo docker network create my-network
             fi
-  
-            sudo docker network create my-network
   
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mjk_agent:latest
   
-            sudo docker-compose up -d --build --force-recreate --remove-orphans
+            sudo docker-compose -f docker-compose-service.yml up -d --build --force-recreate --remove-orphans
