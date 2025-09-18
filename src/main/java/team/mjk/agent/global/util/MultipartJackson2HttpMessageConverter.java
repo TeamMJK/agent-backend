@@ -9,10 +9,10 @@ import java.lang.reflect.Type;
 
 @Component
 public class MultipartJackson2HttpMessageConverter extends AbstractJackson2HttpMessageConverter {
+
     protected MultipartJackson2HttpMessageConverter(ObjectMapper objectMapper) {
         super(objectMapper, MediaType.APPLICATION_OCTET_STREAM);
     }
-
 
     @Override
     public boolean canWrite(Class<?> clazz, MediaType mediaType) {
