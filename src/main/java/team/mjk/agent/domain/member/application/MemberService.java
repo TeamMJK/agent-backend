@@ -31,10 +31,7 @@ public class MemberService {
   public MemberSaveResponse signUp(MemberSaveRequest request) {
     validateEmail(request.email());
 
-    Member member = Member.builder()
-        .email(request.email())
-        .password(passwordEncoder.encode(request.password()))
-        .build();
+    Member member = Member.create(request.email(), passwordEncoder.encode(request.password()));
     memberRepository.save(member);
 
     return MemberSaveResponse.builder()
