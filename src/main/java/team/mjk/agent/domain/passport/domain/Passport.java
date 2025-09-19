@@ -3,13 +3,13 @@ package team.mjk.agent.domain.passport.domain;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@Getter
+import lombok.*;
+
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 @Entity
 public class Passport {
 
@@ -22,12 +22,6 @@ public class Passport {
 
   @Column(columnDefinition = "TEXT")
   private String passportExpireDate;
-
-  @Builder
-  private Passport(String passportNumber, String passportExpireDate) {
-    this.passportNumber = passportNumber;
-    this.passportExpireDate = passportExpireDate;
-  }
 
   public void update(String passportNumber, String passportExpireDate) {
     if (passportNumber != null) {
