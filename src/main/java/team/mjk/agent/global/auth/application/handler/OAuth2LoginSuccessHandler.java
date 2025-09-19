@@ -36,6 +36,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(
             HttpServletRequest request, HttpServletResponse response, Authentication authentication
     ) throws IOException {
+        System.out.println("OAuth2LoginSuccessHandler 호출됨!");
         try {
             OauthLoginResultResponse result = resolveLoginResultFromAuthentication(authentication);
             tokenInjector.injectTokensToCookie(result, response);
@@ -77,4 +78,5 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     private void handleAlreadyExistUser(HttpServletResponse response) throws IOException {
         response.sendRedirect(securityProperties.loginUrl() + "?error=true&exception=" + ALREADY_REGISTERED_MEMBER);
     }
+
 }
