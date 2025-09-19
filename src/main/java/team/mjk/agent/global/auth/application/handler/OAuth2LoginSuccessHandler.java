@@ -36,7 +36,6 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(
             HttpServletRequest request, HttpServletResponse response, Authentication authentication
     ) throws IOException {
-        System.out.println("OAuth2LoginSuccessHandler 호출됨!");
         try {
             OauthLoginResultResponse result = resolveLoginResultFromAuthentication(authentication);
             tokenInjector.injectTokensToCookie(result, response);
@@ -72,7 +71,6 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         if (StringUtils.hasText(redirectCookie)) {
             return redirectCookie;
         }
-        System.out.println("쿠키 없으므로 securityProperties.redirectUrl(): " + securityProperties.redirectUrl());
         return securityProperties.redirectUrl();
     }
 
