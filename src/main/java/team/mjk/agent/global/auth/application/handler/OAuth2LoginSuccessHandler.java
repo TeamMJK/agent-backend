@@ -72,6 +72,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         if (StringUtils.hasText(redirectCookie)) {
             return redirectCookie;
         }
+        System.out.println("쿠키 없으므로 securityProperties.redirectUrl(): " + securityProperties.redirectUrl());
         return securityProperties.redirectUrl();
     }
 
