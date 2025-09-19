@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsUtils;
+import team.mjk.agent.global.auth.application.handler.OAuth2LoginSuccessHandler;
 import team.mjk.agent.global.auth.presentation.filter.RedirectUrlFilter;
 import team.mjk.agent.global.jwt.config.SecurityProperties;
 import team.mjk.agent.global.jwt.filter.JwtTokenFilter;
@@ -33,7 +34,7 @@ public class SecurityConfig {
     private final JwtTokenFilter jwtTokenFilter;
     private final RedirectUrlFilter redirectUrlFilter;
     private final SecurityProperties securityProperties;
-    private final AuthenticationSuccessHandler authenticationSuccessHandler;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final AuthenticationFailureHandler authenticationFailureHandler;
 
     private static final String[] PERMIT_ALL_PATTERNS = {
@@ -115,7 +116,7 @@ public class SecurityConfig {
         http.oauth2Login(oauth2 ->
             oauth2.loginPage(securityProperties.loginUrl())
                 .userInfoEndpoint(userInfo -> userInfo.userService(defaultOAuth2UserService))
-                .successHandler(authenticationSuccessHandler)
+                .successHandler(oAuth2LoginSuccessHandler)
                 .failureHandler(authenticationFailureHandler)
         );
     }
