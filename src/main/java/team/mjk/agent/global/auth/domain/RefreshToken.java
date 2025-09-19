@@ -1,17 +1,17 @@
 package team.mjk.agent.global.auth.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import team.mjk.agent.global.auth.presentation.exception.RefreshTokenNotValidException;
 import team.mjk.agent.global.domain.BaseTimeEntity;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 @Entity
 public class RefreshToken extends BaseTimeEntity {
 
@@ -26,16 +26,14 @@ public class RefreshToken extends BaseTimeEntity {
 
     private LocalDateTime expiredAt;
 
-    private RefreshToken(Long memberId, String token, LocalDateTime expiredAt) {
-        this.memberId = memberId;
-        this.token = token;
-        this.expiredAt = expiredAt;
-    }
-
     public static RefreshToken of(Long memberId, String token, long expiredSeconds) {
         LocalDateTime expiredAt = LocalDateTime.now().plusSeconds(expiredSeconds);
 
-        return new RefreshToken(memberId, token, expiredAt);
+        return RefreshToken.builder()
+                .memberId(memberId)
+                .token(token)
+                .expiredAt(expiredAt)
+                .build();
     }
 
     public void rotate(String token) {
