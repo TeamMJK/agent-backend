@@ -1,10 +1,7 @@
 package team.mjk.agent.domain.member.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.company.presentation.exception.CompanyNotFoundException;
@@ -22,8 +19,10 @@ import java.util.Objects;
 
 import static jakarta.persistence.EnumType.STRING;
 
-@Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 @Entity
 public class Member extends BaseTimeEntity {
 
@@ -67,12 +66,11 @@ public class Member extends BaseTimeEntity {
     @JoinColumn(name = "passport_id", unique = true)
     private Passport passport;
 
-    @Builder
-    private Member(String email, String password, String externalId, LoginProvider loginProvider) {
-        this.email = email;
-        this.password = password;
-        this.externalId = externalId;
-        this.loginProvider = loginProvider;
+    public static Member create(String email, String password) {
+        return Member.builder()
+                .email(email)
+                .password(password)
+                .build();
     }
 
     public void checkPassword(PasswordEncoder passwordEncoder, String password) {
