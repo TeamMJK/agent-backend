@@ -71,17 +71,16 @@ public class ReceiptService {
       imageUrl = uploadImage(image);
     }
 
-    Receipt receipt = Receipt.builder()
-            .writer(member.getName())
-            .paymentDate(request.paymentDate())
-            .approvalNumber(request.approvalNumber())
-            .storeAddress(request.storeAddress())
-            .totalAmount(request.totalAmount())
-            .url(imageUrl)
-            .company(company)
-            .memberId(memberId)
-            .build();
-
+    Receipt receipt = Receipt.create(
+            member.getName(),
+            request.paymentDate(),
+            request.approvalNumber(),
+            request.storeAddress(),
+            request.totalAmount(),
+            imageUrl,
+            company,
+            memberId
+    );
     receiptRepository.save(receipt);
 
     return ReceiptSaveResponse.builder()

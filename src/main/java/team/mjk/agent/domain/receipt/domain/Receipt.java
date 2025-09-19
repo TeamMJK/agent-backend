@@ -1,10 +1,7 @@
 package team.mjk.agent.domain.receipt.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.global.domain.BaseTimeEntity;
@@ -12,8 +9,10 @@ import team.mjk.agent.global.domain.BaseTimeEntity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 @Entity
 public class Receipt extends BaseTimeEntity {
 
@@ -39,8 +38,7 @@ public class Receipt extends BaseTimeEntity {
     @JoinColumn(name = "company_id")
     private Company company;
 
-    @Builder
-    private Receipt(
+    public static Receipt create(
             String writer,
             LocalDate paymentDate,
             String approvalNumber,
@@ -50,14 +48,16 @@ public class Receipt extends BaseTimeEntity {
             Company company,
             Long memberId
     ) {
-        this.writer = writer;
-        this.paymentDate = paymentDate;
-        this.approvalNumber = approvalNumber;
-        this.storeAddress = storeAddress;
-        this.totalAmount = totalAmount;
-        this.url = url;
-        this.company = company;
-        this.memberId = memberId;
+        return Receipt.builder()
+                .writer(writer)
+                .paymentDate(paymentDate)
+                .approvalNumber(approvalNumber)
+                .storeAddress(storeAddress)
+                .totalAmount(totalAmount)
+                .url(url)
+                .company(company)
+                .memberId(memberId)
+                .build();
     }
 
     public void updateUrl(String imageUrl) {
