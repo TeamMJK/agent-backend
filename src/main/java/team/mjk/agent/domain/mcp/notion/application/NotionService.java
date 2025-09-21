@@ -66,7 +66,7 @@ public class NotionService implements McpService {
 
   @Transactional
   public Long delete(Long memberId) {
-      Member member = memberRepository.findByMemberId(memberId);
+    Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getCompany();
 
     Notion notion = notionRepository.findByCompanyId(company.getId());

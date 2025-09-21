@@ -80,18 +80,18 @@ public class CompanyService {
 
     if (request.workspaceConfigs().getNotionTokenRequest() != null) {
       Notion notion = Notion.create(
-          request.workspaceConfigs().getNotionTokenRequest().token(),
-          request.workspaceConfigs().getNotionTokenRequest().businessTripDatabaseId(),
+          kmsUtil.encrypt(request.workspaceConfigs().getNotionTokenRequest().token()),
+          kmsUtil.encrypt(request.workspaceConfigs().getNotionTokenRequest().businessTripDatabaseId()),
           company.getId(),
-          request.workspaceConfigs().getNotionTokenRequest().receiptDatabaseId()
+          kmsUtil.encrypt(request.workspaceConfigs().getNotionTokenRequest().receiptDatabaseId())
       );
       notionRepository.save(notion);
     }
 
     if (request.workspaceConfigs().getSlackSaveRequest() != null) {
       Slack slack = Slack.create(
-          request.workspaceConfigs().getSlackSaveRequest().token(),
-          request.workspaceConfigs().getSlackSaveRequest().channelId(),
+          kmsUtil.encrypt(request.workspaceConfigs().getSlackSaveRequest().token()),
+          kmsUtil.encrypt(request.workspaceConfigs().getSlackSaveRequest().channelId()),
           company.getId()
       );
       slackRepository.save(slack);
@@ -139,10 +139,10 @@ public class CompanyService {
 
     if (request.workspaceConfigs().getNotionTokenRequest() != null) {
       Notion notion = Notion.create(
-          request.workspaceConfigs().getNotionTokenRequest().token(),
-          request.workspaceConfigs().getNotionTokenRequest().businessTripDatabaseId(),
+          kmsUtil.encrypt(request.workspaceConfigs().getNotionTokenRequest().token()),
+          kmsUtil.encrypt(request.workspaceConfigs().getNotionTokenRequest().businessTripDatabaseId()),
           company.getId(),
-          request.workspaceConfigs().getNotionTokenRequest().receiptDatabaseId()
+          kmsUtil.encrypt(request.workspaceConfigs().getNotionTokenRequest().receiptDatabaseId())
       );
       notionRepository.save(notion);
     } else {
@@ -152,8 +152,8 @@ public class CompanyService {
 
     if (request.workspaceConfigs().getSlackSaveRequest() != null) {
       Slack slack = Slack.create(
-          request.workspaceConfigs().getSlackSaveRequest().token(),
-          request.workspaceConfigs().getSlackSaveRequest().channelId(),
+          kmsUtil.encrypt(request.workspaceConfigs().getSlackSaveRequest().token()),
+          kmsUtil.encrypt(request.workspaceConfigs().getSlackSaveRequest().channelId()),
           company.getId()
       );
       slackRepository.save(slack);
