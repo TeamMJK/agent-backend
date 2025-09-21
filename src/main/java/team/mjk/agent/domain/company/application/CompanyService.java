@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import team.mjk.agent.domain.businessTrip.domain.BusinessTripRepository;
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.company.domain.CompanyRepository;
 import team.mjk.agent.domain.company.dto.request.CompanyInvitationCodeRequest;
@@ -26,6 +25,7 @@ import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
 import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
+import team.mjk.agent.domain.receipt.application.ReceiptService;
 import team.mjk.agent.domain.receipt.domain.ReceiptRepository;
 import team.mjk.agent.global.util.EmailMessageBuilder;
 import team.mjk.agent.global.util.KmsUtil;
@@ -38,6 +38,7 @@ public class CompanyService {
   private final InvitationRepository invitationRepository;
   private final CompanyRepository companyRepository;
   private final MemberRepository memberRepository;
+  private final ReceiptService receiptService;
   private final EmailSender emailSender;
   private final EmailMessageBuilder emailMessageBuilder;
   private final KmsUtil kmsUtil;
@@ -119,6 +120,8 @@ public class CompanyService {
     Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getCompany();
 
+    receiptService.getReceiptsByCompany(company)
+            .forEach(receipt -> receiptService.deleteReceipt(memberId, receipt.getId()));
     memberRepository.deleteAllByCompanyId(company.getId());
     companyRepository.delete(company);
 
