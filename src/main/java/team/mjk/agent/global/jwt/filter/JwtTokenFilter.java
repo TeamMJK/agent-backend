@@ -3,6 +3,7 @@ package team.mjk.agent.global.jwt.filter;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -35,13 +36,29 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
     private final RefreshTokenService refreshTokenService;
 
-    @Override
-    protected void doFilterInternal(
-            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
-    ) throws ServletException, IOException {
-        processTokenAuthentication(request, response);
-        filterChain.doFilter(request, response);
+//    @Override
+//    protected void doFilterInternal(
+//            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
+//    ) throws ServletException, IOException {
+//        processTokenAuthentication(request, response);
+//        filterChain.doFilter(request, response);
+//    }
+@Override
+protected void doFilterInternal(
+        HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
+) throws ServletException, IOException {
+    if (request.getCookies() != null) {
+        for (Cookie cookie : request.getCookies()) {
+            log.info("[JwtTokenFilter] Incoming cookie - Name: {}, Value: {}",
+                    cookie.getName(), cookie.getValue());
+        }
+    } else {
+        log.info("[JwtTokenFilter] No cookies found in the request");
     }
+
+    processTokenAuthentication(request, response);
+    filterChain.doFilter(request, response);
+}
 
     private void processTokenAuthentication(HttpServletRequest request, HttpServletResponse response) {
         try {
