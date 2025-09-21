@@ -184,10 +184,12 @@ public class ReceiptService {
     return receiptRepository.findAllByCompany(company).stream()
             .map(receipt -> ReceiptGetResponse.builder()
                     .receiptId(receipt.getId())
+                    .writer(receipt.getWriter())
                     .approvalNumber(receipt.getApprovalNumber())
                     .paymentDate(receipt.getPaymentDate())
                     .storeAddress(receipt.getStoreAddress())
                     .totalAmount(receipt.getTotalAmount())
+                    .url(receipt.getUrl())
                     .build())
             .toList();
   }
@@ -200,10 +202,12 @@ public class ReceiptService {
 
     return ReceiptGetResponse.builder()
             .receiptId(receipt.getId())
+            .writer(receipt.getWriter())
             .approvalNumber(receipt.getApprovalNumber())
             .paymentDate(receipt.getPaymentDate())
             .storeAddress(receipt.getStoreAddress())
             .totalAmount(receipt.getTotalAmount())
+            .url(receipt.getUrl())
             .build();
   }
 
