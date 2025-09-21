@@ -100,12 +100,17 @@ public class ReceiptService {
       throw new EmptyFileExceptionCode();
     }
 
-    String imageUrl = uploadImage(image);
+    String oldImageUrl = receipt.getUrl();
+    if (oldImageUrl != null && !oldImageUrl.isBlank()) {
+      deleteImageFromS3(memberId, oldImageUrl);
+    }
 
-    receipt.updateUrl(imageUrl);
+    String newImageUrl = uploadImage(image);
+
+    receipt.updateUrl(newImageUrl);
 
     return ImageUploadResponse.builder()
-            .imageUrl(imageUrl)
+            .imageUrl(newImageUrl)
             .build();
   }
 
