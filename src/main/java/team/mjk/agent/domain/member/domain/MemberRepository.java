@@ -21,4 +21,7 @@ public interface MemberRepository {
     void delete(Long memberId);
 
     long countByCompanyId(Long companyId);
+
+    void deleteAllByCompanyId(Long companyId);
+
 }

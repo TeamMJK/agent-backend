@@ -119,7 +119,9 @@ public class CompanyService {
     Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getCompany();
 
+    memberRepository.deleteAllByCompanyId(company.getId());
     companyRepository.delete(company);
+
     return company.getId();
   }
 

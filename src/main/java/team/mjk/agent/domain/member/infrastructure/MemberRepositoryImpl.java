@@ -57,4 +57,9 @@ public class MemberRepositoryImpl implements MemberRepository {
     return memberJpaRepository.countByCompanyId(companyId);
   }
 
+  @Override
+  public void deleteAllByCompanyId(Long companyId) {
+    memberJpaRepository.deleteAllByCompanyId(companyId);
+  }
+
 }
