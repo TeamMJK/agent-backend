@@ -24,4 +24,6 @@ public interface MemberRepository {
 
     void deleteAllByCompanyId(Long companyId);
 
+    void nullifyMembersCompanyByCompanyId(Long companyId);
+
 }

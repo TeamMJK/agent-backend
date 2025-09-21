@@ -1,9 +1,11 @@
 package team.mjk.agent.domain.member.infrastructure;
 
 import io.jsonwebtoken.security.Jwks.OP;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder.Op;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import team.mjk.agent.domain.company.domain.Company;
@@ -26,5 +28,10 @@ public interface MemberJpaRepository extends JpaRepository<Member, Long> {
     long countByCompanyId(Long companyId);
 
     void deleteAllByCompanyId(Long companyId);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Member m SET m.company = null WHERE m.company.id = :companyId")
+    void nullifyMembersCompanyByCompanyId(Long companyId);
 
 }

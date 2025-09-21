@@ -173,7 +173,8 @@ public class CompanyService {
 
     receiptService.getReceiptsByCompany(company)
         .forEach(receipt -> receiptService.deleteReceipt(memberId, receipt.getId()));
-    memberRepository.deleteAllByCompanyId(company.getId());
+
+    memberRepository.nullifyMembersCompanyByCompanyId(company.getId());
     companyRepository.delete(company);
 
     return company.getId();

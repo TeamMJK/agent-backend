@@ -62,4 +62,9 @@ public class MemberRepositoryImpl implements MemberRepository {
     memberJpaRepository.deleteAllByCompanyId(companyId);
   }
 
+  @Override
+  public void nullifyMembersCompanyByCompanyId(Long companyId) {
+    memberJpaRepository.nullifyMembersCompanyByCompanyId(companyId);
+  }
+
 }
