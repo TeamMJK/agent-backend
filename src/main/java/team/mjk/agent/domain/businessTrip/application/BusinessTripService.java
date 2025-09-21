@@ -122,12 +122,26 @@ public class BusinessTripService {
         .build();
   }
 
+  @Transactional
+  public void delete(
+      Long memberId,
+      Long businessTripId
+  ) {
+    Member member = memberRepository.findByMemberId(memberId);
+    Company company = member.getCompany();
+
+    BusinessTrip businessTrip = businessTripRepository.findByIdAndCompanyId(businessTripId,
+        company.getId());
+    businessTripRepository.delete(businessTrip);
+  }
+
   @Transactional(readOnly = true)
   public BusinessTripGetAllResponse getAllBusinessTrip(Long memberId) {
     Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getCompany();
 
-    List<BusinessTrip> businessTripList = businessTripRepository.findAllByCompanyId(company.getId());
+    List<BusinessTrip> businessTripList = businessTripRepository.findAllByCompanyId(
+        company.getId());
 
     return BusinessTripGetAllResponse.builder()
         .businessTripList(businessTripList)

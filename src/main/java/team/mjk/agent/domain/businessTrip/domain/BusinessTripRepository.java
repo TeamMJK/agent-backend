@@ -10,4 +10,6 @@ public interface BusinessTripRepository {
 
   List<BusinessTrip> findAllByCompanyId(Long companyId);
 
+  void delete(BusinessTrip businessTrip);
+
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +25,7 @@ import team.mjk.agent.global.annotation.MemberId;
 @RequiredArgsConstructor
 @RequestMapping("/business-trips")
 @RestController
-public class BusinessTripController implements BusinessTripDocsController{
+public class BusinessTripController implements BusinessTripDocsController {
 
   private final BusinessTripService businessTripService;
 
@@ -44,8 +45,8 @@ public class BusinessTripController implements BusinessTripDocsController{
       @MemberId Long memberId,
       @RequestBody BusinessTripSaveRequest request
   ) {
-    List<Workspace> workspace =  businessTripService.saveMcp(memberId, request);
-    return new ResponseEntity<>(workspace,HttpStatus.CREATED);
+    List<Workspace> workspace = businessTripService.saveMcp(memberId, request);
+    return new ResponseEntity<>(workspace, HttpStatus.CREATED);
   }
 
   @GetMapping("/{business-trip-id}")
@@ -54,7 +55,8 @@ public class BusinessTripController implements BusinessTripDocsController{
       @PathVariable("business-trip-id") Long businessTripId
 
   ) {
-    BusinessTripGetResponse response = businessTripService.getBusinessTrip(memberId, businessTripId);
+    BusinessTripGetResponse response = businessTripService.getBusinessTrip(memberId,
+        businessTripId);
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
@@ -64,7 +66,8 @@ public class BusinessTripController implements BusinessTripDocsController{
       @PathVariable("business-trip-id") Long businessTripId,
       @RequestBody BusinessTripUpdateRequest request
   ) {
-    BusinessTripUpdateResponse response = businessTripService.update(memberId, businessTripId, request);
+    BusinessTripUpdateResponse response = businessTripService.update(memberId, businessTripId,
+        request);
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
@@ -72,6 +75,15 @@ public class BusinessTripController implements BusinessTripDocsController{
   public ResponseEntity<BusinessTripGetAllResponse> getAllBusinessTrip(@MemberId Long memberId) {
     BusinessTripGetAllResponse response = businessTripService.getAllBusinessTrip(memberId);
     return new ResponseEntity<>(response, HttpStatus.OK);
+  }
+
+  @DeleteMapping(("/{business-trip-id}"))
+  public ResponseEntity<Void> deleteBusinessTrip(
+      @MemberId Long memberId,
+      @PathVariable("business-trip-id") Long businessTripId
+  ) {
+    businessTripService.delete(memberId, businessTripId);
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
 }
