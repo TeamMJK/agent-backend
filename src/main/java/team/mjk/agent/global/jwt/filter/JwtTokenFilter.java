@@ -22,6 +22,7 @@ import team.mjk.agent.global.jwt.injector.TokenInjector;
 import team.mjk.agent.global.jwt.resolver.JwtTokenResolver;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import static team.mjk.agent.global.jwt.resolver.JwtTokenResolver.ACCESS_TOKEN;
 import static team.mjk.agent.global.jwt.resolver.JwtTokenResolver.REFRESH_TOKEN;
@@ -77,14 +78,39 @@ protected void doFilterInternal(
         }
     }
 
-    private String resolveTokenFromRequest(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            return jwtTokenResolver.resolveTokenFromRequest(request)
-                    .orElseGet(() -> refreshTokenService.reissueBasedOnRefreshToken(request, response).accessToken());
-        } catch (ExpiredJwtException e) {
-            return refreshTokenService.reissueBasedOnRefreshToken(request, response).accessToken();
-        }
+//    private String resolveTokenFromRequest(HttpServletRequest request, HttpServletResponse response) {
+//        try {
+//            return jwtTokenResolver.resolveTokenFromRequest(request)
+//                    .orElseGet(() -> refreshTokenService.reissueBasedOnRefreshToken(request, response).accessToken());
+//        } catch (ExpiredJwtException e) {
+//            return refreshTokenService.reissueBasedOnRefreshToken(request, response).accessToken();
+//        }
+//    }
+private String resolveTokenFromRequest(HttpServletRequest request, HttpServletResponse response) {
+    log.info("[JwtTokenFilter] Resolving token from request");
+    if (request.getCookies() != null) {
+        Arrays.stream(request.getCookies()).forEach(cookie ->
+                log.info("[JwtTokenFilter] Cookie - Name: {}, Value: {}", cookie.getName(), cookie.getValue())
+        );
+    } else {
+        log.warn("[JwtTokenFilter] No cookies in request");
     }
+
+    try {
+        return jwtTokenResolver.resolveTokenFromRequest(request)
+                .orElseGet(() -> {
+                    log.info("[JwtTokenFilter] Access token not found, trying refresh token");
+                    return refreshTokenService.reissueBasedOnRefreshToken(request, response).accessToken();
+                });
+    } catch (ExpiredJwtException e) {
+        log.warn("[JwtTokenFilter] Access token expired, reissuing from refresh token");
+        return refreshTokenService.reissueBasedOnRefreshToken(request, response).accessToken();
+    } catch (Exception e) {
+        log.error("[JwtTokenFilter] Failed to resolve token", e);
+        return null;
+    }
+}
+
 
     private UserDetails getUserDetails(String token, HttpServletRequest request, HttpServletResponse response) {
         try {
@@ -97,12 +123,26 @@ protected void doFilterInternal(
         }
     }
 
+//    private void setAuthentication(HttpServletRequest request, UserDetails userDetails) {
+//        UsernamePasswordAuthenticationToken authentication =
+//                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+//        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+//    }
     private void setAuthentication(HttpServletRequest request, UserDetails userDetails) {
+        if (userDetails == null) {
+            log.warn("[JwtTokenFilter] UserDetails is null, authentication will not be set");
+            return;
+        }
+
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        log.info("[JwtTokenFilter] Authentication set for user: {}", userDetails.getUsername());
     }
+
 
     private void invalidateCookie(String cookieName, HttpServletResponse response) {
         tokenInjector.invalidateCookie(cookieName, response);
