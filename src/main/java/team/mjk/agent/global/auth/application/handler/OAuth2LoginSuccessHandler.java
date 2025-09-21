@@ -89,12 +89,24 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         String redirectUrlByCookie = getRedirectUrlByCookie(request);
         log.info("[OAuth2LoginSuccessHandler] Redirect URL from cookie: {}", redirectUrlByCookie);
 
-        String redirectUrl = determineRedirectUrl(redirectUrlByCookie, result.isFirstLogin());
+        String baseRedirectUrl = StringUtils.hasText(redirectUrlByCookie)
+                ? redirectUrlByCookie
+                : (result.isFirstLogin() ? securityProperties.firstLoginUrl() : securityProperties.defaultUrl());
+
+        // 쿼리 파라미터로 토큰과 로그인 상태 전달
+        String redirectUrl = String.format("%s?success=true&token=%s&refreshToken=%s&memberId=%d&firstLogin=%b",
+                baseRedirectUrl,
+                result.accessToken(),
+                result.refreshToken(),
+                result.memberId(),
+                result.isFirstLogin());
+
         log.info("[OAuth2LoginSuccessHandler] Redirecting to: {}", redirectUrl);
 
         response.sendRedirect(redirectUrl);
+
+        // 쿠키 무효화는 유지
         tokenInjector.invalidateCookie(REDIRECT_URL_COOKIE_NAME, response);
-        log.info("[OAuth2LoginSuccessHandler] Redirecting to URL (after sendRedirect): {}", redirectUrl);
     }
 
     private String getRedirectUrlByCookie(HttpServletRequest request) {
