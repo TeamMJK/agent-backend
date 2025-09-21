@@ -1,5 +1,6 @@
 package team.mjk.agent.domain.mcp.notion.infrastructure;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import team.mjk.agent.domain.mcp.notion.domain.NotionRepository;
@@ -24,7 +25,13 @@ public class NotionRepositoryImpl implements NotionRepository {
   }
 
   @Override
+  public Optional<Notion> findOptionalByCompanyId(Long companyId) {
+    return notionJpaRepository.findByCompanyId(companyId);
+  }
+
+  @Override
   public void delete(Notion notion) {
     notionJpaRepository.delete(notion);
   }
+
 }

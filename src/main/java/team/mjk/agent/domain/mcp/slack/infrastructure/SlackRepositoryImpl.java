@@ -1,5 +1,6 @@
 package team.mjk.agent.domain.mcp.slack.infrastructure;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import team.mjk.agent.domain.mcp.slack.domain.Slack;
@@ -26,6 +27,11 @@ public class SlackRepositoryImpl implements SlackRepository {
   @Override
   public void delete(Slack slack) {
     slackJpaRepository.delete(slack);
+  }
+
+  @Override
+  public Optional<Slack> findOptionalByCompanyId(Long companyId) {
+    return slackJpaRepository.findByCompanyId(companyId);
   }
 
 }
