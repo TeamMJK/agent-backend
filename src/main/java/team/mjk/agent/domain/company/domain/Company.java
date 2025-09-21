@@ -24,7 +24,7 @@ public class Company {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(unique = true, nullable = false)
+  @Column(nullable = false)
   private String name;
 
   @Convert(converter = WorkspaceListConverter.class)
