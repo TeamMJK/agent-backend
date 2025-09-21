@@ -173,8 +173,12 @@ public class CompanyService {
 
     receiptService.getReceiptsByCompany(company)
         .forEach(receipt -> receiptService.deleteReceipt(memberId, receipt.getId()));
-    memberRepository.deleteAllByCompanyId(company.getId());
-    companyRepository.delete(company);
+
+    member.updateCompany(null);
+    boolean hasOtherMembers = memberRepository.existsByCompanyId(company.getId());
+    if (!hasOtherMembers) {
+      companyRepository.delete(company);
+    }
 
     return company.getId();
   }

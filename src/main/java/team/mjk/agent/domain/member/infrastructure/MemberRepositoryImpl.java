@@ -58,8 +58,8 @@ public class MemberRepositoryImpl implements MemberRepository {
   }
 
   @Override
-  public void deleteAllByCompanyId(Long companyId) {
-    memberJpaRepository.deleteAllByCompanyId(companyId);
+  public boolean existsByCompanyId(Long companyId) {
+    return memberJpaRepository.existsByCompanyId(companyId);
   }
 
 }

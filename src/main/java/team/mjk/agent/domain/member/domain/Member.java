@@ -150,4 +150,8 @@ public class Member extends BaseTimeEntity {
                 .build();
     }
 
+    public void updateCompany(Company company) {
+        this.company = company;
+    }
+
 }

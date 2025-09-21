@@ -22,6 +22,6 @@ public interface MemberRepository {
 
     long countByCompanyId(Long companyId);
 
-    void deleteAllByCompanyId(Long companyId);
+    boolean existsByCompanyId(Long companyId);
 
 }

@@ -25,6 +25,6 @@ public interface MemberJpaRepository extends JpaRepository<Member, Long> {
 
     long countByCompanyId(Long companyId);
 
-    void deleteAllByCompanyId(Long companyId);
+    boolean existsByCompanyId(Long companyId);
 
 }
