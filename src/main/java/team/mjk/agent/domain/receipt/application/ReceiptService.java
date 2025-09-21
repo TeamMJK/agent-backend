@@ -193,6 +193,11 @@ public class ReceiptService {
     receiptRepository.delete(receipt);
   }
 
+  @Transactional(readOnly = true)
+  public List<Receipt> getReceiptsByCompany(Company company) {
+    return receiptRepository.findAllByCompany(company);
+  }
+
   private String uploadImage(MultipartFile image) {
     validateImageFileExtension(image.getOriginalFilename());
     try {
