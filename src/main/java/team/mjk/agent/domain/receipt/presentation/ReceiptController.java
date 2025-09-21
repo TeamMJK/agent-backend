@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import team.mjk.agent.domain.company.domain.Workspace;
 import team.mjk.agent.domain.receipt.application.ReceiptService;
 import team.mjk.agent.domain.receipt.dto.request.ReceiptSaveRequest;
+import team.mjk.agent.domain.receipt.dto.response.ImageUploadResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptGetResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptSaveResponse;
 import team.mjk.agent.global.annotation.MemberId;
@@ -33,12 +34,12 @@ public class ReceiptController implements ReceiptDocsController {
   }
 
   @PatchMapping(value = "/upload/{receiptId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<String> uploadImage(
+  public ResponseEntity<ImageUploadResponse> uploadImage(
           @MemberId Long memberId,
           @PathVariable Long receiptId,
           @RequestPart(value = "image", required = false) MultipartFile image
   ) {
-    String imageUrl = receiptService.upload(memberId, receiptId, image);
+    ImageUploadResponse imageUrl = receiptService.upload(memberId, receiptId, image);
     return ResponseEntity.ok(imageUrl);
   }
 
