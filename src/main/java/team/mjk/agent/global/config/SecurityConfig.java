@@ -42,11 +42,10 @@ public class SecurityConfig {
             "/swagger-ui.html",
             "/v3/api-docs/**",
             "/actuator/**",
-            "/login/**",
-            "/oauth2/**",
-            "/members",
-            "/emails/**",
-            "/receipts/**"
+            "/api/login/**",
+            "/api/oauth2/**",
+            "/api/members",
+            "/api/emails/**"
     };
 
     @Bean
