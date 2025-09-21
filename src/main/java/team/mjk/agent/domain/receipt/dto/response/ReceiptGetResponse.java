@@ -9,13 +9,17 @@ public record ReceiptGetResponse(
 
     Long receiptId,
 
+    String writer,
+
     LocalDate paymentDate,
 
     String approvalNumber,
 
     String storeAddress,
 
-    BigDecimal totalAmount
+    BigDecimal totalAmount,
+
+    String url
 ) {
 
 }
