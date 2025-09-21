@@ -9,9 +9,11 @@ import org.springframework.web.multipart.MultipartFile;
 import team.mjk.agent.domain.company.domain.Workspace;
 import team.mjk.agent.domain.receipt.application.ReceiptService;
 import team.mjk.agent.domain.receipt.dto.request.ReceiptSaveRequest;
+import team.mjk.agent.domain.receipt.dto.request.ReceiptUpdateRequest;
 import team.mjk.agent.domain.receipt.dto.response.ImageUploadResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptGetResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptSaveResponse;
+import team.mjk.agent.domain.receipt.dto.response.ReceiptUpdateResponse;
 import team.mjk.agent.global.annotation.MemberId;
 
 import java.util.List;
@@ -31,6 +33,16 @@ public class ReceiptController implements ReceiptDocsController {
   ) {
     ReceiptSaveResponse response = receiptService.saveReceipt(memberId, request, image);
     return new ResponseEntity<>(response, HttpStatus.CREATED);
+  }
+
+  @PatchMapping("/{receiptId}")
+  public ResponseEntity<ReceiptUpdateResponse> updateReceipt(
+          @MemberId Long memberId,
+          @PathVariable Long receiptId,
+          @RequestBody ReceiptUpdateRequest request
+  ) {
+    ReceiptUpdateResponse response = receiptService.updateReceipt(memberId, receiptId, request);
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   @PatchMapping(value = "/upload/{receiptId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

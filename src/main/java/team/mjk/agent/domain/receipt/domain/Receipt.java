@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.member.domain.Member;
+import team.mjk.agent.domain.receipt.presentation.exception.UpdateNotForbiddenExceptionCode;
 import team.mjk.agent.global.domain.BaseTimeEntity;
 
 import java.math.BigDecimal;
@@ -62,6 +63,24 @@ public class Receipt extends BaseTimeEntity {
 
     public void updateUrl(String imageUrl) {
         this.url = imageUrl;
+    }
+
+    public void updateReceipt(
+            LocalDate paymentDate,
+            String approvalNumber,
+            String storeAddress,
+            BigDecimal totalAmount
+    ) {
+        this.paymentDate = paymentDate;
+        this.approvalNumber = approvalNumber;
+        this.storeAddress = storeAddress;
+        this.totalAmount = totalAmount;
+    }
+
+    public void validateUpdateReceipt(Long memberId) {
+        if (!this.memberId.equals(memberId)) {
+            throw new UpdateNotForbiddenExceptionCode();
+        }
     }
 
 }

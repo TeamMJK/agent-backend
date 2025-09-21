@@ -8,12 +8,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 import team.mjk.agent.domain.receipt.dto.request.ReceiptSaveRequest;
+import team.mjk.agent.domain.receipt.dto.request.ReceiptUpdateRequest;
 import team.mjk.agent.domain.receipt.dto.response.ImageUploadResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptGetResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptSaveResponse;
+import team.mjk.agent.domain.receipt.dto.response.ReceiptUpdateResponse;
 
 import java.util.List;
 
@@ -35,6 +38,24 @@ public interface ReceiptDocsController {
             @Parameter(hidden = true) Long memberId,
             @RequestPart(value = "request") ReceiptSaveRequest request,
             @RequestPart(value = "image", required = false) MultipartFile image
+    );
+
+    @Operation(summary = "영수증 수정", description = "영수증 데이터를 수정합니다.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "수정 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ReceiptUpdateResponse.class)
+                    )
+            ),
+            @ApiResponse(responseCode = "404", description = "영수증 또는 회원을 찾을 수 없음")
+    })
+    ResponseEntity<ReceiptUpdateResponse> updateReceipt(
+            @Parameter(hidden = true) Long memberId,
+            @Parameter(description = "수정할 영수증 ID", required = true) Long receiptId,
+            @RequestBody ReceiptUpdateRequest request
     );
 
     @Operation(summary = "영수증 이미지 업로드", description = "이미 등록된 영수증에 이미지를 업로드합니다.")
