@@ -37,9 +37,11 @@ import team.mjk.agent.domain.receipt.domain.Receipt;
 import team.mjk.agent.domain.receipt.domain.ReceiptRepository;
 import team.mjk.agent.domain.receipt.dto.request.ReceiptMcpRequest;
 import team.mjk.agent.domain.receipt.dto.request.ReceiptSaveRequest;
+import team.mjk.agent.domain.receipt.dto.request.ReceiptUpdateRequest;
 import team.mjk.agent.domain.receipt.dto.response.ImageUploadResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptGetResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptSaveResponse;
+import team.mjk.agent.domain.receipt.dto.response.ReceiptUpdateResponse;
 import team.mjk.agent.domain.receipt.presentation.exception.*;
 import team.mjk.agent.domain.mcp.McpService;
 import team.mjk.agent.domain.mcp.McpServiceRegistry;
@@ -133,6 +135,25 @@ public class ReceiptService {
     }
 
     return company.getWorkspace();
+  }
+
+  @Transactional
+  public ReceiptUpdateResponse updateReceipt(Long memberId, Long receiptId, ReceiptUpdateRequest request) {
+    Member member = memberRepository.findByMemberId(memberId);
+    Receipt receipt = receiptRepository.findByReceiptId(receiptId);
+
+    receipt.validateUpdateReceipt(member.getId());
+
+    receipt.updateReceipt(
+            request.paymentDate(),
+            request.approvalNumber(),
+            request.storeAddress(),
+            request.totalAmount()
+    );
+
+    return ReceiptUpdateResponse.builder()
+            .ReceiptId(receipt.getId())
+            .build();
   }
 
   public void deleteImageFromS3(Long memberId, String imageAddress) {
