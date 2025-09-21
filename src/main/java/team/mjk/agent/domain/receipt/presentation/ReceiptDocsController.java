@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 import team.mjk.agent.domain.receipt.dto.request.ReceiptSaveRequest;
+import team.mjk.agent.domain.receipt.dto.response.ImageUploadResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptGetResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptSaveResponse;
 
@@ -48,7 +49,7 @@ public interface ReceiptDocsController {
             ),
             @ApiResponse(responseCode = "404", description = "영수증 또는 회원을 찾을 수 없음")
     })
-    ResponseEntity<String> uploadImage(
+    ResponseEntity<ImageUploadResponse> uploadImage(
             @Parameter(hidden = true) Long memberId,
             @Parameter(description = "이미지를 업로드할 영수증 ID", required = true) Long receiptId,
             @RequestPart(value = "image", required = false) MultipartFile image

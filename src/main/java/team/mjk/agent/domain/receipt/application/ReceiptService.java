@@ -37,6 +37,7 @@ import team.mjk.agent.domain.receipt.domain.Receipt;
 import team.mjk.agent.domain.receipt.domain.ReceiptRepository;
 import team.mjk.agent.domain.receipt.dto.request.ReceiptMcpRequest;
 import team.mjk.agent.domain.receipt.dto.request.ReceiptSaveRequest;
+import team.mjk.agent.domain.receipt.dto.response.ImageUploadResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptGetResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptSaveResponse;
 import team.mjk.agent.domain.receipt.presentation.exception.*;
@@ -89,7 +90,7 @@ public class ReceiptService {
   }
 
   @Transactional
-  public String upload(Long memberId, Long receiptId, MultipartFile image) {
+  public ImageUploadResponse upload(Long memberId, Long receiptId, MultipartFile image) {
     memberRepository.findByMemberId(memberId);
     Receipt receipt = receiptRepository.findByReceiptId(receiptId);
 
@@ -101,7 +102,9 @@ public class ReceiptService {
 
     receipt.updateUrl(imageUrl);
 
-    return imageUrl;
+    return ImageUploadResponse.builder()
+            .imageUrl(imageUrl)
+            .build();
   }
 
   @Transactional
