@@ -39,7 +39,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         try {
             OauthLoginResultResponse result = resolveLoginResultFromAuthentication(authentication);
             tokenInjector.injectTokensToCookie(result, response);
-            redirectToSuccessUrl(request, response);
+            redirectToSuccessUrl(request, response, result);
         } catch (AlreadyRegisteredMemberException e) {
             handleAlreadyExistUser(response);
         }
@@ -51,10 +51,10 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     }
 
     private void redirectToSuccessUrl(
-            HttpServletRequest request, HttpServletResponse response
+            HttpServletRequest request, HttpServletResponse response, OauthLoginResultResponse result
     ) throws IOException {
         String redirectUrlByCookie = getRedirectUrlByCookie(request);
-        String redirectUrl = determineRedirectUrl(redirectUrlByCookie);
+        String redirectUrl = determineRedirectUrl(redirectUrlByCookie, result.isFirstLogin());
         response.sendRedirect(redirectUrl);
         tokenInjector.invalidateCookie(REDIRECT_URL_COOKIE_NAME, response);
     }
@@ -67,11 +67,12 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                 .orElse(null);
     }
 
-    private String determineRedirectUrl(String redirectCookie) {
+    private String determineRedirectUrl(String redirectCookie, boolean isFirstLogin) {
         if (StringUtils.hasText(redirectCookie)) {
             return redirectCookie;
         }
-        return securityProperties.redirectUrl();
+
+        return isFirstLogin ? securityProperties.firstLoginUrl() : securityProperties.defaultUrl();
     }
 
     private void handleAlreadyExistUser(HttpServletResponse response) throws IOException {
