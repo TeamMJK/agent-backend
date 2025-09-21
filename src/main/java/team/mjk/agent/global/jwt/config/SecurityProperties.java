@@ -9,6 +9,8 @@ public record SecurityProperties(
         String redirectUrl,
         String newUserRedirectUrl,
         String onboardingRedirectUrl,
+        String firstLoginUrl,
+        String defaultUrl,
         @NestedConfigurationProperty
         Cookie cookie
 ) {
