@@ -2,8 +2,6 @@ package team.mjk.agent.domain.passport.domain;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
-
 import lombok.*;
 
 @Builder
