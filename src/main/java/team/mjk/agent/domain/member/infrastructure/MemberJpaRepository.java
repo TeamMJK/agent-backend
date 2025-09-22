@@ -1,9 +1,7 @@
 package team.mjk.agent.domain.member.infrastructure;
 
-import io.jsonwebtoken.security.Jwks.OP;
 import jakarta.transaction.Transactional;
 import java.util.List;
-import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder.Op;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
