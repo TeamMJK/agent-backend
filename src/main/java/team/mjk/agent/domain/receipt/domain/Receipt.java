@@ -3,7 +3,6 @@ package team.mjk.agent.domain.receipt.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import team.mjk.agent.domain.company.domain.Company;
-import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.receipt.presentation.exception.UpdateNotForbiddenExceptionCode;
 import team.mjk.agent.global.domain.BaseTimeEntity;
 
