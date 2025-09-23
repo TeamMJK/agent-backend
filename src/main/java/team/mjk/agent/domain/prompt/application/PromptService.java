@@ -2,6 +2,7 @@ package team.mjk.agent.domain.prompt.application;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.scheduling.annotation.Async;
@@ -14,6 +15,7 @@ import team.mjk.agent.domain.flight.dto.FlightList;
 import team.mjk.agent.domain.hotel.application.HotelService;
 import team.mjk.agent.domain.hotel.dto.HotelAndMemberInfoResponse;
 import team.mjk.agent.domain.hotel.dto.HotelList;
+import team.mjk.agent.domain.hotel.dto.SessionIdAndVncList;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
@@ -42,13 +44,14 @@ public class PromptService {
     extractHotel(memberId, request);
   }
 
-  public void extractHotel(Long memberId, PromptRequest request) {
+  public SessionIdAndVncList extractHotel(Long memberId, PromptRequest request) {
     HotelList hotelList = extractHotelInfo(memberId, request);
     MemberInfoList memberInfoList = extractNames(memberId, request);
 
     HotelAndMemberInfoResponse response = new HotelAndMemberInfoResponse(hotelList, memberInfoList);
-
-    hotelService.handleHotel(memberId,response);
+    SessionIdAndVncList result = hotelService.getHotel(memberId,response);
+    //hotelService.handleHotel(memberId,response,result);
+    return  result;
   }
 
   public void extractFlight(Long memberId,
