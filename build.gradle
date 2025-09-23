@@ -93,6 +93,9 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    implementation 'io.projectreactor.netty:reactor-netty-http'
+
 }
 
 tasks.named('test') {

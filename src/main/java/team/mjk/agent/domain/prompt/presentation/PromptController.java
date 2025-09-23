@@ -1,11 +1,16 @@
 package team.mjk.agent.domain.prompt.presentation;
 
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import team.mjk.agent.domain.hotel.dto.SessionIdAndVncList;
 import team.mjk.agent.domain.prompt.application.PromptService;
 import team.mjk.agent.domain.prompt.dto.request.PromptRequest;
 import team.mjk.agent.domain.prompt.dto.response.IntegrationResponse;
@@ -19,11 +24,13 @@ public class PromptController {
   private final PromptService promptService;
 
   @PostMapping("/hotel")
-  public void extractHotelPrompt(
+  public ResponseEntity<SessionIdAndVncList> extractHotelPrompt(
       @MemberId Long memberId,
       @Valid @RequestBody PromptRequest request
   ) {
-    promptService.extractHotel(memberId, request);
+    SessionIdAndVncList response = promptService.extractHotel(memberId, request);
+
+    return new ResponseEntity<>(response,HttpStatus.OK);
   }
 
   @PostMapping("/flight")
