@@ -20,7 +20,7 @@ public class HotelService {
 
   @Async
   public void handleHotel(Long memberId, HotelAndMemberInfoResponse response,String sessionId) {
-    String pythonUrlAgent = "http://localhost:8000/hotel-agent";
+    String pythonUrlAgent = "http://1.228.118.20:8000/hotel-agent";
 
     for (var hotel : response.hotelList().hotels()) {
       List<MemberInfoGetResponse> matchedMembers = response.memberInfoList()
@@ -66,7 +66,7 @@ public class HotelService {
   public SessionIdAndVncList getHotel(Long memberId, HotelAndMemberInfoResponse response) {
     SessionIdAndVncList retrunSessionIdAndVncList = new SessionIdAndVncList(new ArrayList<>());
 
-    String pythonUrlAgent = "http://localhost:8000/hotel-session";
+    String pythonUrlAgent = "http://1.228.118.20:8000/hotel-session";
 
     for (var hotel : response.hotelList().hotels()) {
       List<MemberInfoGetResponse> matchedMembers = response.memberInfoList()
