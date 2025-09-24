@@ -9,4 +9,5 @@ public interface VncJpaRepository extends JpaRepository<Vnc, Long> {
 
   List<Vnc> findAllByMember(Member member);
 
+  Vnc findByMemberAndSessionId(Member member, String sessionId);
 }

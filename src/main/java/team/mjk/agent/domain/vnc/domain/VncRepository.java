@@ -8,4 +8,6 @@ public interface VncRepository {
   Vnc save(Vnc vnc);
 
   List<Vnc> findAllByMember(Member member);
+
+  Vnc findByMemberAndSessionId(Member member, String sessionId);
 }
