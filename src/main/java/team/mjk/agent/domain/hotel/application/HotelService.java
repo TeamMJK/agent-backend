@@ -19,9 +19,9 @@ public class HotelService {
   private final AgentResponseUtil agentResponseUtil;
 
   @Async
-  public void handleHotel(Long memberId, HotelAndMemberInfoResponse response,String sessionId) {
+  public void handleHotel(Long memberId, HotelAndMemberInfoResponse response,SessionIdAndVncList list) {
     String pythonUrlAgent = "http://1.228.118.20:8000/hotel-agent";
-
+    int index=0;
     for (var hotel : response.hotelList().hotels()) {
       List<MemberInfoGetResponse> matchedMembers = response.memberInfoList()
           .memberInfoGetResponseList().stream()
@@ -54,10 +54,10 @@ public class HotelService {
                 "passportExpireDate", firstMember.passportExpireDate()
             ),
             "sessionId", Map.of(
-                "session",sessionId
+                "session",list.sessionIdAndVncList().get(index).session_id()
             )
         );
-
+        index++;
         agentResponseUtil.agentResponse(memberId, pythonUrlAgent, payload);
       }
     }
@@ -102,7 +102,7 @@ public class HotelService {
         );
 
         SessionIdAndVnc sessionIdAndVnc = agentResponseUtil.agentVnc(pythonUrlAgent, payload);
-        handleHotel(memberId,response, sessionIdAndVnc.session_id());
+
         retrunSessionIdAndVncList.sessionIdAndVncList().add(sessionIdAndVnc);
 
       }
