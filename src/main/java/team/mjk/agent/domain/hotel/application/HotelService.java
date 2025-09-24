@@ -6,9 +6,15 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import team.mjk.agent.domain.hotel.dto.HotelAndMemberInfoResponse;
-import team.mjk.agent.domain.hotel.dto.SessionIdAndVnc;
-import team.mjk.agent.domain.hotel.dto.SessionIdAndVncList;
+import team.mjk.agent.domain.hotel.dto.VncBusinessInfo;
+import team.mjk.agent.domain.member.domain.Member;
+import team.mjk.agent.domain.member.domain.MemberRepository;
+import team.mjk.agent.domain.vnc.domain.Vnc;
+import team.mjk.agent.domain.vnc.domain.VncRepository;
+import team.mjk.agent.domain.vnc.dto.VncResponse;
+import team.mjk.agent.domain.vnc.dto.VncResponseList;
 import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
 import team.mjk.agent.global.util.AgentResponseUtil;
 
@@ -17,10 +23,13 @@ import team.mjk.agent.global.util.AgentResponseUtil;
 public class HotelService {
 
   private final AgentResponseUtil agentResponseUtil;
+  private final VncRepository vncRepository;
+  private final MemberRepository memberRepository;
+
 
   @Async
-  public void handleHotel(Long memberId, HotelAndMemberInfoResponse response,SessionIdAndVncList list) {
-    String pythonUrlAgent = "http://1.228.118.20:8000/hotel-agent";
+  public void handleHotel(Long memberId, HotelAndMemberInfoResponse response, VncResponseList list) {
+    String pythonUrlAgent = "http://127.0.0.1:8000/hotel-agent";
     int index=0;
     for (var hotel : response.hotelList().hotels()) {
       List<MemberInfoGetResponse> matchedMembers = response.memberInfoList()
@@ -54,7 +63,7 @@ public class HotelService {
                 "passportExpireDate", firstMember.passportExpireDate()
             ),
             "sessionId", Map.of(
-                "session",list.sessionIdAndVncList().get(index).session_id()
+                "session",list.vncResponseList().get(index).session_id()
             )
         );
         index++;
@@ -63,10 +72,11 @@ public class HotelService {
     }
   }
 
-  public SessionIdAndVncList getHotel(Long memberId, HotelAndMemberInfoResponse response) {
-    SessionIdAndVncList retrunSessionIdAndVncList = new SessionIdAndVncList(new ArrayList<>());
+  @Transactional
+  public VncResponseList getHotel(Long memberId, HotelAndMemberInfoResponse response) {
+    VncResponseList retrunVncResponseList = new VncResponseList(new ArrayList<>());
 
-    String pythonUrlAgent = "http://1.228.118.20:8000/hotel-session";
+    String pythonUrlAgent = "http://127.0.0.1:8000/hotel-session";
 
     for (var hotel : response.hotelList().hotels()) {
       List<MemberInfoGetResponse> matchedMembers = response.memberInfoList()
@@ -101,13 +111,26 @@ public class HotelService {
             )
         );
 
-        SessionIdAndVnc sessionIdAndVnc = agentResponseUtil.agentVnc(pythonUrlAgent, payload);
+        VncResponse vncResponse = agentResponseUtil.agentVnc(pythonUrlAgent, payload);
+        VncBusinessInfo vncBusinessInfo = vncResponse.vncBusinessInfo();
+        Member member = memberRepository.findByMemberId(memberId);
 
-        retrunSessionIdAndVncList.sessionIdAndVncList().add(sessionIdAndVnc);
+        Vnc vnc = Vnc.create(
+            vncResponse.session_id(),
+            vncResponse.novnc_url(),
+            vncResponse.status(),
+            member,
+            vncBusinessInfo.hotel_destination(),
+            vncBusinessInfo.booking_dates(),
+            vncBusinessInfo.guests(),
+            vncBusinessInfo.budget()
+            );
+        vncRepository.save(vnc);
 
+        retrunVncResponseList.vncResponseList().add(vncResponse);
       }
     }
-    return retrunSessionIdAndVncList;
+    return retrunVncResponseList;
 
   }
 

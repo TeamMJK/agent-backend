@@ -1,6 +1,6 @@
 package team.mjk.agent.domain.hotel.dto;
 
-public record Detail(
+public record VncBusinessInfo(
     String hotel_destination,
     String booking_dates,
     int guests,

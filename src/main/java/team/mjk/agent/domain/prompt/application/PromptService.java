@@ -2,20 +2,17 @@ package team.mjk.agent.domain.prompt.application;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import team.mjk.agent.domain.company.domain.Company;
-import team.mjk.agent.domain.company.domain.CompanyRepository;
 import team.mjk.agent.domain.flight.application.FlightService;
 import team.mjk.agent.domain.flight.dto.FlightAndMemberInfoResponse;
 import team.mjk.agent.domain.flight.dto.FlightList;
 import team.mjk.agent.domain.hotel.application.HotelService;
 import team.mjk.agent.domain.hotel.dto.HotelAndMemberInfoResponse;
 import team.mjk.agent.domain.hotel.dto.HotelList;
-import team.mjk.agent.domain.hotel.dto.SessionIdAndVncList;
+import team.mjk.agent.domain.vnc.dto.VncResponseList;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
@@ -44,12 +41,12 @@ public class PromptService {
     extractHotel(memberId, request);
   }
 
-  public SessionIdAndVncList extractHotel(Long memberId, PromptRequest request) {
+  public VncResponseList extractHotel(Long memberId, PromptRequest request) {
     HotelList hotelList = extractHotelInfo(memberId, request);
     MemberInfoList memberInfoList = extractNames(memberId, request);
 
     HotelAndMemberInfoResponse response = new HotelAndMemberInfoResponse(hotelList, memberInfoList);
-    SessionIdAndVncList result = hotelService.getHotel(memberId,response);
+    VncResponseList result = hotelService.getHotel(memberId,response);
     hotelService.handleHotel(memberId,response,result);
     return  result;
   }
