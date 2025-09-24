@@ -23,4 +23,9 @@ public class VncRepositoryImpl implements VncRepository {
     return vncJpaRepository.findAllByMember(member);
   }
 
+  @Override
+  public Vnc findByMemberAndSessionId(Member member, String sessionId) {
+    return vncJpaRepository.findByMemberAndSessionId(member,sessionId);
+  }
+
 }

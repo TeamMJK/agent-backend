@@ -72,6 +72,27 @@ public void agentResponse(Long memberId, String pythonUrl, Map<String, Object> p
 }
 **/
 
+  public void pauseAgent(String sessionId) {
+    String pythonUrlAgent = "http://127.0.0.1:8000/session/" + sessionId + "/pause";
+
+    WebClient http11WebClient = WebClient.builder()
+        .clientConnector(new ReactorClientHttpConnector(
+            HttpClient.create()
+                .protocol(HttpProtocol.HTTP11)
+        ))
+        .build();
+
+    String responseResult = http11WebClient.post()
+        .uri(pythonUrlAgent)
+        .accept(MediaType.APPLICATION_JSON)
+        .retrieve()
+        .bodyToMono(String.class)
+        .block();
+
+    System.out.println("응답 받음: " + responseResult);
+  }
+
+
   public VncResponse agentVnc(String pythonUrl, Map<String, Object> payload) {
     try {
       String jsonPayload = objectMapper.writeValueAsString(payload);
