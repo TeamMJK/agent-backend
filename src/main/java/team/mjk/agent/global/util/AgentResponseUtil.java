@@ -13,7 +13,7 @@ import reactor.netty.http.HttpProtocol;
 import reactor.netty.http.client.HttpClient;
 import team.mjk.agent.domain.businessTrip.application.BusinessTripService;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
-import team.mjk.agent.domain.hotel.dto.SessionIdAndVnc;
+import team.mjk.agent.domain.vnc.dto.VncResponse;
 
 @RequiredArgsConstructor
 @Component
@@ -72,7 +72,7 @@ public void agentResponse(Long memberId, String pythonUrl, Map<String, Object> p
 }
 **/
 
-  public SessionIdAndVnc agentVnc(String pythonUrl, Map<String, Object> payload) {
+  public VncResponse agentVnc(String pythonUrl, Map<String, Object> payload) {
     try {
       String jsonPayload = objectMapper.writeValueAsString(payload);
       System.out.println("JSON으로 변환된 payload: " + jsonPayload);
@@ -96,14 +96,14 @@ public void agentResponse(Long memberId, String pythonUrl, Map<String, Object> p
 
       if (responseResult != null) {
         // ObjectMapper로 직접 record 타입 매핑
-        SessionIdAndVnc response = objectMapper.readValue(responseResult, SessionIdAndVnc.class);
+        VncResponse response = objectMapper.readValue(responseResult, VncResponse.class);
 
         System.out.println("Session ID: " + response.session_id());
         System.out.println("NoVNC URL: " + response.novnc_url());
-        System.out.println("Hotel Destination: " + response.detail().hotel_destination());
-        System.out.println("Booking Dates: " + response.detail().booking_dates());
-        System.out.println("Guests: " + response.detail().guests());
-        System.out.println("Budget: " + response.detail().budget());
+        System.out.println("Hotel Destination: " + response.vncBusinessInfo().hotel_destination());
+        System.out.println("Booking Dates: " + response.vncBusinessInfo().booking_dates());
+        System.out.println("Guests: " + response.vncBusinessInfo().guests());
+        System.out.println("Budget: " + response.vncBusinessInfo().budget());
 
         return response;
       } else {
