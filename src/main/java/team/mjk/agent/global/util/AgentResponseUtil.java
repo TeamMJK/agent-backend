@@ -13,7 +13,9 @@ import reactor.netty.http.HttpProtocol;
 import reactor.netty.http.client.HttpClient;
 import team.mjk.agent.domain.businessTrip.application.BusinessTripService;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
+import team.mjk.agent.domain.vnc.domain.VncStatus;
 import team.mjk.agent.domain.vnc.dto.VncResponse;
+import team.mjk.agent.domain.vnc.presentation.exception.EndAgentExceptionCode;
 
 @RequiredArgsConstructor
 @Component
@@ -72,8 +74,16 @@ public void agentResponse(Long memberId, String pythonUrl, Map<String, Object> p
 }
 **/
 
-  public void pauseAgent(String sessionId) {
-    String pythonUrlAgent = "http://127.0.0.1:8000/session/" + sessionId + "/pause";
+  public void pauseAgent(String sessionId, VncStatus status) {
+    String pythonUrlAgent;
+
+    if(status.equals(VncStatus.PAUSE)) {
+      pythonUrlAgent = "http://127.0.0.1:8000/session/" + sessionId + "/pause";
+    } else if(status.equals(VncStatus.ING)) {
+      pythonUrlAgent = "http://127.0.0.1:8000/session/" + sessionId + "/unpause";
+    } else {
+      throw new EndAgentExceptionCode();
+    }
 
     WebClient http11WebClient = WebClient.builder()
         .clientConnector(new ReactorClientHttpConnector(

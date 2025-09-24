@@ -75,7 +75,6 @@ public class HotelService {
   @Transactional
   public VncResponseList getHotel(Long memberId, HotelAndMemberInfoResponse response) {
     VncResponseList retrunVncResponseList = new VncResponseList(new ArrayList<>());
-
     String pythonUrlAgent = "http://127.0.0.1:8000/hotel-session";
 
     for (var hotel : response.hotelList().hotels()) {
