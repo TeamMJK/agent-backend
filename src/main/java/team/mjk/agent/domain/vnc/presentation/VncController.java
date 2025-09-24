@@ -38,4 +38,14 @@ public class VncController {
     return new ResponseEntity<>(vncResponse, HttpStatus.OK);
   }
 
+  @GetMapping("/unpause")
+  public ResponseEntity<List<VncResponse>> unpause(
+      @MemberId Long memberId,
+      @RequestBody VncSessionIdRequest request
+  ) {
+    List<VncResponse> vncResponse = vncService.unpause(memberId,request);
+
+    return new ResponseEntity<>(vncResponse, HttpStatus.OK);
+  }
+
 }

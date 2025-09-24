@@ -5,7 +5,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 import team.mjk.agent.domain.hotel.dto.VncBusinessInfo;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
@@ -13,7 +12,6 @@ import team.mjk.agent.domain.vnc.domain.Vnc;
 import team.mjk.agent.domain.vnc.domain.VncRepository;
 import team.mjk.agent.domain.vnc.domain.VncStatus;
 import team.mjk.agent.domain.vnc.dto.VncResponse;
-import team.mjk.agent.domain.vnc.dto.VncResponseList;
 import team.mjk.agent.domain.vnc.dto.VncSessionIdRequest;
 import team.mjk.agent.global.util.AgentResponseUtil;
 
@@ -34,11 +32,21 @@ public class VncService {
   @Transactional
   public List<VncResponse> pause(Long memberId, VncSessionIdRequest request) {
     Member member = memberRepository.findByMemberId(memberId);
-    pauseVnc(memberId,request);
+    changeStatus(memberId, request, VncStatus.PAUSE);
 
-    agentResponseUtil.pauseAgent(request.sessionId());
+    agentResponseUtil.pauseAgent(request.sessionId(),VncStatus.PAUSE);
     return getVncResponses(member);
   }
+
+  @Transactional
+  public List<VncResponse> unpause(Long memberId, VncSessionIdRequest request) {
+    Member member = memberRepository.findByMemberId(memberId);
+    changeStatus(memberId, request, VncStatus.ING);
+
+    agentResponseUtil.pauseAgent(request.sessionId(),VncStatus.ING);
+    return getVncResponses(member);
+  }
+
 
   @NotNull
   private List<VncResponse> getVncResponses(Member member) {
@@ -66,11 +74,11 @@ public class VncService {
   }
 
   @Transactional
-  public void pauseVnc(Long memberId, VncSessionIdRequest request) {
+  public void changeStatus(Long memberId, VncSessionIdRequest request, VncStatus status) {
     Member member = memberRepository.findByMemberId(memberId);
 
-    Vnc vnc = vncRepository.findByMemberAndSessionId(member,request.sessionId());
-    vnc.updateStatus(VncStatus.PAUSE);
+    Vnc vnc = vncRepository.findByMemberAndSessionId(member, request.sessionId());
+    vnc.updateStatus(status);
   }
 
 }
