@@ -50,7 +50,7 @@ public class PromptService {
 
     HotelAndMemberInfoResponse response = new HotelAndMemberInfoResponse(hotelList, memberInfoList);
     SessionIdAndVncList result = hotelService.getHotel(memberId,response);
-    //hotelService.handleHotel(memberId,response,result);
+    hotelService.handleHotel(memberId,response,result);
     return  result;
   }
 
