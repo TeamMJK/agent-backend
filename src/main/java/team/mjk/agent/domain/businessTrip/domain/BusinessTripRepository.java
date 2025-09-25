@@ -12,4 +12,6 @@ public interface BusinessTripRepository {
 
   void delete(BusinessTrip businessTrip);
 
+  void deleteAllByCompanyId(Long companyId);
+
 }
