@@ -78,9 +78,9 @@ public void agentResponse(Long memberId, String pythonUrl, Map<String, Object> p
     String pythonUrlAgent;
 
     if(status.equals(VncStatus.PAUSE)) {
-      pythonUrlAgent = "http://127.0.0.1:8000/session/" + sessionId + "/pause";
+      pythonUrlAgent = "http://localhost:8000/session/" + sessionId + "/pause";
     } else if(status.equals(VncStatus.ING)) {
-      pythonUrlAgent = "http://127.0.0.1:8000/session/" + sessionId + "/unpause";
+      pythonUrlAgent = "http://localhost:8000/session/" + sessionId + "/unpause";
     } else {
       throw new EndAgentExceptionCode();
     }
