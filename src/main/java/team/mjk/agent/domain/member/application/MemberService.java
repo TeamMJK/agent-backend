@@ -89,12 +89,15 @@ public class MemberService {
     Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getCompany();
 
+    if (company != null) {
+      long remainCount = memberRepository.countByCompanyId(company.getId());
+      if (remainCount == 0) {
+        companyRepository.delete(company);
+      }
+    }
+
     memberRepository.delete(memberId);
 
-    long remainCount = memberRepository.countByCompanyId(company.getId());
-    if (remainCount == 0) {
-      companyRepository.delete(company);
-    }
     return memberId;
   }
 

@@ -67,7 +67,7 @@ public class ReceiptService {
   @Transactional
   public ReceiptSaveResponse saveReceipt(Long memberId, ReceiptSaveRequest request, MultipartFile image) {
     Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
 
     String imageUrl = null;
     if (image != null && !image.isEmpty() && image.getOriginalFilename() != null) {
@@ -117,7 +117,7 @@ public class ReceiptService {
   @Transactional
   public List<Workspace> saveMcp(Long memberId, MultipartFile file) {
     Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
 
     List<Workspace> workspaces = company.getWorkspace();
 
@@ -179,7 +179,7 @@ public class ReceiptService {
   @Transactional(readOnly = true)
   public List<ReceiptGetResponse> getAllReceipt(Long memberId) {
     Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
 
     return receiptRepository.findAllByCompany(company).stream()
             .map(receipt -> ReceiptGetResponse.builder()
@@ -197,7 +197,7 @@ public class ReceiptService {
   @Transactional(readOnly = true)
   public ReceiptGetResponse getReceipt(Long memberId, Long receiptId) {
     Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
     Receipt receipt = receiptRepository.findByIdAndCompany(receiptId, company);
 
     return ReceiptGetResponse.builder()

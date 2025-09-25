@@ -161,7 +161,7 @@ public class PromptService {
   private MemberInfoList extractMemberInfo(Long memberId, NameList nameList) {
     Member member = memberRepository.findByMemberId(memberId);
     MemberInfoGetResponse memberInfoGetResponse = Member.toMemberInfoGetResponse(member, kmsUtil);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
 
     List<MemberInfoGetResponse> resultList = new ArrayList<>();
 

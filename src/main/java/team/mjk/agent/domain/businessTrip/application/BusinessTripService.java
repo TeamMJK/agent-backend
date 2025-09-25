@@ -35,7 +35,7 @@ public class BusinessTripService {
   @Transactional
   public BusinessTripSaveResponse save(Long memberId, BusinessTripSaveRequest request) {
     Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
 
     BusinessTrip businessTrip = BusinessTrip.create(
         request.departDate(),
@@ -57,7 +57,7 @@ public class BusinessTripService {
   @Transactional
   public List<Workspace> saveMcp(Long memberId, BusinessTripSaveRequest request) {
     Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
     List<Workspace> workspaces = company.getWorkspace();
 
     for (Workspace workspace : workspaces) {
@@ -74,7 +74,7 @@ public class BusinessTripService {
   @Transactional
   public void saveAgentMcp(Long memberId, BusinessTripAgentRequest request) {
     Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
     List<Workspace> workspaces = company.getWorkspace();
 
     for (Workspace workspace : workspaces) {
@@ -89,7 +89,7 @@ public class BusinessTripService {
   @Transactional(readOnly = true)
   public BusinessTripGetResponse getBusinessTrip(Long memberId, Long businessTripId) {
     Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
 
     BusinessTrip businessTrip = businessTripRepository.findByIdAndCompanyId(businessTripId,
         company.getId());
@@ -111,7 +111,7 @@ public class BusinessTripService {
       BusinessTripUpdateRequest request
   ) {
     Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
 
     BusinessTrip businessTrip = businessTripRepository.findByIdAndCompanyId(businessTripId,
         company.getId());
@@ -128,7 +128,7 @@ public class BusinessTripService {
       Long businessTripId
   ) {
     Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
 
     BusinessTrip businessTrip = businessTripRepository.findByIdAndCompanyId(businessTripId,
         company.getId());
@@ -138,7 +138,7 @@ public class BusinessTripService {
   @Transactional(readOnly = true)
   public BusinessTripGetAllResponse getAllBusinessTrip(Long memberId) {
     Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
 
     List<BusinessTrip> businessTripList = businessTripRepository.findAllByCompanyId(
         company.getId());

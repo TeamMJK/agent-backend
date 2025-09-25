@@ -32,7 +32,7 @@ public class SlackService implements McpService {
 
   public Long save(Long memberId, SlackSaveRequest request) {
     Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
 
     String encryptToken = kmsUtil.encrypt(request.token());
     String channelId = kmsUtil.encrypt(request.channelId());
@@ -50,7 +50,7 @@ public class SlackService implements McpService {
   @Transactional
   public Long update(Long memberId, SlackUpdateRequest request) {
     Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
 
     Slack slack = slackRepository.findByCompanyId(company.getId());
     slack.update(
@@ -65,7 +65,7 @@ public class SlackService implements McpService {
   @Transactional
   public Long delete(Long memberId) {
     Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
 
     Slack slack = slackRepository.findByCompanyId(company.getId());
     slackRepository.delete(slack);
