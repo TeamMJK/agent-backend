@@ -34,4 +34,9 @@ public class BusinessRepositoryImpl implements BusinessTripRepository {
     businessJpaRepository.delete(businessTrip);
   }
 
+  @Override
+  public void deleteAllByCompanyId(Long companyId) {
+    businessJpaRepository.deleteAllByCompanyId(companyId);
+  }
+
 }
