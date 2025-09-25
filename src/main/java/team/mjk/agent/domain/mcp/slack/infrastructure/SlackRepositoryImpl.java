@@ -34,4 +34,9 @@ public class SlackRepositoryImpl implements SlackRepository {
     return slackJpaRepository.findByCompanyId(companyId);
   }
 
+  @Override
+  public void deleteAllByCompanyId(Long companyId) {
+    slackJpaRepository.deleteAllByCompanyId(companyId);
+  }
+
 }

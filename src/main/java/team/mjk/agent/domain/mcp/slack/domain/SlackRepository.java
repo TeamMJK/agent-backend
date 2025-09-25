@@ -12,4 +12,6 @@ public interface SlackRepository {
 
  Optional<Slack> findOptionalByCompanyId(Long companyId);
 
+ void deleteAllByCompanyId(Long companyId);
+
 }
