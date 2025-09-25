@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
+import team.mjk.agent.global.auth.domain.RefreshTokenRepository;
 import team.mjk.agent.global.auth.dto.response.LoginResultResponse;
 import team.mjk.agent.global.jwt.injector.TokenInjector;
 
@@ -19,6 +20,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final LoginProcessor loginProcessor;
     private final TokenInjector tokenInjector;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
     public LoginResultResponse login(String email, String password, HttpServletResponse response) {
@@ -32,5 +34,14 @@ public class AuthService {
 
         return result;
     }
+
+    @Transactional
+    public void logout(Long memberId, HttpServletResponse response) {
+        tokenInjector.invalidateCookie("accessToken", response);
+        tokenInjector.invalidateCookie("refreshToken", response);
+
+        refreshTokenRepository.deleteByMemberId(memberId);
+    }
+
 
 }
