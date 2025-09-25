@@ -16,6 +16,7 @@ import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
 import team.mjk.agent.domain.vnc.domain.VncStatus;
 import team.mjk.agent.domain.vnc.dto.VncResponse;
 import team.mjk.agent.domain.vnc.presentation.exception.EndAgentExceptionCode;
+import team.mjk.agent.global.config.AgentUrlConfig;
 
 @RequiredArgsConstructor
 @Component
@@ -24,6 +25,7 @@ public class AgentResponseUtil {
   private final WebClient webClient;
   private final ObjectMapper objectMapper;
   private final BusinessTripService businessTripService;
+  private final AgentUrlConfig agentUrlConfig;
   /**
   public void agentResponse(Long memberId, String pythonUrl, Map<String, Object> payload) {
     System.out.println("날라갑니다~: " +payload);
@@ -76,11 +78,12 @@ public void agentResponse(Long memberId, String pythonUrl, Map<String, Object> p
 
   public void pauseAgent(String sessionId, VncStatus status) {
     String pythonUrlAgent;
+    String baseSessionUrl = agentUrlConfig.session();
 
-    if(status.equals(VncStatus.PAUSE)) {
-      pythonUrlAgent = "http://localhost:8000/session/" + sessionId + "/pause";
-    } else if(status.equals(VncStatus.ING)) {
-      pythonUrlAgent = "http://localhost:8000/session/" + sessionId + "/unpause";
+    if (status.equals(VncStatus.PAUSE)) {
+      pythonUrlAgent = baseSessionUrl + "/" + sessionId + "/pause";
+    } else if (status.equals(VncStatus.ING)) {
+      pythonUrlAgent = baseSessionUrl + "/" + sessionId + "/unpause";
     } else {
       throw new EndAgentExceptionCode();
     }

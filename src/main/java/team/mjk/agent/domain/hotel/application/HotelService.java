@@ -33,7 +33,7 @@ public class HotelService {
 
   @Async
   public void handleHotel(Long memberId, HotelAndMemberInfoResponse response, VncResponseList list) {
-    String pythonUrlAgent = agentUrlConfig.getHotelAgent();
+    String pythonUrlAgent = agentUrlConfig.hotelAgent();
     int index=0;
     for (var hotel : response.hotelList().hotels()) {
       List<MemberInfoGetResponse> matchedMembers = response.memberInfoList()
@@ -79,7 +79,7 @@ public class HotelService {
   @Transactional
   public VncResponseList getHotel(Long memberId, HotelAndMemberInfoResponse response) {
     VncResponseList retrunVncResponseList = new VncResponseList(new ArrayList<>());
-    String pythonUrlAgent = agentUrlConfig.getHotelSession();
+    String pythonUrlAgent = agentUrlConfig.hotelSession();
 
     for (var hotel : response.hotelList().hotels()) {
       List<MemberInfoGetResponse> matchedMembers = response.memberInfoList()
