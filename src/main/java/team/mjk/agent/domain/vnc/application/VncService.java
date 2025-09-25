@@ -26,18 +26,14 @@ public class VncService {
   private final VncCacheService vncCacheService;
 
   public VncResponseList getVncList(Long memberId) {
-    List<VncResponse> allResponses = vncCacheService.getAllVncResponses(memberId);
-    return new VncResponseList(allResponses);
+    return vncCacheService.getVncList(memberId);
   }
 
   @Transactional
-  public List<VncResponse> pause(Long memberId, VncSessionIdRequest request) {
-    memberRepository.findByMemberId(memberId);
-
+  public VncResponseList pause(Long memberId, VncSessionIdRequest request) {
     vncCacheService.updateVncStatus(memberId, request.sessionId(), VncStatus.PAUSE);
     agentResponseUtil.pauseAgent(request.sessionId(), VncStatus.PAUSE);
-
-    return vncCacheService.getAllVncResponses(memberId);
+    return vncCacheService.getVncList(memberId);
   }
 
   @Transactional
