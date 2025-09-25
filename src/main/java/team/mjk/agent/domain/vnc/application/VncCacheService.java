@@ -9,50 +9,50 @@ import team.mjk.agent.domain.vnc.domain.VncStatus;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class VncCacheService {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, VncResponseList> redisTemplate;
     private static final Duration TTL = Duration.ofHours(2);
-
-    public void saveVncResponse(Long memberId, VncResponse vncResponse) {
-        String key = "vnc:" + memberId;
-        redisTemplate.opsForHash().put(key, vncResponse.session_id(), vncResponse);
-        redisTemplate.expire(key, TTL);
-    }
-
-    public VncResponse getVncResponse(Long memberId, String sessionId) {
-        String key = "vnc:" + memberId;
-        return (VncResponse) redisTemplate.opsForHash().get(key, sessionId);
-    }
-
-    public List<VncResponse> getAllVncResponses(Long memberId) {
-        String key = "vnc:" + memberId;
-        return redisTemplate.opsForHash().values(key).stream()
-                .map(obj -> (VncResponse) obj)
-                .toList();
-    }
-
-    public void updateVncStatus(Long memberId, String sessionId, VncStatus newStatus) {
-        String key = "vnc:" + memberId;
-        VncResponse old = (VncResponse) redisTemplate.opsForHash().get(key, sessionId);
-        if (old != null) {
-            VncResponse updated = new VncResponse(
-                    old.session_id(),
-                    old.novnc_url(),
-                    old.vncBusinessInfo(),
-                    newStatus
-            );
-            redisTemplate.opsForHash().put(key, sessionId, updated);
-        }
-    }
 
     public void saveVncList(Long memberId, VncResponseList list) {
         String key = "vnc:" + memberId;
-        list.vncResponseList().forEach(v -> redisTemplate.opsForHash().put(key, v.session_id(), v));
-        redisTemplate.expire(key, TTL);
+        redisTemplate.opsForValue().set(key, list, TTL);
+    }
+
+    public VncResponseList getVncList(Long memberId) {
+        String key = "vnc:" + memberId;
+        VncResponseList list = redisTemplate.opsForValue().get(key);
+        if (list == null) {
+            return new VncResponseList(List.of());
+        }
+        return list;
+    }
+
+    public void updateVncStatus(Long memberId, String sessionId, VncStatus newStatus) {
+        VncResponseList list = getVncList(memberId);
+        List<VncResponse> updatedList = list.vncResponseList().stream()
+                .map(v -> v.session_id().equals(sessionId)
+                        ? new VncResponse(v.session_id(), v.novnc_url(), v.vncBusinessInfo(), newStatus)
+                        : v
+                )
+                .collect(Collectors.toList());
+
+        saveVncList(memberId, new VncResponseList(updatedList));
+    }
+
+    public List<VncResponse> getAllVncResponses(Long memberId) {
+        return getVncList(memberId).vncResponseList();
+    }
+
+    public VncResponse getVncResponse(Long memberId, String sessionId) {
+        return getVncList(memberId).vncResponseList().stream()
+                .filter(v -> v.session_id().equals(sessionId))
+                .findFirst()
+                .orElse(null);
     }
 
 }

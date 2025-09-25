@@ -29,11 +29,11 @@ public class VncController {
   }
 
   @GetMapping("/pause")
-  public ResponseEntity<List<VncResponse>> pause(
+  public ResponseEntity<VncResponseList> pause(
       @MemberId Long memberId,
       @RequestBody VncSessionIdRequest request
   ) {
-    List<VncResponse> vncResponse = vncService.pause(memberId,request);
+    VncResponseList vncResponse = vncService.pause(memberId,request);
 
     return new ResponseEntity<>(vncResponse, HttpStatus.OK);
   }
