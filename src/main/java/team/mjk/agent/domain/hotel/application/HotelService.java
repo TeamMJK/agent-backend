@@ -17,6 +17,7 @@ import team.mjk.agent.domain.vnc.domain.VncRepository;
 import team.mjk.agent.domain.vnc.dto.VncResponse;
 import team.mjk.agent.domain.vnc.dto.VncResponseList;
 import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
+import team.mjk.agent.global.config.AgentUrlConfig;
 import team.mjk.agent.global.util.AgentResponseUtil;
 
 @Service
@@ -25,13 +26,14 @@ public class HotelService {
 
   private final AgentResponseUtil agentResponseUtil;
   private final VncCacheService vncCacheService;
+  private final AgentUrlConfig agentUrlConfig;
   private final VncRepository vncRepository;
   private final MemberRepository memberRepository;
 
 
   @Async
   public void handleHotel(Long memberId, HotelAndMemberInfoResponse response, VncResponseList list) {
-    String pythonUrlAgent = "http:/localhost:8000/hotel-agent";
+    String pythonUrlAgent = agentUrlConfig.getHotelAgent();
     int index=0;
     for (var hotel : response.hotelList().hotels()) {
       List<MemberInfoGetResponse> matchedMembers = response.memberInfoList()
@@ -77,7 +79,7 @@ public class HotelService {
   @Transactional
   public VncResponseList getHotel(Long memberId, HotelAndMemberInfoResponse response) {
     VncResponseList retrunVncResponseList = new VncResponseList(new ArrayList<>());
-    String pythonUrlAgent = "http://localhost:8000/hotel-session";
+    String pythonUrlAgent = agentUrlConfig.getHotelSession();
 
     for (var hotel : response.hotelList().hotels()) {
       List<MemberInfoGetResponse> matchedMembers = response.memberInfoList()
