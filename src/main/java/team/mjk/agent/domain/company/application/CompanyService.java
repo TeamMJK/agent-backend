@@ -54,7 +54,7 @@ public class CompanyService {
   public CompanyInvitationEmailResponse createInvitationCodeAndSendEmail(Long memberId,
       CompanyInvitationEmailRequest request) {
     Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
 
     Invitation invitation = invitationCodeProvider.create(company.getId());
 
@@ -122,7 +122,7 @@ public class CompanyService {
   @Transactional(readOnly = true)
   public CompanyInfoResponse getCompanyInfo(Long memberId) {
     Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
 
     return CompanyInfoResponse.builder()
         .workspaces(company.getWorkspace())
@@ -133,7 +133,7 @@ public class CompanyService {
   @Transactional
   public Long update(Long memberId, CompanyUpdateRequest request) {
     Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
 
     if (request.workspaceConfigs().getNotionTokenRequest() != null) {
       Notion notion = Notion.create(
@@ -167,7 +167,7 @@ public class CompanyService {
   @Transactional
   public Long delete(Long memberId) {
     Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
 
     receiptService.getReceiptsByCompany(company)
         .forEach(receipt -> receiptService.deleteReceipt(memberId, receipt.getId()));
@@ -181,7 +181,7 @@ public class CompanyService {
   @Transactional(readOnly = true)
   public CompanyMemberListResponse getMembersInfo(Long memberId) {
     Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
 
     List<Member> members = memberRepository.findAllByCompanyId(company.getId());
     List<MemberInfoGetResponse> memberInfoGetResponses = members.stream()

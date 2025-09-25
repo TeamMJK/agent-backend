@@ -129,8 +129,8 @@ public class Member extends BaseTimeEntity {
         );
     }
 
-    public Company getCompany(){
-        if(this.company == null) {
+    public Company getValidatedCompany() {
+        if (this.company == null) {
             throw new CompanyNotFoundException();
         }
         return this.company;

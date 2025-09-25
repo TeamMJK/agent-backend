@@ -53,7 +53,7 @@ public class NoneService implements McpService {
 
   @Override
   public void createReceipt(ReceiptMcpRequest request, Long companyId, Member member) {
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
 
     Receipt receipt = Receipt.builder()
         .writer(member.getName())

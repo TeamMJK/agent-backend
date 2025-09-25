@@ -35,7 +35,7 @@ public class NotionService implements McpService {
 
   public Long save(Long memberId, NotionTokenRequest request) {
       Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
 
     String encryptToken = kmsUtil.encrypt(request.token());
     String encryptBusinessTripDatabaseId = kmsUtil.encrypt(request.businessTripDatabaseId());
@@ -55,7 +55,7 @@ public class NotionService implements McpService {
   @Transactional
   public Long update(Long memberId, NotionTokenUpdateRequest request) {
       Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
 
     Notion notion = notionRepository.findByCompanyId(company.getId());
     notion.update(request.token(), request.businessTripDatabaseId(),
@@ -67,7 +67,7 @@ public class NotionService implements McpService {
   @Transactional
   public Long delete(Long memberId) {
     Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getCompany();
+    Company company = member.getValidatedCompany();
 
     Notion notion = notionRepository.findByCompanyId(company.getId());
     notionRepository.delete(notion);
