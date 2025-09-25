@@ -11,4 +11,6 @@ public interface NotionRepository {
 
   void delete(Notion notion);
 
+  void deleteAllByCompanyId(Long companyId);
+
 }

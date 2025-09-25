@@ -34,4 +34,9 @@ public class NotionRepositoryImpl implements NotionRepository {
     notionJpaRepository.delete(notion);
   }
 
+  @Override
+  public void deleteAllByCompanyId(Long companyId) {
+    notionJpaRepository.deleteAllByCompanyId(companyId);
+  }
+
 }

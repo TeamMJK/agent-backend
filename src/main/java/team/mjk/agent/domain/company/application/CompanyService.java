@@ -150,7 +150,6 @@ public class CompanyService {
     return company.getId();
   }
 
-
   @Transactional(readOnly = true)
   public CompanyMemberListResponse getMembersInfo(Long memberId) {
     Member member = memberRepository.findByMemberId(memberId);
