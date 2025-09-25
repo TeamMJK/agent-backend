@@ -8,12 +8,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.mjk.agent.domain.hotel.dto.HotelAndMemberInfoResponse;
-import team.mjk.agent.domain.hotel.dto.VncBusinessInfo;
-import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.vnc.application.VncCacheService;
-import team.mjk.agent.domain.vnc.domain.Vnc;
-import team.mjk.agent.domain.vnc.domain.VncRepository;
 import team.mjk.agent.domain.vnc.dto.VncResponse;
 import team.mjk.agent.domain.vnc.dto.VncResponseList;
 import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
@@ -27,7 +23,6 @@ public class HotelService {
   private final AgentResponseUtil agentResponseUtil;
   private final VncCacheService vncCacheService;
   private final AgentUrlConfig agentUrlConfig;
-  private final VncRepository vncRepository;
   private final MemberRepository memberRepository;
 
 
