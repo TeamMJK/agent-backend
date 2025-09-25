@@ -43,7 +43,7 @@ public class VncService {
     Member member = memberRepository.findByMemberId(memberId);
     changeStatus(memberId, request, VncStatus.ING);
 
-    agentResponseUtil.pauseAgent(request.sessionId(),VncStatus.ING);
+    agentResponseUtil.pauseAgent(request.sessionId(),VncStatus.PAUSE);
     return getVncResponses(member);
   }
 

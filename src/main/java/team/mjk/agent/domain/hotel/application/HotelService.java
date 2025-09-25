@@ -31,7 +31,7 @@ public class HotelService {
 
   @Async
   public void handleHotel(Long memberId, HotelAndMemberInfoResponse response, VncResponseList list) {
-    String pythonUrlAgent = "http://127.0.0.1:8000/hotel-agent";
+    String pythonUrlAgent = "http:/localhost:8000/hotel-agent";
     int index=0;
     for (var hotel : response.hotelList().hotels()) {
       List<MemberInfoGetResponse> matchedMembers = response.memberInfoList()
@@ -77,7 +77,7 @@ public class HotelService {
   @Transactional
   public VncResponseList getHotel(Long memberId, HotelAndMemberInfoResponse response) {
     VncResponseList retrunVncResponseList = new VncResponseList(new ArrayList<>());
-    String pythonUrlAgent = "http://127.0.0.1:8000/hotel-session";
+    String pythonUrlAgent = "http://localhost:8000/hotel-session";
 
     for (var hotel : response.hotelList().hotels()) {
       List<MemberInfoGetResponse> matchedMembers = response.memberInfoList()
