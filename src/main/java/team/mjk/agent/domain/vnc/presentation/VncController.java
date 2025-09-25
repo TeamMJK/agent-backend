@@ -4,10 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import team.mjk.agent.domain.vnc.application.VncCacheService;
 import team.mjk.agent.domain.vnc.application.VncService;
 import team.mjk.agent.domain.vnc.dto.VncResponse;
@@ -28,7 +25,7 @@ public class VncController {
     return ResponseEntity.ok(vncResponseList);
   }
 
-  @GetMapping("/pause")
+  @PostMapping("/pause")
   public ResponseEntity<VncResponseList> pause(
       @MemberId Long memberId,
       @RequestBody VncSessionIdRequest request
@@ -38,12 +35,12 @@ public class VncController {
     return new ResponseEntity<>(vncResponse, HttpStatus.OK);
   }
 
-  @GetMapping("/unpause")
-  public ResponseEntity<List<VncResponse>> unpause(
+  @PostMapping("/unpause")
+  public ResponseEntity<VncResponseList> unpause(
       @MemberId Long memberId,
       @RequestBody VncSessionIdRequest request
   ) {
-    List<VncResponse> vncResponse = vncService.unpause(memberId,request);
+    VncResponseList vncResponse = vncService.unpause(memberId,request);
 
     return new ResponseEntity<>(vncResponse, HttpStatus.OK);
   }

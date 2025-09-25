@@ -37,13 +37,13 @@ public class VncService {
   }
 
   @Transactional
-  public List<VncResponse> unpause(Long memberId, VncSessionIdRequest request) {
-    Member member = memberRepository.findByMemberId(memberId);
-    changeStatus(memberId, request, VncStatus.ING);
+  public VncResponseList unpause(Long memberId, VncSessionIdRequest request) {
+    vncCacheService.updateVncStatus(memberId, request.sessionId(), VncStatus.ING);
+    agentResponseUtil.pauseAgent(request.sessionId(), VncStatus.ING);
 
-    agentResponseUtil.pauseAgent(request.sessionId(),VncStatus.PAUSE);
-    return getVncResponses(member);
+    return vncCacheService.getVncList(memberId);
   }
+
 
 
   @NotNull
