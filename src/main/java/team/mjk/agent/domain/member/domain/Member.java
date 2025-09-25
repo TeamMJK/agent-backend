@@ -10,7 +10,6 @@ import team.mjk.agent.domain.member.dto.response.EncryptedMemberInfoResponse;
 import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
 import team.mjk.agent.domain.member.presentation.exception.EmailOrPasswordNotInvalidException;
 import team.mjk.agent.domain.passport.domain.Passport;
-import team.mjk.agent.domain.vnc.domain.Vnc;
 import team.mjk.agent.global.auth.application.dto.AuthAttributes;
 import team.mjk.agent.global.domain.BaseTimeEntity;
 import team.mjk.agent.global.util.KmsUtil;
