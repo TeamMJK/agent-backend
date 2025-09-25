@@ -12,7 +12,7 @@ import java.util.List;
 @Service
 public class VncCacheService {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, VncResponseList> redisTemplate;
     private static final Duration TTL = Duration.ofHours(2);
 
     public void saveVncList(Long memberId, VncResponseList list) {
@@ -20,11 +20,11 @@ public class VncCacheService {
     }
 
     public VncResponseList getVncList(Long memberId) {
-        Object obj = redisTemplate.opsForValue().get("vnc:" + memberId);
+        VncResponseList obj = redisTemplate.opsForValue().get("vnc:" + memberId);
         if (obj == null) {
             return new VncResponseList(List.of());
         }
-        return (VncResponseList) obj;
+        return obj;
     }
 
 }

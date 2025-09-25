@@ -7,7 +7,9 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import team.mjk.agent.domain.vnc.dto.VncResponseList;
 
 @Configuration
 public class RedisConfig {
@@ -40,6 +42,17 @@ public class RedisConfig {
         redisTemplate.setValueSerializer(new StringRedisSerializer());  // value -> 직렬화 설정
 
         return redisTemplate;
+    }
+
+    @Bean
+    public RedisTemplate<String, VncResponseList> vncRedisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, VncResponseList> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+
+        return template;
     }
 
 }
