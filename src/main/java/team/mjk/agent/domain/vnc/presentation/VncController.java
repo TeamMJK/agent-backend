@@ -21,11 +21,10 @@ import team.mjk.agent.global.annotation.MemberId;
 public class VncController {
 
   private final VncService vncService;
-  private final VncCacheService vncCacheService;
 
   @GetMapping
   public ResponseEntity<VncResponseList> getStatus(@MemberId Long memberId) {
-    VncResponseList vncResponseList = vncCacheService.getVncList(memberId);
+    VncResponseList vncResponseList = vncService.getVncList(memberId);
     return ResponseEntity.ok(vncResponseList);
   }
 

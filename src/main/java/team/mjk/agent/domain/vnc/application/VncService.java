@@ -12,6 +12,7 @@ import team.mjk.agent.domain.vnc.domain.Vnc;
 import team.mjk.agent.domain.vnc.domain.VncRepository;
 import team.mjk.agent.domain.vnc.domain.VncStatus;
 import team.mjk.agent.domain.vnc.dto.VncResponse;
+import team.mjk.agent.domain.vnc.dto.VncResponseList;
 import team.mjk.agent.domain.vnc.dto.VncSessionIdRequest;
 import team.mjk.agent.global.util.AgentResponseUtil;
 
@@ -22,20 +23,21 @@ public class VncService {
   private final VncRepository vncRepository;
   private final MemberRepository memberRepository;
   private final AgentResponseUtil agentResponseUtil;
+  private final VncCacheService vncCacheService;
 
-  public List<VncResponse> getVncList(Long memberId) {
-    Member member = memberRepository.findByMemberId(memberId);
-
-    return getVncResponses(member);
+  public VncResponseList getVncList(Long memberId) {
+    List<VncResponse> allResponses = vncCacheService.getAllVncResponses(memberId);
+    return new VncResponseList(allResponses);
   }
 
   @Transactional
   public List<VncResponse> pause(Long memberId, VncSessionIdRequest request) {
-    Member member = memberRepository.findByMemberId(memberId);
-    changeStatus(memberId, request, VncStatus.PAUSE);
+    memberRepository.findByMemberId(memberId);
 
-    agentResponseUtil.pauseAgent(request.sessionId(),VncStatus.PAUSE);
-    return getVncResponses(member);
+    vncCacheService.updateVncStatus(memberId, request.sessionId(), VncStatus.PAUSE);
+    agentResponseUtil.pauseAgent(request.sessionId(), VncStatus.PAUSE);
+
+    return vncCacheService.getAllVncResponses(memberId);
   }
 
   @Transactional
