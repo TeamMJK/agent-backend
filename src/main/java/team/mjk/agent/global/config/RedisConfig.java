@@ -11,6 +11,7 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import team.mjk.agent.domain.vnc.dto.VncResponse;
+import team.mjk.agent.domain.vnc.dto.VncResponseList;
 
 @Configuration
 public class RedisConfig {
@@ -46,8 +47,8 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, VncResponse> vncRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, VncResponse> template = new RedisTemplate<>();
+    public RedisTemplate<String, VncResponseList> vncRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, VncResponseList> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
 
         template.setKeySerializer(new StringRedisSerializer());
