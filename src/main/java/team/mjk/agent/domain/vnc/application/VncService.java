@@ -30,7 +30,6 @@ public class VncService {
   public VncResponseList unpause(Long memberId, VncSessionIdRequest request) {
     vncCacheService.updateVncStatus(memberId, request.sessionId(), VncStatus.ING);
     agentResponseUtil.pauseAgent(request.sessionId(), VncStatus.ING);
-
     return vncCacheService.getVncList(memberId);
   }
 

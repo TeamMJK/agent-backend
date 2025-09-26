@@ -73,7 +73,7 @@ public class HotelService {
 
   @Transactional
   public VncResponseList getHotel(Long memberId, HotelAndMemberInfoResponse response) {
-    VncResponseList retrunVncResponseList = new VncResponseList(new ArrayList<>());
+    VncResponseList returnVncResponseList = new VncResponseList(new ArrayList<>());
     String pythonUrlAgent = agentUrlConfig.hotelSession();
 
     for (var hotel : response.hotelList().hotels()) {
@@ -109,32 +109,15 @@ public class HotelService {
                 )
         );
 
-//        VncResponse vncResponse = agentResponseUtil.agentVnc(pythonUrlAgent, payload);
-//        VncBusinessInfo vncBusinessInfo = vncResponse.vncBusinessInfo();
-//        Member member = memberRepository.findByMemberId(memberId);
-//
-//        Vnc vnc = Vnc.create(
-//                vncResponse.session_id(),
-//                vncResponse.novnc_url(),
-//                vncResponse.status(),
-//                member,
-//                vncBusinessInfo.hotel_destination(),
-//                vncBusinessInfo.booking_dates(),
-//                vncBusinessInfo.guests(),
-//                vncBusinessInfo.budget()
-//        );
-//        vncRepository.save(vnc);
-//
-//        retrunVncResponseList.vncResponseList().add(vncResponse);
-
         VncResponse vncResponse = agentResponseUtil.agentVnc(pythonUrlAgent, payload);
-        retrunVncResponseList.vncResponseList().add(vncResponse);
+
+        vncCacheService.saveVnc(memberId, vncResponse);
+
+        returnVncResponseList.vncResponseList().add(vncResponse);
       }
     }
 
-    vncCacheService.saveVncList(memberId, retrunVncResponseList);
-
-    return retrunVncResponseList;
+    return returnVncResponseList;
   }
 
 }

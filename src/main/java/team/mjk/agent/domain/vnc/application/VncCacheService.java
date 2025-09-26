@@ -8,6 +8,7 @@ import team.mjk.agent.domain.vnc.dto.VncResponseList;
 import team.mjk.agent.domain.vnc.domain.VncStatus;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,18 +19,22 @@ public class VncCacheService {
     private final RedisTemplate<String, VncResponseList> redisTemplate;
     private static final Duration TTL = Duration.ofHours(2);
 
-    public void saveVncList(Long memberId, VncResponseList list) {
+    public void saveVnc(Long memberId, VncResponse newResponse) {
         String key = "vnc:" + memberId;
-        redisTemplate.opsForValue().set(key, list, TTL);
+        VncResponseList existingList = redisTemplate.opsForValue().get(key);
+
+        if (existingList == null) {
+            existingList = new VncResponseList(new ArrayList<>());
+        }
+
+        existingList.vncResponseList().add(newResponse);
+        redisTemplate.opsForValue().set(key, existingList, TTL);
     }
 
     public VncResponseList getVncList(Long memberId) {
         String key = "vnc:" + memberId;
         VncResponseList list = redisTemplate.opsForValue().get(key);
-        if (list == null) {
-            return new VncResponseList(List.of());
-        }
-        return list;
+        return list != null ? list : new VncResponseList(List.of());
     }
 
     public void updateVncStatus(Long memberId, String sessionId, VncStatus newStatus) {
@@ -41,7 +46,7 @@ public class VncCacheService {
                 )
                 .collect(Collectors.toList());
 
-        saveVncList(memberId, new VncResponseList(updatedList));
+        redisTemplate.opsForValue().set("vnc:" + memberId, new VncResponseList(updatedList), TTL);
     }
 
     public List<VncResponse> getAllVncResponses(Long memberId) {
