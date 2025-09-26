@@ -16,6 +16,9 @@ import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
 import team.mjk.agent.domain.vnc.domain.VncStatus;
 import team.mjk.agent.domain.vnc.dto.VncResponse;
 import team.mjk.agent.domain.vnc.presentation.exception.EndAgentExceptionCode;
+import team.mjk.agent.domain.vnc.presentation.exception.FailAgentExceptionCode;
+import team.mjk.agent.domain.vnc.presentation.exception.NotFoundAgentSessionExceptionCode;
+import team.mjk.agent.domain.vnc.presentation.exception.NullAgentExceptionCode;
 import team.mjk.agent.global.config.AgentUrlConfig;
 
 @RequiredArgsConstructor
@@ -88,23 +91,25 @@ public void agentResponse(Long memberId, String pythonUrl, Map<String, Object> p
       throw new EndAgentExceptionCode();
     }
 
-    WebClient http11WebClient = WebClient.builder()
-        .clientConnector(new ReactorClientHttpConnector(
-            HttpClient.create()
-                .protocol(HttpProtocol.HTTP11)
-        ))
-        .build();
+    try {
+      WebClient http11WebClient = WebClient.builder()
+          .clientConnector(new ReactorClientHttpConnector(
+              HttpClient.create()
+                  .protocol(HttpProtocol.HTTP11)
+          ))
+          .build();
 
-    String responseResult = http11WebClient.post()
-        .uri(pythonUrlAgent)
-        .accept(MediaType.APPLICATION_JSON)
-        .retrieve()
-        .bodyToMono(String.class)
-        .block();
+      http11WebClient.post()
+          .uri(pythonUrlAgent)
+          .accept(MediaType.APPLICATION_JSON)
+          .retrieve()
+          .bodyToMono(String.class)
+          .block();
+    } catch (Exception e) {
+      throw new NotFoundAgentSessionExceptionCode();
+    }
 
-    System.out.println("응답 받음: " + responseResult);
   }
-
 
   public VncResponse agentVnc(String pythonUrl, Map<String, Object> payload) {
     try {
@@ -147,8 +152,7 @@ public void agentResponse(Long memberId, String pythonUrl, Map<String, Object> p
 
     } catch (Exception e) {
       System.out.println("요청 처리 중 오류: " + e.getMessage());
-      e.printStackTrace();
-      return null;
+      throw new NullAgentExceptionCode();
     }
   }
 
@@ -186,7 +190,7 @@ public void agentResponse(Long memberId, String pythonUrl, Map<String, Object> p
                 System.out.println("ERROR: detailNode is null in response: " + responseResult);
               }
             } catch (JsonProcessingException e) {
-              System.out.println(e.getMessage());
+              throw new FailAgentExceptionCode();
             }
           }, error -> {
             System.out.println("WebClient error: " + error.getMessage());
