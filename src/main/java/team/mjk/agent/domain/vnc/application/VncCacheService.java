@@ -10,6 +10,7 @@ import team.mjk.agent.domain.vnc.domain.VncStatus;
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
+import team.mjk.agent.domain.vnc.presentation.exception.FailRedisAgentConnectExceptionCode;
 
 @RequiredArgsConstructor
 @Service
@@ -19,8 +20,12 @@ public class VncCacheService {
     private static final Duration TTL = Duration.ofHours(2);
 
     public void saveVncList(Long memberId, VncResponseList list) {
-        String key = "vnc:" + memberId;
-        redisTemplate.opsForValue().set(key, list, TTL);
+        try {
+            String key = "vnc:" + memberId;
+            redisTemplate.opsForValue().set(key, list, TTL);
+        } catch (Exception e) {
+            throw new FailRedisAgentConnectExceptionCode();
+        }
     }
 
     public VncResponseList getVncList(Long memberId) {
