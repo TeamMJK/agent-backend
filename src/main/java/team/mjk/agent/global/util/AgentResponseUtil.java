@@ -13,6 +13,7 @@ import reactor.netty.http.HttpProtocol;
 import reactor.netty.http.client.HttpClient;
 import team.mjk.agent.domain.businessTrip.application.BusinessTripService;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
+import team.mjk.agent.domain.vnc.application.VncCacheService;
 import team.mjk.agent.domain.vnc.domain.VncStatus;
 import team.mjk.agent.domain.vnc.dto.VncResponse;
 import team.mjk.agent.domain.vnc.presentation.exception.EndAgentExceptionCode;
@@ -29,6 +30,7 @@ public class AgentResponseUtil {
   private final ObjectMapper objectMapper;
   private final BusinessTripService businessTripService;
   private final AgentUrlConfig agentUrlConfig;
+  private final VncCacheService vncCacheService;
   /**
   public void agentResponse(Long memberId, String pythonUrl, Map<String, Object> payload) {
     System.out.println("날라갑니다~: " +payload);
@@ -176,10 +178,14 @@ public void agentResponse(Long memberId, String pythonUrl, Map<String, Object> p
           .retrieve()
           .bodyToMono(String.class)
           .subscribe(responseResult -> {
+            String sessionId = null;
             System.out.println("응답 받음: " + responseResult);
             try {
               JsonNode rootNode = objectMapper.readTree(responseResult);
               JsonNode detailNode = rootNode.get("detail");
+              JsonNode sessionIdNode = rootNode.get("sessionId");
+              sessionId = sessionIdNode.asText();
+
               if (detailNode != null) {
                 String detailJson = detailNode.toString();
                 System.out.println("result :" + responseResult);
@@ -191,9 +197,23 @@ public void agentResponse(Long memberId, String pythonUrl, Map<String, Object> p
               }
             } catch (JsonProcessingException e) {
               throw new FailAgentExceptionCode();
+            } finally {
+              if (sessionId != null) {
+                vncCacheService.updateVncStatus(memberId, sessionId, VncStatus.END);
+              }
             }
           }, error -> {
             System.out.println("WebClient error: " + error.getMessage());
+            try {
+              JsonNode rootNode = objectMapper.readTree(error.getMessage());
+              JsonNode sessionIdNode = rootNode.get("sessionId");
+              if (sessionIdNode != null) {
+                String sessionId = sessionIdNode.asText();
+                vncCacheService.updateVncStatus(memberId, sessionId, VncStatus.END);
+              }
+            } catch (JsonProcessingException ex) {
+              ex.printStackTrace();
+            }
           });
 
     } catch (JsonProcessingException e) {
