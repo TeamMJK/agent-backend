@@ -76,7 +76,6 @@ jobs:
             EOF
   
             sudo docker-compose -f docker-compose-service.yml down --remove-orphans || true
-            sudo docker rm -f springboot redis nginx || true
             
             if ! sudo docker network ls | grep -q my-network; then
               sudo docker network create my-network
