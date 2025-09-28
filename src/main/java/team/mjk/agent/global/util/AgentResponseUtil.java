@@ -31,55 +31,6 @@ public class AgentResponseUtil {
   private final BusinessTripService businessTripService;
   private final AgentUrlConfig agentUrlConfig;
   private final VncCacheService vncCacheService;
-  /**
-  public void agentResponse(Long memberId, String pythonUrl, Map<String, Object> payload) {
-    System.out.println("날라갑니다~: " +payload);
-    webClient.post()
-        .uri(pythonUrl)
-        .header("Content-Type", "application/json")
-        .bodyValue(payload)
-        .retrieve()
-        .bodyToMono(String.class)
-        .subscribe(responseResult -> {
-          try {
-            JsonNode rootNode = objectMapper.readTree(responseResult);
-            JsonNode detailNode = rootNode.get("detail");
-            String detailJson = detailNode.toString();
-            System.out.println("result :" + responseResult);
-            BusinessTripAgentRequest agentRequest = objectMapper.readValue(detailJson, BusinessTripAgentRequest.class);
-
-            System.out.println("names" + agentRequest.names());
-            businessTripService.saveAgentMcp(memberId, agentRequest);
-          } catch (JsonProcessingException e) {
-            System.out.println(e.getMessage());
-          }
-        }, error -> {
-
-          System.out.println("WebClient error: " + error.getMessage());
-        });
-  }
-
-public void agentResponse(Long memberId, String pythonUrl, Map<String, Object> payload) {
-  try {
-    String jsonPayload = objectMapper.writeValueAsString(payload);
-    System.out.println("[DEBUG] Sending payload: " + jsonPayload);
-
-
-    webClient.post()
-        .uri(pythonUrl)
-        .header("Content-Type", "application/json")
-        .bodyValue(jsonPayload)
-        .retrieve()
-        .bodyToMono(String.class)
-        .block();
-
-
-
-  } catch (Exception e) {
-    System.out.println("WebClient error: " + e.getMessage());
-  }
-}
-**/
 
   public void pauseAgent(String sessionId, VncStatus status) {
     String pythonUrlAgent;
