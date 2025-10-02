@@ -61,12 +61,13 @@ public class PromptService {
     flightService.handleFlight(memberId,response);
   }
 
-  private HotelList extractHotelInfo(Long memberId, PromptRequest request) {
+  public HotelList extractHotelInfo(Long memberId, PromptRequest request) {
     Member member = memberRepository.findByMemberId(memberId);
 
     String fullPrompt = String.format(
         """
             다음 문장에서 출장 정보를 추출해줘. 올해는 2025년이야. 예산은 숙박 일수 만큼 나눠.
+            날짜 중 더 빠른 날짜를 departure_date 에 저장해.
             출발일은 departure_date 에 저장하고 도착일은 arrival_date 에 저장해.
             문장을 파악해서 요청자와 같이 출장을 가는 사람 이름이면 그것에 맞춰 인원 수 추가.
             만약 9월 23일부터 4박 5일이면 depart_date = 2025-09-23, return_date = 2025-09-27.
