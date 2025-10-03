@@ -10,6 +10,7 @@ import team.mjk.agent.domain.flight.application.FlightService;
 import team.mjk.agent.domain.flight.dto.FlightAndMemberInfoResponse;
 import team.mjk.agent.domain.flight.dto.FlightList;
 import team.mjk.agent.domain.hotel.application.HotelService;
+import team.mjk.agent.domain.hotel.dto.AgodaHotelList;
 import team.mjk.agent.domain.hotel.dto.HotelAndMemberInfoResponse;
 import team.mjk.agent.domain.hotel.dto.HotelList;
 import team.mjk.agent.domain.vnc.dto.VncResponseList;
@@ -46,9 +47,9 @@ public class PromptService {
     MemberInfoList memberInfoList = extractNames(memberId, request);
 
     HotelAndMemberInfoResponse response = new HotelAndMemberInfoResponse(hotelList, memberInfoList);
-    VncResponseList result = hotelService.getHotel(memberId,response);
-    hotelService.handleHotel(memberId,response,result);
-    return  result;
+    VncResponseList result = hotelService.getHotel(memberId, response);
+    hotelService.handleHotel(memberId, response, result);
+    return result;
   }
 
   public void extractFlight(Long memberId,
@@ -56,9 +57,51 @@ public class PromptService {
     FlightList flightList = extractFlightInfo(memberId, request);
     MemberInfoList memberInfoList = extractNames(memberId, request);
 
-    FlightAndMemberInfoResponse response = new FlightAndMemberInfoResponse(flightList, memberInfoList);
+    FlightAndMemberInfoResponse response = new FlightAndMemberInfoResponse(flightList,
+        memberInfoList);
 
-    flightService.handleFlight(memberId,response);
+    flightService.handleFlight(memberId, response);
+  }
+
+  public AgodaHotelList extractAgodaHotelInfo(Long memberId, PromptRequest request) {
+    Member member = memberRepository.findByMemberId(memberId);
+
+    String fullPrompt = String.format(
+        """
+            너는 숙박 예약해주는 AI야. 모든 문장을 숙박 시설 예약하는 것으로 간주하고 생각해
+            다음 문장에서 출장 정보를 추출해줘. 올해는 2025년이야. 예산은 숙박 일수 만큼 나눠.
+            날짜 중 더 빠른 날짜를 departure_date 에 저장해.
+            월을 못찾겠으면 앞선 날짜의 월로 추측해.
+            예)
+            11월3일부터 5일 까지 인천으로 가. 예산은 20만원 -> arrival_date = 2025-11-05
+            출발일은 departure_date 에 저장하고 도착일은 arrival_date 에 저장해.
+            문장을 파악해서 요청자와 같이 출장을 가는 사람 이름이면 그것에 맞춰 인원 수 추가.
+            만약 9월 23일부터 4박 5일이면 depart_date = 2025-09-23, return_date = 2025-09-27.
+            만약 "11월3일부터 5일 까지 안동으로 가. 예산은 15만원이여" 일 때 maximum 은 150000
+            만약 문장에 '다음주 월요일'과 같이 상대적인 날짜가 나오면, 2025년 기준으로 프롬프트 요청 날짜 기준으로 절대 날짜로 변환해 departure_date와 arrival_date에 넣어줘.
+            문장 :
+            %s""",
+        request.prompt()
+    );
+
+    AgodaHotelList hotelList = chatClient.prompt()
+        .user(p -> p.text(fullPrompt))
+        .call()
+        .entity(AgodaHotelList.class);
+
+    hotelList.agodaHotelList().forEach(hotel -> {
+      if (hotel.destination() == null || hotel.destination().isBlank()) {
+        throw new EmptyDestinationException();
+      }
+      if (hotel.departure_date() == null) {
+        throw new EmptyDepartureDateExceptionCode();
+      }
+      if (hotel.arrival_date() == null) {
+        throw new EmptyArrivalDateException();
+      }
+    });
+
+    return hotelList;
   }
 
   public HotelList extractHotelInfo(Long memberId, PromptRequest request) {
@@ -68,6 +111,9 @@ public class PromptService {
         """
             다음 문장에서 출장 정보를 추출해줘. 올해는 2025년이야. 예산은 숙박 일수 만큼 나눠.
             날짜 중 더 빠른 날짜를 departure_date 에 저장해.
+            월을 못찾겠으면 앞선 날짜의 월로 추측해.
+            예)
+            11월3일부터 5일 까지 인천으로 가. 예산은 20만원 -> arrival_date = 2025-11-05
             출발일은 departure_date 에 저장하고 도착일은 arrival_date 에 저장해.
             문장을 파악해서 요청자와 같이 출장을 가는 사람 이름이면 그것에 맞춰 인원 수 추가.
             만약 9월 23일부터 4박 5일이면 depart_date = 2025-09-23, return_date = 2025-09-27.
@@ -130,7 +176,7 @@ public class PromptService {
       if (flight.departure() == null || flight.departure().isBlank()) {
         throw new EmptyDepartureException();
       }
-      if(flight.arrival() == null || flight.arrival().isBlank()) {
+      if (flight.arrival() == null || flight.arrival().isBlank()) {
         throw new EmptyDestinationException();
       }
       if (flight.depart_date() == null) {
