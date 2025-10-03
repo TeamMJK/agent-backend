@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import team.mjk.agent.domain.agoda.dto.request.AgodaHotelRequest;
 import team.mjk.agent.domain.agoda.dto.response.AgodaHotelResponse;
 import team.mjk.agent.domain.agoda.presentation.exception.HotelInfoNotFoundException;
+import team.mjk.agent.domain.hotel.dto.AgodaHotel;
+import team.mjk.agent.domain.hotel.dto.AgodaHotelList;
 import team.mjk.agent.domain.hotel.dto.Hotel;
 import team.mjk.agent.domain.hotel.dto.HotelList;
 import team.mjk.agent.domain.prompt.dto.request.PromptRequest;
@@ -19,9 +21,9 @@ public class AgodaHotelReadService {
     private final PromptService promptService;
 
     public AgodaHotelResponse getHotelsFromPrompt(Long memberId, String prompt) {
-        HotelList hotelList = promptService.extractHotelInfo(memberId, new PromptRequest(prompt));
+        AgodaHotelList agodaHotelList = promptService.extractAgodaHotelInfo(memberId, new PromptRequest(prompt));
 
-        Hotel hotel = validateHotelInfo(hotelList);
+        AgodaHotel hotel = validateHotelInfo(agodaHotelList);
 
         int cityId;
         try {
@@ -31,20 +33,18 @@ public class AgodaHotelReadService {
         }
 
         AgodaHotelRequest request = AgodaHotelRequest.of(
-                hotel.departure_date(),
-                hotel.arrival_date(),
-                hotel.budget(),
+                hotel,
                 cityId
         );
 
         return agodaHotelApiClient.fetchHotels(request);
     }
 
-    private Hotel validateHotelInfo(HotelList hotelList) {
-        if (hotelList == null || hotelList.hotels().isEmpty()) {
+    private AgodaHotel validateHotelInfo(AgodaHotelList hotelList) {
+        if (hotelList == null || hotelList.agodaHotelList().isEmpty()) {
             throw new HotelInfoNotFoundException();
         }
-        return hotelList.hotels().get(0);
+        return hotelList.agodaHotelList().get(0);
     }
 
 }

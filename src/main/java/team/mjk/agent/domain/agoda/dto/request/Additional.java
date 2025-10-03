@@ -5,15 +5,16 @@ import lombok.Builder;
 @Builder
 public record Additional(
 
-        String currency,
-        DailyRate dailyRate,
-        boolean discountOnly,
-        String language,
-        int maxResult,
-        int minimumReviewScore,
-        int minimumStarRating,
-        Occupancy occupancy,
-        String sortBy
+    String currency,
+    DailyRate dailyRate,
+    boolean discountOnly,
+    String language,
+    int maxResult,
+    double minimumReviewScore,
+    double minimumStarRating,
+    Occupancy occupancy,
+    String sortBy
 
 ) {
+
 }
