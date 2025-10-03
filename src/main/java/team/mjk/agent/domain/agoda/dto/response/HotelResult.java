@@ -1,6 +1,7 @@
 package team.mjk.agent.domain.agoda.dto.response;
 
 import lombok.Builder;
+import team.mjk.agent.domain.agoda.dto.request.AgodaHotelInfo;
 
 @Builder
 public record HotelResult(
@@ -16,7 +17,8 @@ public record HotelResult(
         boolean includeBreakfast,
         String landingURL,
         double reviewScore,
-        double starRating
+        double starRating,
+        AgodaHotelInfo agodaHotelInfo
 
 ) {
 }

@@ -5,6 +5,8 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
+import team.mjk.agent.domain.agoda.dto.request.AgodaHotelInfo;
+import team.mjk.agent.domain.agoda.dto.response.HotelResult;
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.flight.application.FlightService;
 import team.mjk.agent.domain.flight.dto.FlightAndMemberInfoResponse;
@@ -188,6 +190,27 @@ public class PromptService {
     });
 
     return flightList;
+  }
+
+  public AgodaHotelInfo extractAgodaHotelInfo(HotelResult hotelResult) {
+    String fullPrompt = String.format("""
+        넌 관광 및 호텔 평가 전문가야. 실시간으로 호텔 정보를 토대로 장단점 및 주변 관광지 추천 및 맛집을 찾아주고 한글로 알려줘.
+        관광지 추천을 할 땐 숙소에서 얼마나 걸리는지도 알려줘.
+        맛집을 추천할 땐 네이버에서 현재 존재하는 식당인지 검증하고 추천해줘.
+        아래 모든 정보가 확인 가능한 식당만 추천해줘.
+        아침 식사 시간이랑 브레이크 타임이랑 주문 마감 시간이랑 휴일 같은 것도 검증된 정보를 찾아서 알려줘.
+        - Advantages
+        - Disadvantages
+        - Nearby tourist attractions
+        - Recommended restaurants
+
+        Hotel: %s
+        """, hotelResult.hotelName());
+
+    return chatClient.prompt()
+        .user(p -> p.text(fullPrompt))
+        .call()
+        .entity(AgodaHotelInfo.class);
   }
 
   private MemberInfoList extractNames(Long memberId, PromptRequest request) {

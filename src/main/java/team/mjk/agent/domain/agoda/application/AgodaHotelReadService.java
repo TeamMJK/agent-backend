@@ -1,9 +1,12 @@
 package team.mjk.agent.domain.agoda.application;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import team.mjk.agent.domain.agoda.dto.request.AgodaHotelRequest;
 import team.mjk.agent.domain.agoda.dto.response.AgodaHotelResponse;
+import team.mjk.agent.domain.agoda.dto.response.HotelResult;
 import team.mjk.agent.domain.agoda.presentation.exception.HotelInfoNotFoundException;
 import team.mjk.agent.domain.hotel.dto.AgodaHotel;
 import team.mjk.agent.domain.hotel.dto.AgodaHotelList;
@@ -20,31 +23,55 @@ public class AgodaHotelReadService {
     private final AgodaHotelApiClient agodaHotelApiClient;
     private final PromptService promptService;
 
-    public AgodaHotelResponse getHotelsFromPrompt(Long memberId, String prompt) {
+    public List<AgodaHotelResponse> getHotelsFromPrompt(Long memberId, String prompt) {
         AgodaHotelList agodaHotelList = promptService.extractAgodaHotelInfo(memberId, new PromptRequest(prompt));
 
-        AgodaHotel hotel = validateHotelInfo(agodaHotelList);
-
-        int cityId;
-        try {
-            cityId = Integer.parseInt(cityService.getCityId(hotel.destination()));
-        } catch (Exception e) {
+        if (agodaHotelList == null || agodaHotelList.agodaHotelList().isEmpty()) {
             throw new HotelInfoNotFoundException();
         }
 
-        AgodaHotelRequest request = AgodaHotelRequest.of(
-                hotel,
-                cityId
-        );
+        List<AgodaHotelResponse> responses = new ArrayList<>();
 
-        return agodaHotelApiClient.fetchHotels(request);
-    }
+        for (AgodaHotel hotel : agodaHotelList.agodaHotelList()) {
+            int cityId;
+            System.out.println(hotel.destination());
+            try {
+                cityId = Integer.parseInt(cityService.getCityId(hotel.destination()));
+            } catch (Exception e) {
+                throw new HotelInfoNotFoundException();
+            }
 
-    private AgodaHotel validateHotelInfo(AgodaHotelList hotelList) {
-        if (hotelList == null || hotelList.agodaHotelList().isEmpty()) {
-            throw new HotelInfoNotFoundException();
+            AgodaHotelRequest request = AgodaHotelRequest.of(hotel, cityId);
+            AgodaHotelResponse agodaHotelResponse = agodaHotelApiClient.fetchHotels(request);
+
+            List<HotelResult> agodaHotelInfoResponse = agodaHotelResponse.results().stream()
+                .map(r -> HotelResult.builder()
+                    .crossedOutRate(r.crossedOutRate())
+                    .currency(r.currency())
+                    .dailyRate(r.dailyRate())
+                    .discountPercentage(r.discountPercentage())
+                    .freeWifi(r.freeWifi())
+                    .hotelId(r.hotelId())
+                    .hotelName(r.hotelName())
+                    .imageURL(r.imageURL())
+                    .includeBreakfast(r.includeBreakfast())
+                    .landingURL(r.landingURL())
+                    .reviewScore(r.reviewScore())
+                    .starRating(r.starRating())
+                    .agodaHotelInfo(promptService.extractAgodaHotelInfo(r))
+                    .build()
+                )
+                .toList();
+
+            AgodaHotelResponse response = AgodaHotelResponse.builder()
+                .results(agodaHotelInfoResponse)
+                .destination(hotel.destination())
+                .build();
+
+            responses.add(response);
         }
-        return hotelList.agodaHotelList().get(0);
+
+        return responses;
     }
 
 }

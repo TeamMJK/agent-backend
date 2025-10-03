@@ -1,5 +1,6 @@
 package team.mjk.agent.domain.agoda.presentation;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,7 +19,7 @@ public class AgodaController {
     private final AgodaService agodaService;
 
     @PostMapping("/search")
-    public AgodaHotelResponse searchHotels(
+    public List<AgodaHotelResponse> searchHotels(
             @MemberId Long memberId,
             @RequestBody PromptRequest request
     ) {
