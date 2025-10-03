@@ -29,6 +29,7 @@ public class AgodaCityService {
         if (cityId == null) {
             throw new CityNotFoundException();
         }
+
         return cityId;
     }
 

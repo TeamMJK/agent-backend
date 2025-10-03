@@ -9,7 +9,8 @@ import java.util.List;
 public record AgodaHotelResponse(
 
         @Singular
-        List<HotelResult> results
+        List<HotelResult> results,
+        String destination
 
 ) {
 }
