@@ -12,7 +12,7 @@ import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.vnc.application.VncCacheService;
 import team.mjk.agent.domain.vnc.dto.VncResponse;
 import team.mjk.agent.domain.vnc.dto.VncResponseList;
-import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
+import team.mjk.agent.domain.member.application.dto.response.MemberInfoGetResponse;
 import team.mjk.agent.global.config.AgentUrlConfig;
 import team.mjk.agent.global.util.AgentResponseUtil;
 

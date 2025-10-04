@@ -1,4 +1,4 @@
-package team.mjk.agent.domain.member.dto.response;
+package team.mjk.agent.domain.member.application.dto.response;
 
 import java.util.List;
 

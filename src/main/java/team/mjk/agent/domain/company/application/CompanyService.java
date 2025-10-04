@@ -20,7 +20,7 @@ import team.mjk.agent.domain.mcp.slack.domain.Slack;
 import team.mjk.agent.domain.mcp.slack.domain.SlackRepository;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
-import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
+import team.mjk.agent.domain.member.application.dto.response.MemberInfoGetResponse;
 import team.mjk.agent.global.util.KmsUtil;
 
 import java.util.List;
@@ -157,7 +157,7 @@ public class CompanyService {
 
     List<Member> members = memberRepository.findAllByCompanyId(company.getId());
     List<MemberInfoGetResponse> memberInfoGetResponses = members.stream()
-        .map(m -> Member.toMemberInfoGetResponse(m, kmsUtil))
+        .map(m -> MemberInfoGetResponse.from(m, kmsUtil))
         .collect(Collectors.toList());
 
     return CompanyMemberListResponse.builder()
