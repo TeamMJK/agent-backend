@@ -25,7 +25,7 @@ public record MemberInfoGetResponse(
                 .lastName(kmsUtil.decrypt(member.getLastName()))
                 .email(member.getEmail())
                 .phoneNumber(kmsUtil.decrypt(member.getPhoneNumber()))
-                .gender(member.getGender() != null ? member.getGender().name() : null)
+                .gender(member.getGender().name())
                 .birthDate(kmsUtil.decrypt(member.getBirthDate()))
                 .passportNumber(kmsUtil.decrypt(member.getPassport().getPassportNumber()))
                 .passportExpireDate(kmsUtil.decrypt(member.getPassport().getPassportExpireDate()))
