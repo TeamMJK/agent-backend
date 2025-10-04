@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import team.mjk.agent.domain.flight.dto.FlightAndMemberInfoResponse;
-import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
+import team.mjk.agent.domain.member.application.dto.response.MemberInfoGetResponse;
 import team.mjk.agent.global.util.AgentResponseUtil;
 
 @Service

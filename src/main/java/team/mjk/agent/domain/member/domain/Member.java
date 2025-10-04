@@ -5,16 +5,12 @@ import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.company.presentation.exception.CompanyNotFoundException;
-import team.mjk.agent.domain.member.dto.request.MemberInfoUpdateRequest;
-import team.mjk.agent.domain.member.dto.response.EncryptedMemberInfoResponse;
-import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
 import team.mjk.agent.domain.member.presentation.exception.EmailOrPasswordNotInvalidException;
 import team.mjk.agent.domain.passport.domain.Passport;
 import team.mjk.agent.global.auth.application.dto.AuthAttributes;
 import team.mjk.agent.global.domain.BaseTimeEntity;
 import team.mjk.agent.global.util.KmsUtil;
 
-import java.time.LocalDate;
 import java.util.Objects;
 
 import static jakarta.persistence.EnumType.STRING;
@@ -62,7 +58,7 @@ public class Member extends BaseTimeEntity {
     @JoinColumn(name = "company_id")
     private Company company;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "passport_id", unique = true)
     private Passport passport;
 
@@ -97,35 +93,47 @@ public class Member extends BaseTimeEntity {
             String lastName,
             String phoneNumber,
             Gender gender,
-            String birthDate
+            String birthDate,
+            String passportNumber,
+            String passportExpireDate,
+            KmsUtil kmsUtil
     ) {
         this.name = name;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.phoneNumber = phoneNumber;
+        this.firstName = kmsUtil.encrypt(firstName);
+        this.lastName = kmsUtil.encrypt(lastName);
+        this.phoneNumber = kmsUtil.encrypt(phoneNumber);
         this.gender = gender;
-        this.birthDate = birthDate;
-    }
-
-    public void savePassport(Passport passport) {
-        this.passport = passport;
+        this.birthDate = kmsUtil.encrypt(birthDate);
+        this.passport = Passport.create(
+                kmsUtil.encrypt(passportNumber),
+                kmsUtil.encrypt(passportExpireDate)
+        );
     }
 
     public void saveCompany(Company company) {
         this.company = company;
     }
 
-    public void update(EncryptedMemberInfoResponse response) {
-        this.name = response.name();
-        this.firstName = response.firstName();
-        this.lastName = response.lastName();
-        this.phoneNumber = response.phoneNumber();
-        this.gender = Gender.valueOf(response.gender());
-        this.birthDate = response.birthDate();
-
+    public void updateMemberInfo(
+            String name,
+            String firstName,
+            String lastName,
+            String phoneNumber,
+            Gender gender,
+            String birthDate,
+            String passportNumber,
+            String passportExpireDate,
+            KmsUtil kmsUtil
+    ) {
+        this.name = name;
+        this.firstName = kmsUtil.encrypt(firstName);
+        this.lastName = kmsUtil.encrypt(lastName);
+        this.phoneNumber = kmsUtil.encrypt(phoneNumber);
+        this.gender = gender;
+        this.birthDate = kmsUtil.encrypt(birthDate);
         this.passport.update(
-                response.passportNumber(),
-                response.passportExpireDate()
+                kmsUtil.encrypt(passportNumber),
+                kmsUtil.encrypt(passportExpireDate)
         );
     }
 
@@ -134,20 +142,6 @@ public class Member extends BaseTimeEntity {
             throw new CompanyNotFoundException();
         }
         return this.company;
-    }
-
-    public static MemberInfoGetResponse toMemberInfoGetResponse(Member member, KmsUtil kmsUtil) {
-        return MemberInfoGetResponse.builder()
-                .name(member.getName())
-                .firstName(kmsUtil.decrypt(member.getFirstName()))
-                .email(member.getEmail())
-                .lastName(kmsUtil.decrypt(member.getLastName()))
-                .phoneNumber(kmsUtil.decrypt(member.getPhoneNumber()))
-                .gender(String.valueOf(member.getGender()))
-                .birthDate(kmsUtil.decrypt(member.getBirthDate()))
-                .passportNumber(kmsUtil.decrypt(member.getPassport().getPassportNumber()))
-                .passportExpireDate(kmsUtil.decrypt(member.getPassport().getPassportExpireDate()))
-                .build();
     }
 
 }

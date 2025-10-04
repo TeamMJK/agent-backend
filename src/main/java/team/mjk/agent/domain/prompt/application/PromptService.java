@@ -18,8 +18,8 @@ import team.mjk.agent.domain.hotel.dto.HotelList;
 import team.mjk.agent.domain.vnc.dto.VncResponseList;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
-import team.mjk.agent.domain.member.dto.response.MemberInfoGetResponse;
-import team.mjk.agent.domain.member.dto.response.MemberInfoList;
+import team.mjk.agent.domain.member.application.dto.response.MemberInfoGetResponse;
+import team.mjk.agent.domain.member.application.dto.response.MemberInfoList;
 import team.mjk.agent.domain.member.presentation.exception.MemberNotFoundException;
 import team.mjk.agent.domain.prompt.dto.request.PromptRequest;
 import team.mjk.agent.domain.prompt.dto.response.NameList;
@@ -230,7 +230,7 @@ public class PromptService {
 
   private MemberInfoList extractMemberInfo(Long memberId, NameList nameList) {
     Member member = memberRepository.findByMemberId(memberId);
-    MemberInfoGetResponse memberInfoGetResponse = Member.toMemberInfoGetResponse(member, kmsUtil);
+    MemberInfoGetResponse memberInfoGetResponse = MemberInfoGetResponse.from(member, kmsUtil);
     Company company = member.getValidatedCompany();
 
     List<MemberInfoGetResponse> resultList = new ArrayList<>();
@@ -244,7 +244,7 @@ public class PromptService {
       Member findMember = memberRepository.findByNameAndCompany(name, company)
           .orElseThrow(MemberNotFoundException::new);
       System.out.println("name :" + findMember.getName());
-      MemberInfoGetResponse findMemberInfo = Member.toMemberInfoGetResponse(findMember, kmsUtil);
+      MemberInfoGetResponse findMemberInfo = MemberInfoGetResponse.from(findMember, kmsUtil);
       resultList.add(findMemberInfo);
     }
 

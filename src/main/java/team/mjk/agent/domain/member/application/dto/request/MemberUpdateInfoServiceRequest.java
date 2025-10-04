@@ -1,9 +1,11 @@
-package team.mjk.agent.domain.member.dto.response;
+package team.mjk.agent.domain.member.application.dto.request;
 
 import lombok.Builder;
 
 @Builder
-public record EncryptedMemberInfoResponse(
+public record MemberUpdateInfoServiceRequest(
+
+        Long memberId,
 
         String name,
 
