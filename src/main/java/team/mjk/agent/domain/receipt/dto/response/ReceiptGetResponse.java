@@ -34,5 +34,6 @@ public record ReceiptGetResponse(
                 .totalAmount(receipt.getTotalAmount())
                 .url(receipt.getUrl())
                 .build();
+    }
 
 }
