@@ -9,7 +9,7 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
 @Configuration
-public class ImageConfig {
+public class S3Config {
 
     @Value("${cloud.aws.credentials.accessKey}")
     private String accessKey;
