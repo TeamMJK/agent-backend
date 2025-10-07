@@ -1,36 +1,18 @@
 package team.mjk.agent.domain.receipt.application;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.model.Media;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MimeType;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.ResponseBytes;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.company.domain.Workspace;
+import team.mjk.agent.domain.mcp.McpService;
+import team.mjk.agent.domain.mcp.McpServiceRegistry;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.receipt.domain.Receipt;
@@ -42,27 +24,22 @@ import team.mjk.agent.domain.receipt.dto.response.ImageUploadResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptGetResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptSaveResponse;
 import team.mjk.agent.domain.receipt.dto.response.ReceiptUpdateResponse;
-import team.mjk.agent.domain.receipt.presentation.exception.*;
-import team.mjk.agent.domain.mcp.McpService;
-import team.mjk.agent.domain.mcp.McpServiceRegistry;
+import team.mjk.agent.domain.receipt.presentation.exception.DeleteNotForbiddenExceptionCode;
+import team.mjk.agent.domain.receipt.presentation.exception.EmptyFileExceptionCode;
+import team.mjk.agent.global.s3.S3Provider;
+
+import java.util.List;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
 public class ReceiptService {
 
-  private final S3Client s3Client;
   private final ReceiptRepository receiptRepository;
   private final MemberRepository memberRepository;
   private final ChatClient chatClient;
   private final McpServiceRegistry registry;
-
-  @Value("${cloud.aws.cloudfront.domain}")
-  private String cloudFrontDomain;
-
-  @Value("${cloud.aws.s3.bucketName}")
-  private String bucketName;
-
-  private static final Set<String> ALLOWED_EXTENSIONS = Set.of("jpg", "jpeg", "png", "gif");
+  private final S3Provider s3Provider;
 
   @Transactional
   public ReceiptSaveResponse saveReceipt(Long memberId, ReceiptSaveRequest request, MultipartFile image) {
@@ -70,8 +47,8 @@ public class ReceiptService {
     Company company = member.getValidatedCompany();
 
     String imageUrl = null;
-    if (image != null && !image.isEmpty() && image.getOriginalFilename() != null) {
-      imageUrl = uploadImage(image);
+    if (image != null && !image.isEmpty()) {
+      imageUrl = s3Provider.upload(image);
     }
 
     Receipt receipt = Receipt.create(
@@ -102,11 +79,10 @@ public class ReceiptService {
 
     String oldImageUrl = receipt.getUrl();
     if (oldImageUrl != null && !oldImageUrl.isBlank()) {
-      deleteImageFromS3(memberId, oldImageUrl);
+      s3Provider.delete(oldImageUrl);
     }
 
-    String newImageUrl = uploadImage(image);
-
+    String newImageUrl = s3Provider.upload(image);
     receipt.updateUrl(newImageUrl);
 
     return ImageUploadResponse.builder()
@@ -121,7 +97,7 @@ public class ReceiptService {
 
     List<Workspace> workspaces = company.getWorkspace();
 
-    String imageUrl = uploadImage(file);
+    String imageUrl = s3Provider.upload(file);
     ReceiptSaveRequest request = ocr(file);
 
     ReceiptMcpRequest mcpRequest = ReceiptMcpRequest.builder()
@@ -146,7 +122,6 @@ public class ReceiptService {
   public ReceiptUpdateResponse updateReceipt(Long memberId, Long receiptId, ReceiptUpdateRequest request) {
     Member member = memberRepository.findByMemberId(memberId);
     Receipt receipt = receiptRepository.findByReceiptId(receiptId);
-
     receipt.validateUpdateReceipt(member.getId());
 
     receipt.updateReceipt(
@@ -164,16 +139,7 @@ public class ReceiptService {
   public void deleteImageFromS3(Long memberId, String imageAddress) {
     Receipt receipt = receiptRepository.findByUrl(imageAddress);
     validateForbidden(memberId, receipt.getMemberId());
-
-    String key = getKeyFromImageAddress(imageAddress);
-    try {
-      s3Client.deleteObject(DeleteObjectRequest.builder()
-              .bucket(bucketName)
-              .key(key)
-              .build());
-    } catch (Exception e) {
-      throw new OnImageDeleteExceptionCode();
-    }
+    s3Provider.delete(imageAddress);
   }
 
   @Transactional(readOnly = true)
@@ -182,15 +148,7 @@ public class ReceiptService {
     Company company = member.getValidatedCompany();
 
     return receiptRepository.findAllByCompany(company).stream()
-            .map(receipt -> ReceiptGetResponse.builder()
-                    .receiptId(receipt.getId())
-                    .writer(receipt.getWriter())
-                    .approvalNumber(receipt.getApprovalNumber())
-                    .paymentDate(receipt.getPaymentDate())
-                    .storeAddress(receipt.getStoreAddress())
-                    .totalAmount(receipt.getTotalAmount())
-                    .url(receipt.getUrl())
-                    .build())
+            .map(ReceiptGetResponse::from)
             .toList();
   }
 
@@ -199,16 +157,7 @@ public class ReceiptService {
     Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getValidatedCompany();
     Receipt receipt = receiptRepository.findByIdAndCompany(receiptId, company);
-
-    return ReceiptGetResponse.builder()
-            .receiptId(receipt.getId())
-            .writer(receipt.getWriter())
-            .approvalNumber(receipt.getApprovalNumber())
-            .paymentDate(receipt.getPaymentDate())
-            .storeAddress(receipt.getStoreAddress())
-            .totalAmount(receipt.getTotalAmount())
-            .url(receipt.getUrl())
-            .build();
+    return ReceiptGetResponse.from(receipt);
   }
 
   @Transactional
@@ -217,63 +166,19 @@ public class ReceiptService {
     validateForbidden(memberId, receipt.getMemberId());
 
     if (receipt.getUrl() != null) {
-      deleteImageFromS3(memberId, receipt.getUrl());
+      s3Provider.delete(receipt.getUrl());
     }
-
     receiptRepository.delete(receipt);
   }
 
-  @Transactional(readOnly = true)
-  public List<Receipt> getReceiptsByCompany(Company company) {
-    return receiptRepository.findAllByCompany(company);
-  }
-
-  private String uploadImage(MultipartFile image) {
-    validateImageFileExtension(image.getOriginalFilename());
-    try {
-      String s3FileName = uploadImageToS3(image);
-      return cloudFrontDomain + "/" + s3FileName;
-    } catch (IOException e) {
-      throw new OnImageUploadExceptionCode();
-    }
-  }
-
-  private String uploadImageToS3(MultipartFile image) throws IOException {
-    String originalFilename = image.getOriginalFilename();
-    String extension = Objects.requireNonNull(originalFilename)
-            .substring(originalFilename.lastIndexOf(".") + 1)
-            .toLowerCase();
-
-    String s3FileName = UUID.randomUUID().toString().substring(0, 10) + "_" +
-            originalFilename.replaceAll("[^a-zA-Z0-9._-]", "_");
-
-    try (InputStream is = image.getInputStream()) {
-      PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-              .bucket(bucketName)
-              .key(s3FileName)
-              .contentType("image/" + extension)
-              .build();
-
-      s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(is, image.getSize()));
-    } catch (Exception e) {
-      throw new PutObjectExceptionCode();
-    }
-
-    return s3FileName;
-  }
-
   private ReceiptSaveRequest ocr(MultipartFile image) {
-    String imageUrl = uploadImage(image);
-    String key = getKeyFromImageAddress(imageUrl);
+    String imageUrl = s3Provider.upload(image);
 
-    ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(
-            GetObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(key)
-                    .build()
-    );
+    String key = s3Provider.extractKeyFromUrl(imageUrl);
 
-    ByteArrayResource imageResource = new ByteArrayResource(objectBytes.asByteArray());
+    byte[] imageBytes = s3Provider.getObjectBytes(key);
+    ByteArrayResource imageResource = new ByteArrayResource(imageBytes);
+
     Media media = new Media(MimeType.valueOf(MediaType.IMAGE_JPEG_VALUE), imageResource);
 
     String fullPrompt = """
@@ -287,30 +192,6 @@ public class ReceiptService {
             .entity(ReceiptSaveRequest.class);
   }
 
-  private String getKeyFromImageAddress(String imageAddress) {
-    try {
-      URL url = new URL(imageAddress);
-      return URLDecoder.decode(url.getPath().substring(1), UTF_8);
-    } catch (MalformedURLException e) {
-      throw new OnImageDeleteExceptionCode();
-    }
-  }
-
-  private void validateImageFileExtension(String filename) {
-    String extension = extractExtension(filename).orElseThrow(NoFileExtensionExceptionCode::new);
-    if (!ALLOWED_EXTENSIONS.contains(extension)) {
-      throw new InvalidFileExtensionExceptionCode();
-    }
-  }
-
-  private Optional<String> extractExtension(String filename) {
-    int lastIndexOf = filename.lastIndexOf(".");
-    if (lastIndexOf == -1 || lastIndexOf == filename.length() - 1) {
-      return Optional.empty();
-    }
-    return Optional.of(filename.substring(lastIndexOf + 1).toLowerCase());
-  }
-
   private void validateForbidden(Long memberId, Long receiptMemberId) {
     if (!receiptMemberId.equals(memberId)) {
       throw new DeleteNotForbiddenExceptionCode();
@@ -320,13 +201,7 @@ public class ReceiptService {
   @Transactional(readOnly = true)
   public List<ReceiptGetResponse> getAllReceipts() {
     return receiptRepository.findAll().stream()
-            .map(receipt -> ReceiptGetResponse.builder()
-                    .receiptId(receipt.getId())
-                    .approvalNumber(receipt.getApprovalNumber())
-                    .paymentDate(receipt.getPaymentDate())
-                    .storeAddress(receipt.getStoreAddress())
-                    .totalAmount(receipt.getTotalAmount())
-                    .build())
+            .map(ReceiptGetResponse::from)
             .toList();
   }
 

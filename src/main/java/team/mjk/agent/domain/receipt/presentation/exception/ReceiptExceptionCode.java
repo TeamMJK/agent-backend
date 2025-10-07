@@ -19,7 +19,8 @@ public enum ReceiptExceptionCode implements ExceptionCode {
     DELETE_NOT_FORBIDDEN(FORBIDDEN, "삭제 권한이 없습니다."),
     URL_NOT_FOUND(NOT_FOUND, "url을 찾을 수 없습니다."),
     NOT_FOUND_RECEIPT(NOT_FOUND, "영수증을 찾을 수 없습니다."),
-    UPDATE_NOT_FORBIDDEN(FORBIDDEN, "수정 권한이 없습니다.")
+    UPDATE_NOT_FORBIDDEN(FORBIDDEN, "수정 권한이 없습니다."),
+    ON_IMAGE_DOWNLOAD(INTERNAL_SERVER_ERROR, "S3 이미지 다운로드 중 오류가 발생했습니다."),
     ;
 
     private final HttpStatus status;
