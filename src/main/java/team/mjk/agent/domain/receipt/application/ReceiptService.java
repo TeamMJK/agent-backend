@@ -171,6 +171,11 @@ public class ReceiptService {
     receiptRepository.delete(receipt);
   }
 
+  @Transactional(readOnly = true)
+  public List<Receipt> getReceiptsByCompany(Company company) {
+    return receiptRepository.findAllByCompany(company);
+  }
+
   private ReceiptSaveRequest ocr(MultipartFile image) {
     String imageUrl = s3Provider.upload(image);
 
