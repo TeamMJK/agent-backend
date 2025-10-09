@@ -17,6 +17,8 @@ import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.member.presentation.exception.EmailAlreadyExistsException;
 import team.mjk.agent.domain.member.application.dto.response.MemberSaveResponse;
+import team.mjk.agent.domain.passport.domain.Passport;
+import team.mjk.agent.domain.passport.domain.PassportRepository;
 import team.mjk.agent.global.util.KmsUtil;
 
 @RequiredArgsConstructor
@@ -26,6 +28,7 @@ public class MemberService {
   private final MemberRepository memberRepository;
   private final PasswordEncoder passwordEncoder;
   private final CompanyRepository companyRepository;
+  private final PassportRepository passportRepository;
   private final KmsUtil kmsUtil;
 
   public MemberSaveResponse signUp(MemberSaveServiceRequest request) {
@@ -50,8 +53,6 @@ public class MemberService {
             request.phoneNumber(),
             Gender.valueOf(request.gender()),
             request.birthDate(),
-            request.passportNumber(),
-            request.passportExpireDate(),
             kmsUtil
     );
 
@@ -62,8 +63,9 @@ public class MemberService {
 
   public MemberInfoGetResponse getMemberInfo(Long memberId) {
     Member member = memberRepository.findByMemberId(memberId);
+    Passport passport = passportRepository.findByMemberId(memberId);
 
-    return MemberInfoGetResponse.from(member, kmsUtil);
+    return MemberInfoGetResponse.from(member, passport, kmsUtil);
   }
 
   @Transactional
@@ -77,8 +79,6 @@ public class MemberService {
             request.phoneNumber(),
             Gender.valueOf(request.gender()),
             request.birthDate(),
-            request.passportNumber(),
-            request.passportExpireDate(),
             kmsUtil
     );
 

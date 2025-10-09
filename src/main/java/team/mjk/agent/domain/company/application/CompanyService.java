@@ -21,6 +21,8 @@ import team.mjk.agent.domain.mcp.slack.domain.SlackRepository;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.member.application.dto.response.MemberInfoGetResponse;
+import team.mjk.agent.domain.passport.domain.Passport;
+import team.mjk.agent.domain.passport.domain.PassportRepository;
 import team.mjk.agent.global.util.KmsUtil;
 
 import java.util.List;
@@ -38,6 +40,7 @@ public class CompanyService {
   private final KmsUtil kmsUtil;
   private final CompanyCleanupService companyCleanupService;
   private final CompanyInvitationService companyInvitationService;
+  private final PassportRepository passportRepository;
 
   public CompanyInvitationEmailResponse createInvitationCodeAndSendEmail(
           Long memberId,
@@ -153,11 +156,12 @@ public class CompanyService {
   @Transactional(readOnly = true)
   public CompanyMemberListResponse getMembersInfo(Long memberId) {
     Member member = memberRepository.findByMemberId(memberId);
+    Passport passport = passportRepository.findByMemberId(memberId);
     Company company = member.getValidatedCompany();
 
     List<Member> members = memberRepository.findAllByCompanyId(company.getId());
     List<MemberInfoGetResponse> memberInfoGetResponses = members.stream()
-        .map(m -> MemberInfoGetResponse.from(m, kmsUtil))
+        .map(m -> MemberInfoGetResponse.from(m, passport, kmsUtil))
         .collect(Collectors.toList());
 
     return CompanyMemberListResponse.builder()

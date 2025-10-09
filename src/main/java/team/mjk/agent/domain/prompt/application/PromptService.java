@@ -15,6 +15,8 @@ import team.mjk.agent.domain.hotel.application.HotelService;
 import team.mjk.agent.domain.hotel.dto.AgodaHotelList;
 import team.mjk.agent.domain.hotel.dto.HotelAndMemberInfoResponse;
 import team.mjk.agent.domain.hotel.dto.HotelList;
+import team.mjk.agent.domain.passport.domain.Passport;
+import team.mjk.agent.domain.passport.domain.PassportRepository;
 import team.mjk.agent.domain.vnc.dto.VncResponseList;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
@@ -38,6 +40,7 @@ public class PromptService {
   private final KmsUtil kmsUtil;
   private final FlightService flightService;
   private final HotelService hotelService;
+  private final PassportRepository passportRepository;
 
   public void handleIntegration(Long memberId, PromptRequest request) {
     extractFlight(memberId, request);
@@ -230,7 +233,8 @@ public class PromptService {
 
   private MemberInfoList extractMemberInfo(Long memberId, NameList nameList) {
     Member member = memberRepository.findByMemberId(memberId);
-    MemberInfoGetResponse memberInfoGetResponse = MemberInfoGetResponse.from(member, kmsUtil);
+    Passport passport = passportRepository.findByMemberId(memberId);
+    MemberInfoGetResponse memberInfoGetResponse = MemberInfoGetResponse.from(member, passport, kmsUtil);
     Company company = member.getValidatedCompany();
 
     List<MemberInfoGetResponse> resultList = new ArrayList<>();
@@ -244,7 +248,7 @@ public class PromptService {
       Member findMember = memberRepository.findByNameAndCompany(name, company)
           .orElseThrow(MemberNotFoundException::new);
       System.out.println("name :" + findMember.getName());
-      MemberInfoGetResponse findMemberInfo = MemberInfoGetResponse.from(findMember, kmsUtil);
+      MemberInfoGetResponse findMemberInfo = MemberInfoGetResponse.from(findMember, passport, kmsUtil);
       resultList.add(findMemberInfo);
     }
 

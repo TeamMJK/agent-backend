@@ -17,10 +17,8 @@ public interface MemberJpaRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByEmail(String email);
 
-    @Query("select m from Member m join fetch m.company left join fetch m.passport where m.name = :name and m.company = :company")
     Optional<Member> findByNameAndCompany(String name, Company company);
 
-    @Query("select m from Member m join fetch m.company left join fetch m.passport where m.company.id = :companyId")
     List<Member> findAllByCompanyId(@Param("companyId") Long companyId);
 
     long countByCompanyId(Long companyId);
