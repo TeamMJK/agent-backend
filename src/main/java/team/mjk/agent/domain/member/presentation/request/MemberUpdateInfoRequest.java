@@ -24,13 +24,7 @@ public record MemberUpdateInfoRequest(
         String gender,
 
         @NotNull(message = "생일을 선택해주세요.")
-        String birthDate,
-
-        @NotBlank(message = "여권 번호를 입력해 주세요.")
-        String passportNumber,
-
-        @NotBlank(message = "여권 만료일을 입력해 주세요.")
-        String passportExpireDate
+        String birthDate
 
 ) {
 
@@ -43,8 +37,6 @@ public record MemberUpdateInfoRequest(
                 .phoneNumber(phoneNumber)
                 .gender(gender)
                 .birthDate(birthDate)
-                .passportNumber(passportNumber)
-                .passportExpireDate(passportExpireDate)
                 .build();
     }
 

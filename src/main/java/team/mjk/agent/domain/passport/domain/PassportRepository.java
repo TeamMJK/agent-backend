@@ -4,4 +4,6 @@ public interface PassportRepository {
 
   void save(Passport passport);
 
+  Passport findByMemberId(Long memberId);
+
 }

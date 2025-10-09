@@ -17,11 +17,7 @@ public record MemberUpdateInfoServiceRequest(
 
         String gender,
 
-        String birthDate,
-
-        String passportNumber,
-
-        String passportExpireDate
+        String birthDate
 
 ) {
 }

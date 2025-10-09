@@ -6,7 +6,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.company.presentation.exception.CompanyNotFoundException;
 import team.mjk.agent.domain.member.presentation.exception.EmailOrPasswordNotInvalidException;
-import team.mjk.agent.domain.passport.domain.Passport;
 import team.mjk.agent.global.auth.application.dto.AuthAttributes;
 import team.mjk.agent.global.domain.BaseTimeEntity;
 import team.mjk.agent.global.util.KmsUtil;
@@ -58,10 +57,6 @@ public class Member extends BaseTimeEntity {
     @JoinColumn(name = "company_id")
     private Company company;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "passport_id", unique = true)
-    private Passport passport;
-
     public static Member create(String email, String password) {
         return Member.builder()
                 .email(email)
@@ -94,8 +89,6 @@ public class Member extends BaseTimeEntity {
             String phoneNumber,
             Gender gender,
             String birthDate,
-            String passportNumber,
-            String passportExpireDate,
             KmsUtil kmsUtil
     ) {
         this.name = name;
@@ -104,10 +97,6 @@ public class Member extends BaseTimeEntity {
         this.phoneNumber = kmsUtil.encrypt(phoneNumber);
         this.gender = gender;
         this.birthDate = kmsUtil.encrypt(birthDate);
-        this.passport = Passport.create(
-                kmsUtil.encrypt(passportNumber),
-                kmsUtil.encrypt(passportExpireDate)
-        );
     }
 
     public void saveCompany(Company company) {
@@ -121,8 +110,6 @@ public class Member extends BaseTimeEntity {
             String phoneNumber,
             Gender gender,
             String birthDate,
-            String passportNumber,
-            String passportExpireDate,
             KmsUtil kmsUtil
     ) {
         this.name = name;
@@ -131,10 +118,6 @@ public class Member extends BaseTimeEntity {
         this.phoneNumber = kmsUtil.encrypt(phoneNumber);
         this.gender = gender;
         this.birthDate = kmsUtil.encrypt(birthDate);
-        this.passport.update(
-                kmsUtil.encrypt(passportNumber),
-                kmsUtil.encrypt(passportExpireDate)
-        );
     }
 
     public Company getValidatedCompany() {
