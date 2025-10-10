@@ -53,6 +53,8 @@ public class MemberService {
             request.phoneNumber(),
             Gender.valueOf(request.gender()),
             request.birthDate(),
+            request.passportNumber(),
+            request.passportExpireDate(),
             kmsUtil
     );
 
@@ -63,9 +65,8 @@ public class MemberService {
 
   public MemberInfoGetResponse getMemberInfo(Long memberId) {
     Member member = memberRepository.findByMemberId(memberId);
-    Passport passport = passportRepository.findByMemberId(memberId);
 
-    return MemberInfoGetResponse.from(member, passport, kmsUtil);
+    return MemberInfoGetResponse.from(member, kmsUtil);
   }
 
   @Transactional
@@ -79,6 +80,8 @@ public class MemberService {
             request.phoneNumber(),
             Gender.valueOf(request.gender()),
             request.birthDate(),
+            request.passportNumber(),
+            request.passportExpireDate(),
             kmsUtil
     );
 

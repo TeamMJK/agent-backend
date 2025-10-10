@@ -156,12 +156,11 @@ public class CompanyService {
   @Transactional(readOnly = true)
   public CompanyMemberListResponse getMembersInfo(Long memberId) {
     Member member = memberRepository.findByMemberId(memberId);
-    Passport passport = passportRepository.findByMemberId(memberId);
     Company company = member.getValidatedCompany();
 
     List<Member> members = memberRepository.findAllByCompanyId(company.getId());
     List<MemberInfoGetResponse> memberInfoGetResponses = members.stream()
-        .map(m -> MemberInfoGetResponse.from(m, passport, kmsUtil))
+        .map(m -> MemberInfoGetResponse.from(m, kmsUtil))
         .collect(Collectors.toList());
 
     return CompanyMemberListResponse.builder()

@@ -24,7 +24,11 @@ public record MemberSaveInfoRequest(
         String gender,
 
         @NotNull(message = "생일을 선택해주세요.")
-        String birthDate
+        String birthDate,
+
+        String passportNumber,
+
+        String passportExpireDate
 
 ) {
 
@@ -37,6 +41,8 @@ public record MemberSaveInfoRequest(
                 .phoneNumber(phoneNumber)
                 .gender(gender)
                 .birthDate(birthDate)
+                .passportNumber(passportNumber)
+                .passportExpireDate(passportExpireDate)
                 .build();
     }
 
