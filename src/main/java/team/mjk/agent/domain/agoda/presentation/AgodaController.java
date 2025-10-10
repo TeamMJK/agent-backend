@@ -14,7 +14,7 @@ import team.mjk.agent.global.annotation.MemberId;
 @RequiredArgsConstructor
 @RequestMapping("/agodas")
 @RestController
-public class AgodaController {
+public class AgodaController implements AgodaDocsController {
 
     private final AgodaService agodaService;
 
