@@ -7,17 +7,18 @@ import team.mjk.agent.domain.agoda.presentation.exception.CityCsvFormatException
 import team.mjk.agent.domain.agoda.presentation.exception.CityNotFoundException;
 
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
 public class AgodaCityService {
 
     private final Map<String, String> cityMap = new HashMap<>();
+    private static final String CSV_PATH = "/app/resources/hotels_city_country.csv";
 
     @PostConstruct
     public void init() {
@@ -29,19 +30,13 @@ public class AgodaCityService {
         if (cityId == null) {
             throw new CityNotFoundException();
         }
-
         return cityId;
     }
 
     private void loadCitiesFromCsv() {
-        try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(
-                        Objects.requireNonNull(getClass().getResourceAsStream("/hotels_city_country.csv")),
-                        StandardCharsets.UTF_8))) {
-
+        try (BufferedReader br = Files.newBufferedReader(Path.of(CSV_PATH), StandardCharsets.UTF_8)) {
             br.readLine();
             br.lines().forEach(this::parseAndAddCity);
-
         } catch (Exception e) {
             throw new CityCsvFormatException();
         }
