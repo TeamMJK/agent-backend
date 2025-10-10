@@ -233,8 +233,7 @@ public class PromptService {
 
   private MemberInfoList extractMemberInfo(Long memberId, NameList nameList) {
     Member member = memberRepository.findByMemberId(memberId);
-    Passport passport = passportRepository.findByMemberId(memberId);
-    MemberInfoGetResponse memberInfoGetResponse = MemberInfoGetResponse.from(member, passport, kmsUtil);
+    MemberInfoGetResponse memberInfoGetResponse = MemberInfoGetResponse.from(member, kmsUtil);
     Company company = member.getValidatedCompany();
 
     List<MemberInfoGetResponse> resultList = new ArrayList<>();
@@ -248,7 +247,7 @@ public class PromptService {
       Member findMember = memberRepository.findByNameAndCompany(name, company)
           .orElseThrow(MemberNotFoundException::new);
       System.out.println("name :" + findMember.getName());
-      MemberInfoGetResponse findMemberInfo = MemberInfoGetResponse.from(findMember, passport, kmsUtil);
+      MemberInfoGetResponse findMemberInfo = MemberInfoGetResponse.from(findMember, kmsUtil);
       resultList.add(findMemberInfo);
     }
 
