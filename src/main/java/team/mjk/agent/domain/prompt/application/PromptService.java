@@ -124,6 +124,7 @@ public class PromptService {
             만약 9월 23일부터 4박 5일이면 depart_date = 2025-09-23, return_date = 2025-09-27.
             출장 정보 한 개당 최소 한 명의 이름 필요.
             만약 이름이 출장 정보에 없다면 %s 이름 추가.
+            사용자의 목적지에 행정 구역이 있으면 항상 도시로 변환해.
             프롬프트 요청자로 예상되면 %s 이름 추가.
             문장 :
             %s""",
@@ -197,7 +198,8 @@ public class PromptService {
 
   public AgodaHotelInfo extractAgodaHotelInfo(HotelResult hotelResult) {
     String fullPrompt = String.format("""
-        넌 관광 및 호텔 평가 전문가야. 실시간으로 호텔 정보를 토대로 장단점 및 주변 관광지 추천 및 맛집을 찾아주고 한글로 알려줘.
+        넌 관광 및 호텔 평가 전문가야. 모두 한글로 설명해.
+        실시간으로 호텔 정보를 토대로 장단점 및 주변 관광지 추천 및 맛집을 찾아주고 한글로 알려줘.
         관광지 추천을 할 땐 숙소에서 얼마나 걸리는지도 알려줘.
         맛집을 추천할 땐 네이버에서 현재 존재하는 식당인지 검증하고 추천해줘.
         아래 모든 정보가 확인 가능한 식당만 추천해줘.
