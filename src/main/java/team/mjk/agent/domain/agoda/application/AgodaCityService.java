@@ -18,7 +18,9 @@ import java.util.Map;
 public class AgodaCityService {
 
     private final Map<String, String> cityMap = new HashMap<>();
-    private static final String CSV_PATH = "/app/resources/hotels_city_country.csv";
+    private final Map<String, String> dongMap = new HashMap<>();
+    private static final String CSV_PATH ="/app/resources/hotels_city_country_dong.csv";
+    //private static final String CSV_PATH = "/Users/choemyeongjae/agent-backend/src/main/resources/hotels_city_country_dong.csv";
 
     @PostConstruct
     public void init() {
@@ -26,12 +28,25 @@ public class AgodaCityService {
     }
 
     public String getCityId(String cityName) {
-        String cityId = cityMap.get(cityName);
-        if (cityId == null) {
-            throw new CityNotFoundException();
+        if (cityMap.containsKey(cityName)) {
+            return cityMap.get(cityName);
         }
-        return cityId;
+
+        for (Map.Entry<String, String> entry : cityMap.entrySet()) {
+            if (entry.getKey().contains(cityName)) {
+                return entry.getValue();
+            }
+        }
+
+        for (Map.Entry<String, String> entry : dongMap.entrySet()) {
+            if (entry.getKey().contains(cityName)) {
+                return entry.getValue();
+            }
+        }
+
+        throw new CityNotFoundException();
     }
+
 
     private void loadCitiesFromCsv() {
         try (BufferedReader br = Files.newBufferedReader(Path.of(CSV_PATH), StandardCharsets.UTF_8)) {
@@ -43,13 +58,22 @@ public class AgodaCityService {
     }
 
     private void parseAndAddCity(String line) {
+        if (line == null || line.isBlank()) return;
+
         String[] parts = line.split(",");
         if (parts.length < 4) {
             throw new CityCsvFormatException();
         }
-        String cityName = parts[2].trim();
+
         String cityId = parts[0].trim();
+        String cityName = parts[2].trim();
+
         cityMap.put(cityName, cityId);
+
+        if (parts.length > 4 && !parts[4].isBlank()) {
+            String dong = parts[4].trim();
+            dongMap.put(dong, cityId);
+        }
     }
 
 }
