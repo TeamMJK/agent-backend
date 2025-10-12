@@ -38,5 +38,8 @@ out/
 
 src/main/resources/application-local.yml
 src/main/resources/hotels_city_country.csv
+src/main/resources/logback-spring.xml
+src/main/resources/hotels_city_country_dong.csv
 
 .DS_Store
+
