@@ -7,5 +7,7 @@ public record AgentUrlConfig(
         String hotelAgent,
         String hotelSession,
         String session
-) {}
+) {
+
+}
 
