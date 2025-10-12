@@ -67,7 +67,7 @@ jobs:
             mkdir -p ~/docker/mjk_agent
             cd ~/docker/mjk_agent
 
-            LOG_PATH=/var/log/springboot
+            LOG_PATH=/home/ec2-user/springboot-logs
             sudo mkdir -p $LOG_PATH
             sudo touch $LOG_PATH/debug.log $LOG_PATH/info.log $LOG_PATH/warn.log $LOG_PATH/error.log $LOG_PATH/condole.log
             sudo chmod 755 $LOG_PATH
