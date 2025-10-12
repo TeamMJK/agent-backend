@@ -12,7 +12,7 @@ import team.mjk.agent.domain.review.presentation.request.ReviewSaveRequest;
 @RequiredArgsConstructor
 @RequestMapping("/reviews")
 @RestController
-public class ReviewController {
+public class ReviewController implements ReviewDocsController {
 
     private final ReviewService reviewService;
 
