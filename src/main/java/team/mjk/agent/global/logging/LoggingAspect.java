@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Aspect
@@ -21,8 +22,8 @@ public class LoggingAspect {
     @Pointcut(
             "execution(* team.mjk.agent.domain..presentation.*Controller.*(..)) || " +
                     "execution(* team.mjk.agent.domain..presentation.*.*Controller.*(..)) || " +
-                    "execution(* team.mjk.agent.global..presentation.*Controller.*(..))" +
-                    "execution(* team.mjk.agent.global..presentation.*.*Controller.*(..)) || "
+                    "execution(* team.mjk.agent.global..presentation.*Controller.*(..)) || " +
+                    "execution(* team.mjk.agent.global..presentation.*.*Controller.*(..))"
     )
     private void cut() {}
 
@@ -31,7 +32,9 @@ public class LoggingAspect {
         long startTime = System.currentTimeMillis();
 
         Method method = getMethod(joinPoint);
-        log.info("Method Log: {} || Args: {}", method.getName(), Arrays.toString(joinPoint.getArgs()));
+
+        String maskedArgs = maskArguments(joinPoint.getArgs());
+        log.info("Method Log: {} || Args: {}", method.getName(), maskedArgs);
 
         Object result = joinPoint.proceed();
         long endTime = System.currentTimeMillis();
@@ -53,6 +56,36 @@ public class LoggingAspect {
     private Method getMethod(JoinPoint joinPoint) {
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();
         return signature.getMethod();
+    }
+
+    private String maskArguments(Object[] args) {
+        if (args == null || args.length == 0) {
+            return "[]";
+        }
+
+        return Arrays.stream(args)
+                .map(this::maskValue)
+                .collect(Collectors.joining(", ", "[", "]"));
+    }
+
+    private String maskValue(Object arg) {
+        if (arg == null) return "null";
+
+        if (arg instanceof String) {
+            return maskString((String) arg);
+        }
+
+        if (arg instanceof Number || arg instanceof Boolean || arg.getClass().isPrimitive()) {
+            return "****";
+        }
+
+        return "{" + arg.getClass().getSimpleName() + ":****}";
+    }
+
+    private String maskString(String value) {
+        if (value.isEmpty()) return "";
+        if (value.length() <= 2) return "**";
+        return value.charAt(0) + "****" + value.charAt(value.length() - 1);
     }
 
 }
