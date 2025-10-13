@@ -2,12 +2,14 @@
 
     <property name="LOG_PATH" value="/var/log/springboot" />
 
+    <!-- 콘솔 출력 -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
+    <!-- ERROR 로그 파일 -->
     <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/error.log</file>
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder" />
@@ -22,6 +24,7 @@
         </filter>
     </appender>
 
+    <!-- INFO 로그 파일 -->
     <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/info.log</file>
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder" />
