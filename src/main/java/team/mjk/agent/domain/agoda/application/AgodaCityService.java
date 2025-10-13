@@ -2,6 +2,7 @@ package team.mjk.agent.domain.agoda.application;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import team.mjk.agent.domain.agoda.presentation.exception.CityCsvFormatException;
 import team.mjk.agent.domain.agoda.presentation.exception.CityNotFoundException;
@@ -17,9 +18,11 @@ import java.util.Map;
 @Service
 public class AgodaCityService {
 
+    @Value("${hotel.csv-path}")
+    private String csvPath;
+
     private final Map<String, String> cityMap = new HashMap<>();
     private final Map<String, String> dongMap = new HashMap<>();
-    private static final String CSV_PATH ="/app/resources/hotels_city_country_dong.csv";
 
     @PostConstruct
     public void init() {
@@ -48,7 +51,7 @@ public class AgodaCityService {
 
 
     private void loadCitiesFromCsv() {
-        try (BufferedReader br = Files.newBufferedReader(Path.of(CSV_PATH), StandardCharsets.UTF_8)) {
+        try (BufferedReader br = Files.newBufferedReader(Path.of(csvPath), StandardCharsets.UTF_8)) {
             br.readLine();
             br.lines().forEach(this::parseAndAddCity);
         } catch (Exception e) {
