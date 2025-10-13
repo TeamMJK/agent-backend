@@ -4,22 +4,10 @@
 
     <!-- 콘솔 로그 -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-            <providers>
-                <timestamp />
-                <pattern>
-                    <pattern>
-                        {
-                        "level": "%level",
-                        "thread": "%thread",
-                        "logger": "%logger",
-                        "message": "%message",
-                        "exception": "%ex"
-                        }
-                    </pattern>
-                </pattern>
-            </providers>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
+
     </appender>
 
     <!-- ERROR 파일 로그 -->
