@@ -13,4 +13,4 @@ COPY ${JAR_FILE} app.jar
 ENV TZ=Asia/Seoul
 ENV LOGGING_PATH=/var/log/springboot
 
-ENTRYPOINT ["java","-Dlogging.file.path=/var/log/springboot","-jar","/app.jar"]
+ENTRYPOINT ["java","-jar","/app.jar"]

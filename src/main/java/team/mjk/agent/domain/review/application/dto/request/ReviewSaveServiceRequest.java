@@ -5,6 +5,8 @@ import lombok.Builder;
 @Builder
 public record ReviewSaveServiceRequest(
 
+        Long memberId,
+
         String reviewContent,
 
         int rating
