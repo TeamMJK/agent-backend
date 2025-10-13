@@ -24,6 +24,7 @@ import team.mjk.agent.global.jwt.resolver.JwtTokenResolver;
 import java.io.IOException;
 import java.util.Arrays;
 
+import static org.aspectj.weaver.tools.cache.SimpleCacheFactory.path;
 import static team.mjk.agent.global.jwt.resolver.JwtTokenResolver.ACCESS_TOKEN;
 import static team.mjk.agent.global.jwt.resolver.JwtTokenResolver.REFRESH_TOKEN;
 
@@ -41,6 +42,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
     ) throws ServletException, IOException {
+        if (path.equals("/login") || path.startsWith("/oauth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         processTokenAuthentication(request, response);
         filterChain.doFilter(request, response);
     }
