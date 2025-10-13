@@ -30,7 +30,6 @@ import static team.mjk.agent.global.jwt.resolver.JwtTokenResolver.REFRESH_TOKEN;
 
 @Slf4j
 @RequiredArgsConstructor
-@Component
 public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final JwtTokenResolver jwtTokenResolver;
