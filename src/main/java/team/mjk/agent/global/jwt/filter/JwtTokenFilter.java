@@ -3,7 +3,6 @@ package team.mjk.agent.global.jwt.filter;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +21,7 @@ import team.mjk.agent.global.jwt.injector.TokenInjector;
 import team.mjk.agent.global.jwt.resolver.JwtTokenResolver;
 
 import java.io.IOException;
-import java.util.Arrays;
 
-import static org.aspectj.weaver.tools.cache.SimpleCacheFactory.path;
 import static team.mjk.agent.global.jwt.resolver.JwtTokenResolver.ACCESS_TOKEN;
 import static team.mjk.agent.global.jwt.resolver.JwtTokenResolver.REFRESH_TOKEN;
 
