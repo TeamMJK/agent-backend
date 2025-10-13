@@ -1,7 +1,5 @@
 package team.mjk.agent.domain.agoda.application;
 
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import team.mjk.agent.domain.agoda.dto.request.AgodaHotelRequest;
@@ -10,10 +8,11 @@ import team.mjk.agent.domain.agoda.dto.response.HotelResult;
 import team.mjk.agent.domain.agoda.presentation.exception.HotelInfoNotFoundException;
 import team.mjk.agent.domain.hotel.dto.AgodaHotel;
 import team.mjk.agent.domain.hotel.dto.AgodaHotelList;
-import team.mjk.agent.domain.hotel.dto.Hotel;
-import team.mjk.agent.domain.hotel.dto.HotelList;
-import team.mjk.agent.domain.prompt.dto.request.PromptRequest;
 import team.mjk.agent.domain.prompt.application.PromptService;
+import team.mjk.agent.domain.prompt.dto.request.PromptRequest;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
