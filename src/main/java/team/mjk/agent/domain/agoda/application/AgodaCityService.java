@@ -19,8 +19,7 @@ public class AgodaCityService {
 
     private final Map<String, String> cityMap = new HashMap<>();
     private final Map<String, String> dongMap = new HashMap<>();
-    private static final String CSV_PATH ="/Users/sin-yejun/Desktop/agent-backend/src/main/resources/hotels_city_country_dong.csv";
-    //private static final String CSV_PATH = "/Users/choemyeongjae/agent-backend/src/main/resources/hotels_city_country_dong.csv";
+    private static final String CSV_PATH ="/app/resources/hotels_city_country_dong.csv";
 
     @PostConstruct
     public void init() {
