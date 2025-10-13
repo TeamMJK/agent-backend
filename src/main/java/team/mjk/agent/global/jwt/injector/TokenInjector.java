@@ -32,6 +32,9 @@ public class TokenInjector {
         Cookie cookie = new Cookie(name, value);
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);
+        if (securityProperties.cookie().domain() != null && !securityProperties.cookie().domain().isEmpty()) {
+            cookie.setDomain(securityProperties.cookie().domain());
+        }
         cookie.setHttpOnly(securityProperties.cookie().httpOnly());
         cookie.setDomain(securityProperties.cookie().domain());
         cookie.setSecure(securityProperties.cookie().secure());
@@ -44,6 +47,9 @@ public class TokenInjector {
         Cookie cookie = new Cookie(name, null);
         cookie.setPath("/");
         cookie.setMaxAge(0);
+        if (securityProperties.cookie().domain() != null && !securityProperties.cookie().domain().isEmpty()) {
+            cookie.setDomain(securityProperties.cookie().domain());
+        }
         cookie.setHttpOnly(securityProperties.cookie().httpOnly());
         cookie.setDomain(securityProperties.cookie().domain());
         cookie.setSecure(securityProperties.cookie().secure());
