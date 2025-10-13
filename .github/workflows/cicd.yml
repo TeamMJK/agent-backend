@@ -66,12 +66,6 @@ jobs:
           script: |
             mkdir -p ~/docker/mjk_agent
             cd ~/docker/mjk_agent
-
-            LOG_PATH=/home/ec2-user/springboot-logs
-            sudo mkdir -p $LOG_PATH
-            sudo touch $LOG_PATH/debug.log $LOG_PATH/info.log $LOG_PATH/warn.log $LOG_PATH/error.log $LOG_PATH/condole.log
-            sudo chmod 755 $LOG_PATH
-            sudo chmod 644 $LOG_PATH/*.log
   
             cat <<'EOF' | sudo tee docker-compose-service.yml > /dev/null
             ${{ secrets.DOCKER_COMPOSE_SERVICE_YML }}
