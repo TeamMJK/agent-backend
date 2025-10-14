@@ -22,8 +22,8 @@ public class LoggingAspect {
     @Pointcut(
             "execution(* team.mjk.agent.domain..presentation.*Controller.*(..)) || " +
                     "execution(* team.mjk.agent.domain..presentation.*.*Controller.*(..)) || " +
-                    "execution(* team.mjk.agent.global..presentation.*Controller.*(..)) || " +
-                    "execution(* team.mjk.agent.global..presentation.*.*Controller.*(..))"
+                    "execution(* team.mjk.agent.global.auth.presentation.*Controller.*(..)) || " +
+                    "execution(* team.mjk.agent.global.auth.presentation.*.*Controller.*(..))"
     )
     private void cut() {}
 
