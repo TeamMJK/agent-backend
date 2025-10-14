@@ -12,6 +12,7 @@ import team.mjk.agent.global.auth.dto.request.LoginResultRequest;
 import team.mjk.agent.global.auth.dto.response.LoginResultResponse;
 
 @RequiredArgsConstructor
+@RequestMapping("/auth")
 @RestController
 public class AuthController implements AuthDocsController{
 

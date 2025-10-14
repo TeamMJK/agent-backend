@@ -6,11 +6,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @RequiredArgsConstructor
-@RequestMapping("/login")
+@RequestMapping("/auth")
 @Controller
 public class OauthController implements OauthDocsController {
 
-    @GetMapping
+    @GetMapping("/login")
     public String login() {
         return "redirect:/oauth2/authorization/google";
     }
