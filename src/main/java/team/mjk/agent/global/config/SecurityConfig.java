@@ -42,7 +42,7 @@ public class SecurityConfig {
             "/swagger-ui.html",
             "/v3/api-docs/**",
             "/actuator/**",
-            "login/**",
+            "auth/login/**",
             "oauth2/**",
             "members",
             "emails/**"
