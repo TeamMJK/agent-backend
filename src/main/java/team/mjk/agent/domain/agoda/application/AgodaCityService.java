@@ -1,40 +1,80 @@
 package team.mjk.agent.domain.agoda.application;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import team.mjk.agent.domain.agoda.presentation.exception.CityCsvFormatException;
 import team.mjk.agent.domain.agoda.presentation.exception.CityNotFoundException;
-import team.mjk.agent.domain.agoda.presentation.exception.HotelInfoNotFoundException;
 
-import java.sql.*;
+import java.io.BufferedReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
 public class AgodaCityService {
 
-    @Value("${hotel.db-path}")
-    private String dbPath;
+    @Value("${hotel.csv-path}")
+    private String csvPath;
 
-    public String getCityId(String name) {
-        String query = "SELECT city_id FROM city WHERE city LIKE ? OR (dong IS NOT NULL AND dong LIKE ?) LIMIT 1";
+    private final Map<String, String> cityMap = new HashMap<>();
+    private final Map<String, String> dongMap = new HashMap<>();
 
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
-             PreparedStatement ps = conn.prepareStatement(query)) {
+    @PostConstruct
+    public void init() {
+        loadCitiesFromCsv();
+    }
 
-            String likeQuery = "%" + name + "%";
-            ps.setString(1, likeQuery);
-            ps.setString(2, likeQuery);
+    public String getCityId(String cityName) {
+        if (cityMap.containsKey(cityName)) {
+            return cityMap.get(cityName);
+        }
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getString("city_id");
-                }
+        for (Map.Entry<String, String> entry : cityMap.entrySet()) {
+            if (entry.getKey().contains(cityName)) {
+                return entry.getValue();
             }
+        }
 
-            throw new CityNotFoundException();
+        for (Map.Entry<String, String> entry : dongMap.entrySet()) {
+            if (entry.getKey().contains(cityName)) {
+                return entry.getValue();
+            }
+        }
 
-        } catch (SQLException e) {
-            throw new HotelInfoNotFoundException();
+        throw new CityNotFoundException();
+    }
+
+
+    private void loadCitiesFromCsv() {
+        try (BufferedReader br = Files.newBufferedReader(Path.of(csvPath), StandardCharsets.UTF_8)) {
+            br.readLine();
+            br.lines().forEach(this::parseAndAddCity);
+        } catch (Exception e) {
+            throw new CityCsvFormatException();
+        }
+    }
+
+    private void parseAndAddCity(String line) {
+        if (line == null || line.isBlank()) return;
+
+        String[] parts = line.split(",");
+        if (parts.length < 4) {
+            throw new CityCsvFormatException();
+        }
+
+        String cityId = parts[0].trim();
+        String cityName = parts[2].trim();
+
+        cityMap.put(cityName, cityId);
+
+        if (parts.length > 4 && !parts[4].isBlank()) {
+            String dong = parts[4].trim();
+            dongMap.put(dong, cityId);
         }
     }
 
