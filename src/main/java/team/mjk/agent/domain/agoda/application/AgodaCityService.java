@@ -15,12 +15,11 @@ public class AgodaCityService {
     @Value("${hotel.db-path}")
     private String dbPath;
 
-    @Value("${hotel.city-query}")
-    private String cityQuery;
-
     public String getCityId(String name) {
+        String query = "SELECT city_id FROM city WHERE city LIKE ? OR (dong IS NOT NULL AND dong LIKE ?) LIMIT 1";
+
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
-             PreparedStatement ps = conn.prepareStatement(cityQuery)) {
+             PreparedStatement ps = conn.prepareStatement(query)) {
 
             String likeQuery = "%" + name + "%";
             ps.setString(1, likeQuery);
