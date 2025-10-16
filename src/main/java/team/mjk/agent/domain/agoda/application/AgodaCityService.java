@@ -1,40 +1,28 @@
 package team.mjk.agent.domain.agoda.application;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import team.mjk.agent.domain.agoda.infrastructure.SQLiteDataSourceProvider;
 import team.mjk.agent.domain.agoda.presentation.exception.CityNotFoundException;
-import team.mjk.agent.domain.agoda.presentation.exception.HotelInfoNotFoundException;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @RequiredArgsConstructor
 @Service
 public class AgodaCityService {
 
-    @Value("${hotel.db-path}")
-    private String dbPath;
-
-    private PreparedStatement ps;
-
-    @PostConstruct
-    public void init() {
-        try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
-
-            ps = conn.prepareStatement(
-                    "SELECT rowid FROM city_fts WHERE city MATCH ? OR dong MATCH ? LIMIT 1"
-            );
-
-        } catch (SQLException e) {
-            throw new RuntimeException("DB 초기화 실패", e);
-        }
-    }
+    private final SQLiteDataSourceProvider dataSourceProvider;
 
     public String getCityId(String name) {
-        try {
-            String queryText = name + "*";
+        String queryText = name + "*";
+        String sql = "SELECT rowid FROM city_fts WHERE city MATCH ? OR dong MATCH ? LIMIT 1";
+
+        try (Connection conn = dataSourceProvider.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, queryText);
             ps.setString(2, queryText);
 
@@ -47,7 +35,7 @@ public class AgodaCityService {
             throw new CityNotFoundException();
 
         } catch (SQLException e) {
-            throw new HotelInfoNotFoundException();
+            throw new RuntimeException("DB 쿼리 실행 중 오류 발생", e);
         }
     }
 
