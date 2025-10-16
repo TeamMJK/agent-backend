@@ -1,42 +1,42 @@
 package team.mjk.agent.domain.agoda.application;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import team.mjk.agent.domain.agoda.infrastructure.SQLiteDataSourceProvider;
 import team.mjk.agent.domain.agoda.presentation.exception.CityNotFoundException;
+import team.mjk.agent.domain.agoda.presentation.exception.HotelInfoNotFoundException;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 @RequiredArgsConstructor
 @Service
 public class AgodaCityService {
 
-    private final SQLiteDataSourceProvider dataSourceProvider;
+    @Value("${hotel.db-path}")
+    private String dbPath;
 
     public String getCityId(String name) {
-        String queryText = name + "*";
-        String sql = "SELECT rowid FROM city_fts WHERE city MATCH ? OR dong MATCH ? LIMIT 1";
+        String query = "SELECT city_id FROM city WHERE city LIKE ? OR (dong IS NOT NULL AND dong LIKE ?) LIMIT 1";
 
-        try (Connection conn = dataSourceProvider.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
+             PreparedStatement ps = conn.prepareStatement(query)) {
 
-            ps.setString(1, queryText);
-            ps.setString(2, queryText);
+            String likeQuery = "%" + name + "%";
+            ps.setString(1, likeQuery);
+            ps.setString(2, likeQuery);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getString("rowid");
+                    return rs.getString("city_id");
                 }
             }
 
             throw new CityNotFoundException();
 
         } catch (SQLException e) {
-            throw new RuntimeException("DB 쿼리 실행 중 오류 발생", e);
+            throw new HotelInfoNotFoundException();
         }
     }
 
 }
+
