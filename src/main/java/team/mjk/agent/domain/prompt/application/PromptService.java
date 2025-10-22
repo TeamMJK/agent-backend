@@ -198,44 +198,26 @@ public class PromptService {
     return flightList;
   }
 
-//  public AgodaHotelInfo extractAgodaHotelInfo(HotelResult hotelResult) {
-//    String fullPrompt = String.format("""
-//        넌 관광 및 호텔 평가 전문가야. 모두 한글로 설명해.
-//        실시간으로 호텔 정보를 토대로 장단점 및 주변 관광지 추천 및 맛집을 찾아주고 한글로 알려줘.
-//        관광지 추천을 할 땐 숙소에서 얼마나 걸리는지도 알려줘.
-//        맛집을 추천할 땐 네이버에서 현재 존재하는 식당인지 검증하고 추천해줘.
-//        아래 모든 정보가 확인 가능한 식당만 추천해줘.
-//        아침 식사 시간이랑 브레이크 타임이랑 주문 마감 시간이랑 휴일 같은 것도 검증된 정보를 찾아서 알려줘.
-//        - Advantages
-//        - Disadvantages
-//        - Nearby tourist attractions
-//        - Recommended restaurants
-//
-//        Hotel: %s
-//        """, hotelResult.hotelName());
-//
-//    return chatClient.prompt()
-//        .user(p -> p.text(fullPrompt))
-//        .call()
-//        .entity(AgodaHotelInfo.class);
-//  }
-
-  public CompletableFuture<AgodaHotelInfo> extractAgodaHotelInfo(HotelResult hotelResult) {
+  public AgodaHotelInfo extractAgodaHotelInfo(HotelResult hotelResult) {
     String fullPrompt = String.format("""
-        넌 관광 및 호텔 평가 전문가야. 아래 호텔 정보를 참고해서 각 항목을 한글로 간단히 bullet 형식(앞에 '-' 붙이기)으로 정리해줘.
-            - 장점
-            - 단점
-            - 주변 관광지 (숙소에서 거리 포함)
-            - 추천 맛집 (실제로 존재하는 곳만)
-            Hotel: %s
+        넌 관광 및 호텔 평가 전문가야. 모두 한글로 설명해.
+        실시간으로 호텔 정보를 토대로 장단점 및 주변 관광지 추천 및 맛집을 찾아주고 한글로 알려줘.
+        관광지 추천을 할 땐 숙소에서 얼마나 걸리는지도 알려줘.
+        맛집을 추천할 땐 네이버에서 현재 존재하는 식당인지 검증하고 추천해줘.
+        아래 모든 정보가 확인 가능한 식당만 추천해줘.
+        아침 식사 시간이랑 브레이크 타임이랑 주문 마감 시간이랑 휴일 같은 것도 검증된 정보를 찾아서 알려줘.
+        - Advantages
+        - Disadvantages
+        - Nearby tourist attractions
+        - Recommended restaurants
+
+        Hotel: %s
         """, hotelResult.hotelName());
 
-    return CompletableFuture.supplyAsync(() ->
-            chatClient.prompt()
-                    .user(p -> p.text(fullPrompt))
-                    .call()
-                    .entity(AgodaHotelInfo.class)
-    );
+    return chatClient.prompt()
+        .user(p -> p.text(fullPrompt))
+        .call()
+        .entity(AgodaHotelInfo.class);
   }
 
   private MemberInfoList extractNames(Long memberId, PromptRequest request) {
