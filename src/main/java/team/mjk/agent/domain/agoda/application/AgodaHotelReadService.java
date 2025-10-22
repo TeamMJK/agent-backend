@@ -57,7 +57,7 @@ public class AgodaHotelReadService {
                     .landingURL(r.landingURL())
                     .reviewScore(r.reviewScore())
                     .starRating(r.starRating())
-                    .agodaHotelInfo(promptService.extractAgodaHotelInfo(r).join())
+                    .agodaHotelInfo(promptService.extractAgodaHotelInfo(r))
                     .build()
                 )
                 .toList();
