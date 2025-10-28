@@ -1,6 +1,5 @@
 package team.mjk.agent.global.config;
 
-
 import java.util.concurrent.Executor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Configuration;
