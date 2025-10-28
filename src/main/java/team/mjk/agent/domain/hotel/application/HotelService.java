@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,10 +26,18 @@ public class HotelService {
   private final AgentUrlConfig agentUrlConfig;
   private final MemberRepository memberRepository;
 
+  @Value("${agent.urls.hotel-agent}")
+  private String hotelAgent;
+
+  @Value("${agent.urls.hotel-session}")
+  private String hotelSession;
+
+  @Value("${agent.urls.session}")
+  private String session;
 
   @Async
   public void handleHotel(Long memberId, HotelAndMemberInfoResponse response, VncResponseList list) {
-    String pythonUrlAgent = agentUrlConfig.hotelAgent();
+    String pythonUrlAgent = hotelAgent;
     int index=0;
     for (var hotel : response.hotelList().hotels()) {
       List<MemberInfoGetResponse> matchedMembers = response.memberInfoList()
@@ -74,7 +83,7 @@ public class HotelService {
   @Transactional
   public VncResponseList getHotel(Long memberId, HotelAndMemberInfoResponse response) {
     VncResponseList returnVncResponseList = new VncResponseList(new ArrayList<>());
-    String pythonUrlAgent = agentUrlConfig.hotelSession();
+    String pythonUrlAgent = hotelSession;
 
     for (var hotel : response.hotelList().hotels()) {
       List<MemberInfoGetResponse> matchedMembers = response.memberInfoList()
