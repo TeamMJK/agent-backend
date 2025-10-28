@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
@@ -32,9 +33,12 @@ public class AgentResponseUtil {
   private final AgentUrlConfig agentUrlConfig;
   private final VncCacheService vncCacheService;
 
+  @Value("${agent.urls.session}")
+  private String session;
+
   public void pauseAgent(String sessionId, VncStatus status) {
     String pythonUrlAgent;
-    String baseSessionUrl = agentUrlConfig.session();
+    String baseSessionUrl = session;
 
     if (status.equals(VncStatus.PAUSE)) {
       pythonUrlAgent = baseSessionUrl + "/" + sessionId + "/pause";
