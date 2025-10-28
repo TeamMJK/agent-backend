@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -23,6 +24,7 @@ import team.mjk.agent.domain.vnc.presentation.exception.NotFoundAgentSessionExce
 import team.mjk.agent.domain.vnc.presentation.exception.NullAgentExceptionCode;
 import team.mjk.agent.global.config.AgentUrlConfig;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class AgentResponseUtil {
@@ -50,65 +52,62 @@ public class AgentResponseUtil {
 
     try {
       WebClient http11WebClient = WebClient.builder()
-          .clientConnector(new ReactorClientHttpConnector(
-              HttpClient.create()
-                  .protocol(HttpProtocol.HTTP11)
-          ))
-          .build();
+              .clientConnector(new ReactorClientHttpConnector(
+                      HttpClient.create().protocol(HttpProtocol.HTTP11)
+              ))
+              .build();
 
       http11WebClient.post()
-          .uri(pythonUrlAgent)
-          .accept(MediaType.APPLICATION_JSON)
-          .retrieve()
-          .bodyToMono(String.class)
-          .block();
+              .uri(pythonUrlAgent)
+              .accept(MediaType.APPLICATION_JSON)
+              .retrieve()
+              .bodyToMono(String.class)
+              .block();
     } catch (Exception e) {
+      log.error("세션 중단 요청 실패: {}", e.getMessage());
       throw new NotFoundAgentSessionExceptionCode();
     }
-
   }
 
   public VncResponse agentVnc(String pythonUrl, Map<String, Object> payload) {
     try {
       String jsonPayload = objectMapper.writeValueAsString(payload);
-      System.out.println("JSON으로 변환된 payload: " + jsonPayload);
+      log.info("JSON으로 변환된 payload: {}", jsonPayload);
 
       WebClient http11WebClient = WebClient.builder()
-          .clientConnector(new ReactorClientHttpConnector(
-              HttpClient.create()
-                  .protocol(HttpProtocol.HTTP11)
-          ))
-          .build();
+              .clientConnector(new ReactorClientHttpConnector(
+                      HttpClient.create().protocol(HttpProtocol.HTTP11)
+              ))
+              .build();
 
       String responseResult = http11WebClient.post()
-          .uri(pythonUrl)
-          .contentType(MediaType.APPLICATION_JSON)
-          .bodyValue(jsonPayload)
-          .retrieve()
-          .bodyToMono(String.class)
-          .block();
+              .uri(pythonUrl)
+              .contentType(MediaType.APPLICATION_JSON)
+              .bodyValue(jsonPayload)
+              .retrieve()
+              .bodyToMono(String.class)
+              .block();
 
-      System.out.println("응답 받음: " + responseResult);
+      log.info("응답 받음: {}", responseResult);
 
       if (responseResult != null) {
-        // ObjectMapper로 직접 record 타입 매핑
         VncResponse response = objectMapper.readValue(responseResult, VncResponse.class);
 
-        System.out.println("Session ID: " + response.session_id());
-        System.out.println("NoVNC URL: " + response.novnc_url());
-        System.out.println("Hotel Destination: " + response.vncBusinessInfo().hotel_destination());
-        System.out.println("Booking Dates: " + response.vncBusinessInfo().booking_dates());
-        System.out.println("Guests: " + response.vncBusinessInfo().guests());
-        System.out.println("Budget: " + response.vncBusinessInfo().budget());
+        log.info("Session ID: {}", response.session_id());
+        log.info("NoVNC URL: {}", response.novnc_url());
+        log.info("Hotel Destination: {}", response.vncBusinessInfo().hotel_destination());
+        log.info("Booking Dates: {}", response.vncBusinessInfo().booking_dates());
+        log.info("Guests: {}", response.vncBusinessInfo().guests());
+        log.info("Budget: {}", response.vncBusinessInfo().budget());
 
         return response;
       } else {
-        System.out.println("응답이 null입니다");
+        log.warn("응답이 null입니다");
         return null;
       }
 
     } catch (Exception e) {
-      System.out.println("요청 처리 중 오류: " + e.getMessage());
+      log.error("요청 처리 중 오류: {}", e.getMessage(), e);
       throw new NullAgentExceptionCode();
     }
   }
@@ -116,64 +115,62 @@ public class AgentResponseUtil {
   public void agentResponse(Long memberId, String pythonUrl, Map<String, Object> payload) {
     try {
       String jsonPayload = objectMapper.writeValueAsString(payload);
-      System.out.println("JSON으로 변환된 payload: " + jsonPayload);
+      log.info("JSON으로 변환된 payload: {}", jsonPayload);
 
-      // HTTP/1.1만 사용하는 WebClient 생성
       WebClient http11WebClient = WebClient.builder()
-          .clientConnector(new ReactorClientHttpConnector(
-              HttpClient.create()
-                  .protocol(HttpProtocol.HTTP11)  // HTTP/1.1만 사용
-          ))
-          .build();
+              .clientConnector(new ReactorClientHttpConnector(
+                      HttpClient.create().protocol(HttpProtocol.HTTP11)
+              ))
+              .build();
 
       http11WebClient.post()
-          .uri(pythonUrl)
-          .contentType(MediaType.APPLICATION_JSON)
-          .bodyValue(jsonPayload)
-          .retrieve()
-          .bodyToMono(String.class)
-          .subscribe(responseResult -> {
-            String sessionId = null;
-            System.out.println("응답 받음: " + responseResult);
-            try {
-              JsonNode rootNode = objectMapper.readTree(responseResult);
-              JsonNode detailNode = rootNode.get("detail");
-              JsonNode sessionIdNode = rootNode.get("sessionId");
-              sessionId = sessionIdNode.asText();
+              .uri(pythonUrl)
+              .contentType(MediaType.APPLICATION_JSON)
+              .bodyValue(jsonPayload)
+              .retrieve()
+              .bodyToMono(String.class)
+              .subscribe(responseResult -> {
+                String sessionId = null;
+                log.info("응답 받음: {}", responseResult);
+                try {
+                  JsonNode rootNode = objectMapper.readTree(responseResult);
+                  JsonNode detailNode = rootNode.get("detail");
+                  JsonNode sessionIdNode = rootNode.get("sessionId");
+                  sessionId = sessionIdNode != null ? sessionIdNode.asText() : null;
 
-              if (detailNode != null) {
-                String detailJson = detailNode.toString();
-                System.out.println("result :" + responseResult);
-                BusinessTripAgentRequest agentRequest = objectMapper.readValue(detailJson, BusinessTripAgentRequest.class);
-                System.out.println("names" + agentRequest.names());
-                businessTripService.saveAgentMcp(memberId, agentRequest);
-              } else {
-                System.out.println("ERROR: detailNode is null in response: " + responseResult);
-              }
-            } catch (JsonProcessingException e) {
-              throw new FailAgentExceptionCode();
-            } finally {
-              if (sessionId != null) {
-                vncCacheService.updateVncStatus(memberId, sessionId, VncStatus.END);
-              }
-            }
-          }, error -> {
-            System.out.println("WebClient error: " + error.getMessage());
-            try {
-              JsonNode rootNode = objectMapper.readTree(error.getMessage());
-              JsonNode sessionIdNode = rootNode.get("sessionId");
-              if (sessionIdNode != null) {
-                String sessionId = sessionIdNode.asText();
-                vncCacheService.updateVncStatus(memberId, sessionId, VncStatus.END);
-              }
-            } catch (JsonProcessingException ex) {
-              ex.printStackTrace();
-            }
-          });
+                  if (detailNode != null) {
+                    String detailJson = detailNode.toString();
+                    log.info("result: {}", responseResult);
+                    BusinessTripAgentRequest agentRequest = objectMapper.readValue(detailJson, BusinessTripAgentRequest.class);
+                    log.info("names: {}", agentRequest.names());
+                    businessTripService.saveAgentMcp(memberId, agentRequest);
+                  } else {
+                    log.warn("ERROR: detailNode is null in response: {}", responseResult);
+                  }
+                } catch (JsonProcessingException e) {
+                  log.error("JSON 파싱 오류: {}", e.getMessage(), e);
+                  throw new FailAgentExceptionCode();
+                } finally {
+                  if (sessionId != null) {
+                    vncCacheService.updateVncStatus(memberId, sessionId, VncStatus.END);
+                  }
+                }
+              }, error -> {
+                log.error("WebClient error: {}", error.getMessage(), error);
+                try {
+                  JsonNode rootNode = objectMapper.readTree(error.getMessage());
+                  JsonNode sessionIdNode = rootNode.get("sessionId");
+                  if (sessionIdNode != null) {
+                    String sessionId = sessionIdNode.asText();
+                    vncCacheService.updateVncStatus(memberId, sessionId, VncStatus.END);
+                  }
+                } catch (JsonProcessingException ex) {
+                  log.error("에러 메시지 JSON 파싱 실패: {}", ex.getMessage(), ex);
+                }
+              });
 
     } catch (JsonProcessingException e) {
-      System.out.println("JSON 변환 실패: " + e.getMessage());
+      log.error("JSON 변환 실패: {}", e.getMessage(), e);
     }
   }
-
 }
