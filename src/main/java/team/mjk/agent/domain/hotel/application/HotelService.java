@@ -3,7 +3,11 @@ package team.mjk.agent.domain.hotel.application;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -17,6 +21,7 @@ import team.mjk.agent.domain.member.application.dto.response.MemberInfoGetRespon
 import team.mjk.agent.global.config.AgentUrlConfig;
 import team.mjk.agent.global.util.AgentResponseUtil;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HotelService {
@@ -25,6 +30,7 @@ public class HotelService {
   private final VncCacheService vncCacheService;
   private final AgentUrlConfig agentUrlConfig;
   private final MemberRepository memberRepository;
+  private final ObjectMapper objectMapper;
 
   @Value("${agent.urls.hotel-agent}")
   private String hotelAgent;
@@ -81,7 +87,7 @@ public class HotelService {
   }
 
   @Transactional
-  public VncResponseList getHotel(Long memberId, HotelAndMemberInfoResponse response) {
+  public VncResponseList getHotel(Long memberId, HotelAndMemberInfoResponse response) throws JsonProcessingException {
     VncResponseList returnVncResponseList = new VncResponseList(new ArrayList<>());
     String pythonUrlAgent = hotelSession;
 
@@ -121,7 +127,6 @@ public class HotelService {
         VncResponse vncResponse = agentResponseUtil.agentVnc(pythonUrlAgent, payload);
 
         vncCacheService.saveVnc(memberId, vncResponse);
-
         returnVncResponseList.vncResponseList().add(vncResponse);
       }
     }
