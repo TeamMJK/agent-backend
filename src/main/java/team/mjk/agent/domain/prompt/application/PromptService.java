@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 import team.mjk.agent.domain.agoda.dto.request.AgodaHotelInfo;
@@ -33,6 +35,7 @@ import team.mjk.agent.domain.prompt.presentation.exception.EmptyDepartureExcepti
 import team.mjk.agent.domain.prompt.presentation.exception.EmptyDestinationException;
 import team.mjk.agent.global.util.KmsUtil;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class PromptService {
@@ -44,16 +47,17 @@ public class PromptService {
   private final HotelService hotelService;
   private final PassportRepository passportRepository;
 
-  public void handleIntegration(Long memberId, PromptRequest request) {
+  public void handleIntegration(Long memberId, PromptRequest request) throws JsonProcessingException {
     extractFlight(memberId, request);
     extractHotel(memberId, request);
   }
 
-  public VncResponseList extractHotel(Long memberId, PromptRequest request) {
+  public VncResponseList extractHotel(Long memberId, PromptRequest request) throws JsonProcessingException {
     HotelList hotelList = extractHotelInfo(memberId, request);
     MemberInfoList memberInfoList = extractNames(memberId, request);
 
     HotelAndMemberInfoResponse response = new HotelAndMemberInfoResponse(hotelList, memberInfoList);
+
     VncResponseList result = hotelService.getHotel(memberId, response);
     hotelService.handleHotel(memberId, response, result);
     return result;

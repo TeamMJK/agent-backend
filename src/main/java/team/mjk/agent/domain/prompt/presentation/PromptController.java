@@ -1,5 +1,6 @@
 package team.mjk.agent.domain.prompt.presentation;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,7 @@ public class PromptController {
   public ResponseEntity<VncResponseList> extractHotelPrompt(
       @MemberId Long memberId,
       @Valid @RequestBody PromptRequest request
-  ) {
+  ) throws JsonProcessingException {
     VncResponseList response = promptService.extractHotel(memberId, request);
 
     return new ResponseEntity<>(response,HttpStatus.OK);
@@ -43,7 +44,7 @@ public class PromptController {
   public void extractIntegration(
       @MemberId Long memberId,
       @Valid @RequestBody PromptRequest request
-  ) {
+  ) throws JsonProcessingException {
     promptService.handleIntegration(memberId, request);
   }
 
