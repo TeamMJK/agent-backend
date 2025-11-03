@@ -41,7 +41,7 @@ public class HotelService {
   @Value("${agent.urls.session}")
   private String session;
 
-//  @Async
+  @Async
   public void handleHotel(Long memberId, HotelAndMemberInfoResponse response, VncResponseList list) {
     String pythonUrlAgent = hotelAgent;
     int index=0;
