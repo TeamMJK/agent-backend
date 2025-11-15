@@ -3,9 +3,10 @@ package team.mjk.agent.domain.email.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import team.mjk.agent.domain.email.dto.request.SendEmailRequest;
-import team.mjk.agent.domain.email.dto.response.SendEmailResponse;
-import team.mjk.agent.domain.email.dto.response.VerifyEmailResponse;
+import team.mjk.agent.domain.email.application.dto.request.SendEmailServiceRequest;
+import team.mjk.agent.domain.email.application.dto.request.VerifyEmailServiceRequest;
+import team.mjk.agent.domain.email.application.dto.response.SendEmailResponse;
+import team.mjk.agent.domain.email.application.dto.response.VerifyEmailResponse;
 import team.mjk.agent.domain.email.infrastructure.EmailSender;
 import team.mjk.agent.domain.email.presentation.exception.InvalidCodeException;
 import team.mjk.agent.global.util.AuthCodeGenerator;
@@ -23,7 +24,7 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String senderEmail;
 
-    public SendEmailResponse sendAuthEmail(SendEmailRequest request) {
+    public SendEmailResponse sendAuthEmail(SendEmailServiceRequest request) {
         String code = codeGenerator.generateCode(6);
         String subject = messageBuilder.buildAuthSubject();
         String content = messageBuilder.buildAuthMessage(code);
@@ -37,14 +38,14 @@ public class EmailService {
                 .build();
     }
 
-    public VerifyEmailResponse verifyAuthCode(String email, String code) {
-        boolean isValid = authCodeService.validateAuthCode(email, code);
+    public VerifyEmailResponse verifyAuthCode(VerifyEmailServiceRequest request) {
+        boolean isValid = authCodeService.validateAuthCode(request.email(), request.code());
 
         if (!isValid) {
             throw new InvalidCodeException();
         }
 
-        authCodeService.deleteAuthCode(code);
+        authCodeService.deleteAuthCode(request.code());
 
         return VerifyEmailResponse.builder()
                 .success(true)

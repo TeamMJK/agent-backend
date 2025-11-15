@@ -1,8 +1,11 @@
-package team.mjk.agent.domain.email.dto.request;
+package team.mjk.agent.domain.email.presentation.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
+import team.mjk.agent.domain.email.application.dto.request.VerifyEmailServiceRequest;
 
+@Builder
 public record VerifyEmailRequest(
 
         @Email(message = "유효한 이메일 형식이어야 합니다.")
@@ -13,4 +16,12 @@ public record VerifyEmailRequest(
         String code
 
 ) {
+
+    public VerifyEmailServiceRequest toServiceRequest() {
+        return VerifyEmailServiceRequest.builder()
+                .email(email)
+                .code(code)
+                .build();
+    }
+
 }
