@@ -7,10 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import team.mjk.agent.domain.email.dto.request.SendEmailRequest;
-import team.mjk.agent.domain.email.dto.request.VerifyEmailRequest;
-import team.mjk.agent.domain.email.dto.response.SendEmailResponse;
-import team.mjk.agent.domain.email.dto.response.VerifyEmailResponse;
+import team.mjk.agent.domain.email.application.dto.response.SendEmailResponse;
+import team.mjk.agent.domain.email.application.dto.response.VerifyEmailResponse;
+import team.mjk.agent.domain.email.presentation.request.SendEmailRequest;
+import team.mjk.agent.domain.email.presentation.request.VerifyEmailRequest;
 
 @Tag(name = "Email", description = "이메일 인증 관련 API")
 @RequestMapping("/emails")

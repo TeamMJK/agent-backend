@@ -1,4 +1,4 @@
-package team.mjk.agent.domain.email.dto.response;
+package team.mjk.agent.domain.email.application.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;

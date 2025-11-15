@@ -5,10 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import team.mjk.agent.domain.email.application.EmailService;
-import team.mjk.agent.domain.email.dto.request.SendEmailRequest;
-import team.mjk.agent.domain.email.dto.request.VerifyEmailRequest;
-import team.mjk.agent.domain.email.dto.response.SendEmailResponse;
-import team.mjk.agent.domain.email.dto.response.VerifyEmailResponse;
+import team.mjk.agent.domain.email.application.dto.response.SendEmailResponse;
+import team.mjk.agent.domain.email.application.dto.response.VerifyEmailResponse;
+import team.mjk.agent.domain.email.presentation.request.SendEmailRequest;
+import team.mjk.agent.domain.email.presentation.request.VerifyEmailRequest;
 
 @RequiredArgsConstructor
 @RequestMapping("/emails")
@@ -21,7 +21,7 @@ public class EmailController implements EmailDocsController {
     public ResponseEntity<SendEmailResponse> sendAuthEmail(
             @Valid @RequestBody SendEmailRequest request
     ) {
-        SendEmailResponse response = emailService.sendAuthEmail(request);
+        SendEmailResponse response = emailService.sendAuthEmail(request.toServiceRequest());
         return ResponseEntity.ok(response);
     }
 
@@ -29,7 +29,7 @@ public class EmailController implements EmailDocsController {
     public ResponseEntity<VerifyEmailResponse> verifyAuthCode(
             @Valid @RequestBody VerifyEmailRequest request
     ) {
-        VerifyEmailResponse response = emailService.verifyAuthCode(request.email(), request.code());
+        VerifyEmailResponse response = emailService.verifyAuthCode(request.toServiceRequest());
         return ResponseEntity.ok(response);
     }
 
