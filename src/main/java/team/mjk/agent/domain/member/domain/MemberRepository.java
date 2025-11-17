@@ -2,7 +2,10 @@ package team.mjk.agent.domain.member.domain;
 
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.data.repository.query.Param;
 import team.mjk.agent.domain.company.domain.Company;
+import team.mjk.agent.domain.member.application.dto.response.MemberInfoGetResponse;
 
 public interface MemberRepository {
 
@@ -17,6 +20,8 @@ public interface MemberRepository {
     Optional<Member> findByNameAndCompany(String name, Company company);
 
     List<Member> findAllByCompanyId(Long companyId);
+
+    List<MemberInfoGetResponse> findAllMemberInfoByCompanyId(Long companyId);
 
     void delete(Long memberId);
 
