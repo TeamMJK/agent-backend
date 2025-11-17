@@ -18,18 +18,18 @@ public record MemberGetInfoResponse2(
         String passportExpireDate
 ) {
 
-    public static MemberGetInfoResponse2 from(Member member, KmsUtil kmsUtil) {
-        return MemberGetInfoResponse2.builder()
-                .name(member.getName())
-                .firstName(kmsUtil.decrypt(member.getFirstName()))
-                .lastName(kmsUtil.decrypt(member.getLastName()))
-                .email(member.getEmail())
-                .phoneNumber(kmsUtil.decrypt(member.getPhoneNumber()))
-                .gender(member.getGender())
-                .birthDate(kmsUtil.decrypt(member.getBirthDate()))
-                .passportNumber(kmsUtil.decrypt(member.getPassport().getPassportNumber()))
-                .passportExpireDate(kmsUtil.decrypt(member.getPassport().getPassportExpireDate()))
-                .build();
+    public static MemberGetInfoResponse2 from(MemberGetInfoResponse2 rawDto, KmsUtil kmsUtil) {
+        return new MemberGetInfoResponse2(
+                rawDto.name(),
+                rawDto.email(),
+                kmsUtil.decrypt(rawDto.firstName()),
+                kmsUtil.decrypt(rawDto.lastName()),
+                kmsUtil.decrypt(rawDto.phoneNumber()),
+                rawDto.gender(),
+                kmsUtil.decrypt(rawDto.birthDate()),
+                kmsUtil.decrypt(rawDto.passportNumber()),
+                kmsUtil.decrypt(rawDto.passportExpireDate())
+        );
     }
 
 }
