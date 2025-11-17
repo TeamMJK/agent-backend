@@ -23,7 +23,7 @@ public interface MemberJpaRepository extends JpaRepository<Member, Long> {
     List<Member> findAllByCompanyId(@Param("companyId") Long companyId);
 
     @Query("select new team.mjk.agent.domain.member.application.dto.response.MemberInfoGetResponse(" +
-            "m.name, m.email, m.firstName, m.lastName, m.phoneNumber, m.birthDate, " +
+            "m.name, m.email, m.firstName, m.lastName, m.phoneNumber, m.gender, m.birthDate, " +
             "p.passportNumber, p.passportExpireDate) " +
             "from Member m " +
             "join m.company c " +
