@@ -19,6 +19,7 @@ import team.mjk.agent.domain.mcp.notion.domain.Notion;
 import team.mjk.agent.domain.mcp.notion.domain.NotionRepository;
 import team.mjk.agent.domain.mcp.slack.domain.Slack;
 import team.mjk.agent.domain.mcp.slack.domain.SlackRepository;
+import team.mjk.agent.domain.member.application.dto.response.MemberGetInfoResponse2;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.member.application.dto.response.MemberInfoGetResponse;
@@ -174,10 +175,10 @@ public class CompanyService {
 
 
     log.info("===== [4] MemberInfo 매핑 시작 - 여기서 N+1 문제 발생 =====");
-    List<MemberInfoGetResponse> memberInfoGetResponses = members.stream()
+    List<MemberGetInfoResponse2> memberInfoGetResponses = members.stream()
             .map(m -> {
               log.info("[Lazy Loading] Member(id: {}) 연관 엔티티 접근 -> 추가 쿼리 발생", m.getId());
-              return MemberInfoGetResponse.from(m, kmsUtil);
+              return MemberGetInfoResponse2.from(m, kmsUtil);
             })
             .collect(Collectors.toList());
     log.info("===== [4] MemberInfo 매핑 완료. (총 {}개의 Lazy 추가 쿼리 발생) =====\n", members.size());
@@ -186,7 +187,7 @@ public class CompanyService {
     log.info("===== [5] 최종 응답 생성 완료 =====");
 
     return CompanyMemberListResponse.builder()
-            .members(memberInfoGetResponses)
+            .members2(memberInfoGetResponses)
             .build();
   }
 

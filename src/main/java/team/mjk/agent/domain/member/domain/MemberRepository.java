@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.repository.query.Param;
 import team.mjk.agent.domain.company.domain.Company;
+import team.mjk.agent.domain.member.application.dto.response.MemberGetInfoResponse2;
 import team.mjk.agent.domain.member.application.dto.response.MemberInfoGetResponse;
 
 public interface MemberRepository {
@@ -21,7 +22,7 @@ public interface MemberRepository {
 
     List<Member> findAllByCompanyId(Long companyId);
 
-    List<MemberInfoGetResponse> findAllMemberInfoByCompanyId(Long companyId);
+    List<MemberGetInfoResponse2> findAllMemberInfoByCompanyId(Long companyId);
 
     void delete(Long memberId);
 
