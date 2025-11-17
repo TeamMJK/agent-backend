@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import team.mjk.agent.domain.company.domain.Company;
+import team.mjk.agent.domain.member.application.dto.response.MemberGetInfoResponse2;
 import team.mjk.agent.domain.member.application.dto.response.MemberInfoGetResponse;
 import team.mjk.agent.domain.member.domain.Member;
 
@@ -22,14 +23,14 @@ public interface MemberJpaRepository extends JpaRepository<Member, Long> {
 
     List<Member> findAllByCompanyId(@Param("companyId") Long companyId);
 
-    @Query("select new team.mjk.agent.domain.member.application.dto.response.MemberInfoGetResponse(" +
+    @Query("select new team.mjk.agent.domain.member.application.dto.response.MemberGetInfoResponse2(" +
             "m.name, m.email, m.firstName, m.lastName, m.phoneNumber, m.gender, m.birthDate, " +
             "p.passportNumber, p.passportExpireDate) " +
             "from Member m " +
             "join m.company c " +
             "left join m.passport p " +
             "where c.id = :companyId")
-    List<MemberInfoGetResponse> findAllMemberInfoByCompanyId(@Param("companyId") Long companyId);
+    List<MemberGetInfoResponse2> findAllMemberInfoByCompanyId(@Param("companyId") Long companyId);
 
     long countByCompanyId(Long companyId);
 
