@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import team.mjk.agent.domain.company.domain.Company;
+import team.mjk.agent.domain.member.application.dto.response.MemberInfoGetResponse;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
 
@@ -45,6 +46,11 @@ public class MemberRepositoryImpl implements MemberRepository {
   @Override
   public List<Member> findAllByCompanyId(Long companyId) {
     return memberJpaRepository.findAllByCompanyId(companyId);
+  }
+
+  @Override
+  public List<MemberInfoGetResponse> findAllMemberInfoByCompanyId(Long companyId) {
+    return memberJpaRepository.findAllMemberInfoByCompanyId(companyId);
   }
 
   @Override
