@@ -11,7 +11,7 @@ public record MemberInfoGetResponse(
     String firstName,
     String lastName,
     String phoneNumber,
-    String gender,
+//    String gender,
     String birthDate,
     String passportNumber,
     String passportExpireDate
@@ -24,7 +24,7 @@ public record MemberInfoGetResponse(
                 .lastName(kmsUtil.decrypt(member.getLastName()))
                 .email(member.getEmail())
                 .phoneNumber(kmsUtil.decrypt(member.getPhoneNumber()))
-                .gender(member.getGender().name())
+//                .gender(member.getGender().name())
                 .birthDate(kmsUtil.decrypt(member.getBirthDate()))
                 .passportNumber(kmsUtil.decrypt(member.getPassport().getPassportNumber()))
                 .passportExpireDate(kmsUtil.decrypt(member.getPassport().getPassportExpireDate()))
