@@ -1,6 +1,7 @@
 package team.mjk.agent.domain.company.application;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.mjk.agent.domain.company.domain.Company;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class CompanyService {
@@ -155,17 +157,37 @@ public class CompanyService {
 
   @Transactional(readOnly = true)
   public CompanyMemberListResponse getMembersInfo(Long memberId) {
-    Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getValidatedCompany();
 
+    log.info("===== [1] Member 단건 조회 시작 =====");
+    Member member = memberRepository.findByMemberId(memberId);
+    log.info("===== [1] Member 조회 완료. (쿼리 1회 발생) =====\n");
+
+
+    log.info("===== [2] Company Lazy 조회 시작 =====");
+    Company company = member.getValidatedCompany();
+    log.info("===== [2] Company Lazy 조회 완료. (쿼리 1회 발생) =====\n");
+
+
+    log.info("===== [3] Company 소속 Member 리스트 조회 시작 =====");
     List<Member> members = memberRepository.findAllByCompanyId(company.getId());
+    log.info("===== [3] Member 리스트 조회 완료. (쿼리 1회 발생) =====\n");
+
+
+    log.info("===== [4] MemberInfo 매핑 시작 - 여기서 N+1 문제 발생 =====");
     List<MemberInfoGetResponse> memberInfoGetResponses = members.stream()
-        .map(m -> MemberInfoGetResponse.from(m, kmsUtil))
-        .collect(Collectors.toList());
+            .map(m -> {
+              log.info("[Lazy Loading] Member(id: {}) 연관 엔티티 접근 -> 추가 쿼리 발생", m.getId());
+              return MemberInfoGetResponse.from(m, kmsUtil);
+            })
+            .collect(Collectors.toList());
+    log.info("===== [4] MemberInfo 매핑 완료. (총 {}개의 Lazy 추가 쿼리 발생) =====\n", members.size());
+
+
+    log.info("===== [5] 최종 응답 생성 완료 =====");
 
     return CompanyMemberListResponse.builder()
-        .members(memberInfoGetResponses)
-        .build();
+            .members(memberInfoGetResponses)
+            .build();
   }
 
 }
