@@ -54,7 +54,7 @@ public class Member extends BaseTimeEntity {
     @Enumerated(STRING)
     private LoginProvider loginProvider;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "passport_id", unique = true)
     private Passport passport;
 
