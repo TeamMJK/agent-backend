@@ -1,4 +1,4 @@
-package team.mjk.agent.domain.member.application.usecase;
+package team.mjk.agent.domain.member.application.query;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,7 +10,7 @@ import team.mjk.agent.global.util.KmsUtil;
 
 @RequiredArgsConstructor
 @Service
-public class MemberGetInfoUseCase {
+public class MemberQueryService {
 
     private final MemberRepository memberRepository;
     private final KmsUtil kmsUtil;
@@ -23,4 +23,3 @@ public class MemberGetInfoUseCase {
     }
 
 }
-
