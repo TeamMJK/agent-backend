@@ -17,7 +17,7 @@ import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetAllRespons
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetResponse;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripSaveResponse;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripUpdateResponse;
-import team.mjk.agent.domain.company.domain.Workspace;
+import team.mjk.agent.domain.companyworkspace.domain.Workspace;
 
 @Tag(name = "BusinessTrip", description = "출장 관련 API")
 @RequestMapping("/business-trips")

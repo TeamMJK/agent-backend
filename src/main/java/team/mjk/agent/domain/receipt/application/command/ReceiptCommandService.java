@@ -11,7 +11,8 @@ import org.springframework.util.MimeType;
 import org.springframework.web.multipart.MultipartFile;
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.company.domain.CompanyRepository;
-import team.mjk.agent.domain.company.domain.Workspace;
+import team.mjk.agent.domain.companyworkspace.application.query.CompanyWorkspaceQueryService;
+import team.mjk.agent.domain.companyworkspace.domain.Workspace;
 import team.mjk.agent.domain.mcp.McpService;
 import team.mjk.agent.domain.mcp.McpServiceRegistry;
 import team.mjk.agent.domain.member.domain.Member;
@@ -42,6 +43,7 @@ public class ReceiptCommandService {
     private final ChatClient chatClient;
     private final McpServiceRegistry registry;
     private final S3Provider s3Provider;
+    private final CompanyWorkspaceQueryService companyWorkspaceQueryService;
 
     @Transactional
     public ReceiptSaveResponse saveReceipt(
@@ -105,7 +107,7 @@ public class ReceiptCommandService {
         Member member = memberRepository.findByMemberId(memberId);
         Company company = member.getValidatedCompany();
 
-        List<Workspace> workspaces = company.getWorkspace();
+        List<Workspace> workspaces = companyWorkspaceQueryService.getWorkspacesByCompanyId(company.getId());
 
         String imageUrl = s3Provider.upload(file);
         ReceiptSaveRequest request = ocr(file);
@@ -125,7 +127,7 @@ public class ReceiptCommandService {
             }
         }
 
-        return company.getWorkspace();
+        return workspaces;
     }
 
     @Transactional

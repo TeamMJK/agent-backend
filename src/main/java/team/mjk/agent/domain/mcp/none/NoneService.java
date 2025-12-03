@@ -9,7 +9,7 @@ import team.mjk.agent.domain.businessTrip.domain.ServiceType;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
 import team.mjk.agent.domain.company.domain.Company;
-import team.mjk.agent.domain.company.domain.Workspace;
+import team.mjk.agent.domain.companyworkspace.domain.Workspace;
 import team.mjk.agent.domain.mcp.McpService;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.receipt.domain.Receipt;

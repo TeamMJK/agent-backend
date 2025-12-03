@@ -13,7 +13,8 @@ import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetResponse;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripSaveResponse;
 import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripUpdateResponse;
 import team.mjk.agent.domain.company.domain.Company;
-import team.mjk.agent.domain.company.domain.Workspace;
+import team.mjk.agent.domain.companyworkspace.application.query.CompanyWorkspaceQueryService;
+import team.mjk.agent.domain.companyworkspace.domain.Workspace;
 import team.mjk.agent.domain.mcp.McpService;
 import team.mjk.agent.domain.mcp.McpServiceRegistry;
 import team.mjk.agent.domain.member.domain.Member;
@@ -27,6 +28,7 @@ public class BusinessTripService {
 
   private final MemberRepository memberRepository;
   private final BusinessTripRepository businessTripRepository;
+  private final CompanyWorkspaceQueryService companyWorkspaceQueryService;
   private final McpServiceRegistry registry;
 
   //사용자 직접 저장 메서드
@@ -56,7 +58,7 @@ public class BusinessTripService {
   public List<Workspace> saveMcp(Long memberId, BusinessTripSaveRequest request) {
     Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getValidatedCompany();
-    List<Workspace> workspaces = company.getWorkspace();
+    List<Workspace> workspaces = companyWorkspaceQueryService.getWorkspacesByCompanyId(company.getId());
 
     for (Workspace workspace : workspaces) {
       List<McpService> mcpServices = registry.getServices(workspace);
@@ -65,7 +67,7 @@ public class BusinessTripService {
       }
     }
 
-    return company.getWorkspace();
+    return workspaces;
   }
 
   //Agent(저장) -> saveAgentMcp 호출 -> save 호출
@@ -73,7 +75,7 @@ public class BusinessTripService {
   public void saveAgentMcp(Long memberId, BusinessTripAgentRequest request) {
     Member member = memberRepository.findByMemberId(memberId);
     Company company = member.getValidatedCompany();
-    List<Workspace> workspaces = company.getWorkspace();
+    List<Workspace> workspaces = companyWorkspaceQueryService.getWorkspacesByCompanyId(company.getId());
 
     for (Workspace workspace : workspaces) {
       List<McpService> mcpServices = registry.getServices(workspace);
