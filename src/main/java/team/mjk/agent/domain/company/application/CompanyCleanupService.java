@@ -9,12 +9,15 @@ import team.mjk.agent.domain.mcp.notion.domain.NotionRepository;
 import team.mjk.agent.domain.mcp.slack.domain.SlackRepository;
 import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.receipt.application.ReceiptService;
+import team.mjk.agent.domain.receipt.application.command.ReceiptCommandService;
+import team.mjk.agent.domain.receipt.application.query.ReceiptQueryService;
 
 @RequiredArgsConstructor
 @Service
 public class CompanyCleanupService {
 
-    private final ReceiptService receiptService;
+    private final ReceiptCommandService receiptCommandService;
+    private final ReceiptQueryService receiptQueryService;
     private final BusinessTripRepository businessTripRepository;
     private final MemberRepository memberRepository;
     private final NotionRepository notionRepository;
@@ -22,8 +25,8 @@ public class CompanyCleanupService {
 
     @Transactional
     public void cleanupCompany(Company company, Long memberId) {
-        receiptService.getReceiptsByCompany(company)
-                .forEach(receipt -> receiptService.deleteReceipt(memberId, receipt.getId()));
+        receiptQueryService.getReceiptsByCompany(company)
+                .forEach(receipt -> receiptCommandService.deleteReceipt(memberId, receipt.getId()));
         businessTripRepository.deleteAllByCompanyId(company.getId());
         notionRepository.deleteAllByCompanyId(company.getId());
         slackRepository.deleteAllByCompanyId(company.getId());
