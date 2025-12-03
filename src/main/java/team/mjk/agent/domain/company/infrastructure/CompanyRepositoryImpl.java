@@ -12,9 +12,10 @@ import team.mjk.agent.domain.company.presentation.exception.CompanyNotFoundExcep
 public class CompanyRepositoryImpl implements CompanyRepository {
 
     private final CompanyJpaRepository companyJpaRepository;
+
     @Override
-    public Company findById(Long id) {
-        return companyJpaRepository.findById(id)
+    public Company findByCompanyId(Long companyId) {
+        return companyJpaRepository.findById(companyId)
             .orElseThrow(CompanyNotFoundException::new);
     }
 

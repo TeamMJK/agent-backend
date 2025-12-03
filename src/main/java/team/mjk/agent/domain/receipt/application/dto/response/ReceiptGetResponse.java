@@ -1,4 +1,4 @@
-package team.mjk.agent.domain.receipt.dto.response;
+package team.mjk.agent.domain.receipt.application.dto.response;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

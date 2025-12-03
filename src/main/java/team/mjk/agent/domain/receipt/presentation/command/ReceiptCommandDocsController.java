@@ -1,4 +1,4 @@
-package team.mjk.agent.domain.receipt.presentation;
+package team.mjk.agent.domain.receipt.presentation.command;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,17 +11,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
-import team.mjk.agent.domain.receipt.dto.request.ReceiptSaveRequest;
-import team.mjk.agent.domain.receipt.dto.request.ReceiptUpdateRequest;
-import team.mjk.agent.domain.receipt.dto.response.ImageUploadResponse;
-import team.mjk.agent.domain.receipt.dto.response.ReceiptGetResponse;
-import team.mjk.agent.domain.receipt.dto.response.ReceiptSaveResponse;
-import team.mjk.agent.domain.receipt.dto.response.ReceiptUpdateResponse;
-
-import java.util.List;
+import team.mjk.agent.domain.receipt.application.dto.response.ImageUploadResponse;
+import team.mjk.agent.domain.receipt.application.dto.response.ReceiptSaveResponse;
+import team.mjk.agent.domain.receipt.application.dto.response.ReceiptUpdateResponse;
+import team.mjk.agent.domain.receipt.presentation.request.ReceiptSaveRequest;
+import team.mjk.agent.domain.receipt.presentation.request.ReceiptUpdateRequest;
 
 @Tag(name = "Receipt", description = "영수증 관련 API")
-public interface ReceiptDocsController {
+public interface ReceiptCommandDocsController {
 
     @Operation(summary = "영수증 저장", description = "영수증 데이터를 저장합니다.")
     @ApiResponses({
@@ -85,37 +82,6 @@ public interface ReceiptDocsController {
             @Parameter(description = "삭제할 이미지 주소", required = true) String addr
     );
 
-    @Operation(summary = "영수증 단건 조회", description = "특정 영수증을 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "조회 성공",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ReceiptGetResponse.class)
-                    )
-            )
-    })
-    ResponseEntity<ReceiptGetResponse> getReceipt(
-            @Parameter(hidden = true) Long memberId,
-            @Parameter(description = "조회할 영수증 ID", required = true) Long receiptId
-    );
-
-    @Operation(summary = "전체 영수증 조회", description = "회원의 전체 영수증 목록을 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "조회 성공",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ReceiptGetResponse.class)
-                    )
-            )
-    })
-    ResponseEntity<List<ReceiptGetResponse>> getAllReceipt(
-            @Parameter(hidden = true) Long memberId
-    );
-
     @Operation(summary = "영수증 삭제", description = "특정 영수증을 삭제합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "삭제 성공"),
@@ -125,5 +91,4 @@ public interface ReceiptDocsController {
             @Parameter(hidden = true) Long memberId,
             @Parameter(description = "삭제할 영수증 ID", required = true) Long receiptId
     );
-
 }

@@ -5,7 +5,6 @@ import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
 import team.mjk.agent.domain.company.domain.Workspace;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.receipt.dto.request.ReceiptMcpRequest;
-import team.mjk.agent.domain.receipt.dto.request.ReceiptSaveRequest;
 
 public interface McpService {
 

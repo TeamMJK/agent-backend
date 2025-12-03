@@ -1,15 +1,16 @@
-package team.mjk.agent.domain.receipt.dto.request;
+package team.mjk.agent.domain.receipt.presentation.request;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import team.mjk.agent.domain.receipt.application.dto.request.ReceiptUpdateServiceRequest;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record ReceiptUpdateRequest(
 
-        @NotNull(message = "결제일을 입력해주세요.")
+        @NotNull(message = "결제 날짜를 선택해 주세요.")
         LocalDate paymentDate,
 
         @NotBlank(message = "승인번호를 입력해주세요.")
@@ -24,5 +25,18 @@ public record ReceiptUpdateRequest(
 
 ) {
 
-}
+    public ReceiptUpdateServiceRequest toServiceRequest(
+            Long memberId,
+            Long receiptId
+    ) {
+        return ReceiptUpdateServiceRequest.builder()
+                .memberId(memberId)
+                .receiptId(receiptId)
+                .paymentDate(paymentDate)
+                .approvalNumber(approvalNumber)
+                .storeAddress(storeAddress)
+                .totalAmount(totalAmount)
+                .build();
+    }
 
+}

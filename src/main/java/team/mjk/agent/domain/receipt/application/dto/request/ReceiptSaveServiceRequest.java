@@ -1,9 +1,14 @@
-package team.mjk.agent.domain.receipt.dto.request;
+package team.mjk.agent.domain.receipt.application.dto.request;
+
+import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record ReceiptSaveRequest(
+@Builder
+public record ReceiptSaveServiceRequest(
+
+        Long memberId,
 
         LocalDate paymentDate,
 

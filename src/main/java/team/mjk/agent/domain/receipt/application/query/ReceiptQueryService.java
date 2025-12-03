@@ -1,31 +1,23 @@
-package team.mjk.agent.domain.receipt.application;
+package team.mjk.agent.domain.receipt.application.query;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.mjk.agent.domain.company.domain.Company;
-import team.mjk.agent.domain.mcp.McpServiceRegistry;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.receipt.domain.Receipt;
 import team.mjk.agent.domain.receipt.domain.ReceiptRepository;
 import team.mjk.agent.domain.receipt.application.dto.response.ReceiptGetResponse;
-import team.mjk.agent.global.s3.S3Provider;
 
 import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class ReceiptService {
+public class ReceiptQueryService {
 
     private final ReceiptRepository receiptRepository;
     private final MemberRepository memberRepository;
-    private final ChatClient chatClient;
-    private final McpServiceRegistry registry;
-    private final S3Provider s3Provider;
-
-
 
     @Transactional(readOnly = true)
     public List<ReceiptGetResponse> getAllReceipt(Long memberId) {
@@ -50,7 +42,5 @@ public class ReceiptService {
     public List<Receipt> getReceiptsByCompany(Company company) {
         return receiptRepository.findAllByCompany(company);
     }
-
-
 
 }
