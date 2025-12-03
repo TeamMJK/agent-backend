@@ -19,6 +19,8 @@ public interface MemberRepository {
 
     List<Member> findAllByCompanyId(Long companyId);
 
+    List<Member> findAllByCompanyIdFetch(Long companyId);
+
     void delete(Long memberId);
 
     long countByCompanyId(Long companyId);

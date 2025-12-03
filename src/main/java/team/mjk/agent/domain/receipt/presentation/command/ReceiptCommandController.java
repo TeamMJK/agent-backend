@@ -6,7 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import team.mjk.agent.domain.company.domain.Workspace;
+import team.mjk.agent.domain.companyworkspace.domain.Workspace;
 import team.mjk.agent.domain.receipt.application.command.ReceiptCommandService;
 import team.mjk.agent.domain.receipt.application.dto.response.ImageUploadResponse;
 import team.mjk.agent.domain.receipt.application.dto.response.ReceiptSaveResponse;
