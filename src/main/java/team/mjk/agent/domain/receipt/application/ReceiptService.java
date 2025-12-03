@@ -35,179 +35,172 @@ import java.util.Objects;
 @Service
 public class ReceiptService {
 
-  private final ReceiptRepository receiptRepository;
-  private final MemberRepository memberRepository;
-  private final ChatClient chatClient;
-  private final McpServiceRegistry registry;
-  private final S3Provider s3Provider;
+    private final ReceiptRepository receiptRepository;
+    private final MemberRepository memberRepository;
+    private final ChatClient chatClient;
+    private final McpServiceRegistry registry;
+    private final S3Provider s3Provider;
 
-  @Transactional
-  public ReceiptSaveResponse saveReceipt(Long memberId, ReceiptSaveRequest request, MultipartFile image) {
-    Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getValidatedCompany();
+    @Transactional
+    public ReceiptSaveResponse saveReceipt(Long memberId, ReceiptSaveRequest request, MultipartFile image) {
+        Member member = memberRepository.findByMemberId(memberId);
+        Company company = member.getValidatedCompany();
 
-    String imageUrl = null;
-    if (image != null && !image.isEmpty()) {
-      imageUrl = s3Provider.upload(image);
+        String imageUrl = null;
+        if (image != null && !image.isEmpty()) {
+            imageUrl = s3Provider.upload(image);
+        }
+
+        Receipt receipt = Receipt.create(
+                member.getName(),
+                request.paymentDate(),
+                request.approvalNumber(),
+                request.storeAddress(),
+                request.totalAmount(),
+                imageUrl,
+                company,
+                memberId
+        );
+        receiptRepository.save(receipt);
+
+        return ReceiptSaveResponse.builder()
+                .receiptId(receipt.getId())
+                .build();
     }
 
-    Receipt receipt = Receipt.create(
-            member.getName(),
-            request.paymentDate(),
-            request.approvalNumber(),
-            request.storeAddress(),
-            request.totalAmount(),
-            imageUrl,
-            company,
-            memberId
-    );
-    receiptRepository.save(receipt);
+    @Transactional
+    public ImageUploadResponse upload(Long memberId, Long receiptId, MultipartFile image) {
+        memberRepository.findByMemberId(memberId);
+        Receipt receipt = receiptRepository.findByReceiptId(receiptId);
 
-    return ReceiptSaveResponse.builder()
-            .receiptId(receipt.getId())
-            .build();
-  }
+        if (image.isEmpty() || Objects.isNull(image.getOriginalFilename())) {
+            throw new EmptyFileExceptionCode();
+        }
 
-  @Transactional
-  public ImageUploadResponse upload(Long memberId, Long receiptId, MultipartFile image) {
-    memberRepository.findByMemberId(memberId);
-    Receipt receipt = receiptRepository.findByReceiptId(receiptId);
+        String oldImageUrl = receipt.getUrl();
+        if (oldImageUrl != null && !oldImageUrl.isBlank()) {
+            s3Provider.delete(oldImageUrl);
+        }
 
-    if (image.isEmpty() || Objects.isNull(image.getOriginalFilename())) {
-      throw new EmptyFileExceptionCode();
+        String newImageUrl = s3Provider.upload(image);
+        receipt.updateUrl(newImageUrl);
+
+        return ImageUploadResponse.builder()
+                .imageUrl(newImageUrl)
+                .build();
     }
 
-    String oldImageUrl = receipt.getUrl();
-    if (oldImageUrl != null && !oldImageUrl.isBlank()) {
-      s3Provider.delete(oldImageUrl);
+    @Transactional
+    public List<Workspace> saveMcp(Long memberId, MultipartFile file) {
+        Member member = memberRepository.findByMemberId(memberId);
+        Company company = member.getValidatedCompany();
+
+        List<Workspace> workspaces = company.getWorkspace();
+
+        String imageUrl = s3Provider.upload(file);
+        ReceiptSaveRequest request = ocr(file);
+
+        ReceiptMcpRequest mcpRequest = ReceiptMcpRequest.builder()
+                .approvalNumber(request.approvalNumber())
+                .storeAddress(request.storeAddress())
+                .totalAmount(request.totalAmount())
+                .imageUrl(imageUrl)
+                .paymentDate(request.paymentDate())
+                .build();
+
+        for (Workspace workspace : workspaces) {
+            List<McpService> mcpServices = registry.getServices(workspace);
+            for (McpService mcpService : mcpServices) {
+                mcpService.createReceipt(mcpRequest, company.getId(), member);
+            }
+        }
+
+        return company.getWorkspace();
     }
 
-    String newImageUrl = s3Provider.upload(image);
-    receipt.updateUrl(newImageUrl);
+    @Transactional
+    public ReceiptUpdateResponse updateReceipt(Long memberId, Long receiptId, ReceiptUpdateRequest request) {
+        Member member = memberRepository.findByMemberId(memberId);
+        Receipt receipt = receiptRepository.findByReceiptId(receiptId);
+        receipt.validateUpdateReceipt(member.getId());
 
-    return ImageUploadResponse.builder()
-            .imageUrl(newImageUrl)
-            .build();
-  }
+        receipt.updateReceipt(
+                request.paymentDate(),
+                request.approvalNumber(),
+                request.storeAddress(),
+                request.totalAmount()
+        );
 
-  @Transactional
-  public List<Workspace> saveMcp(Long memberId, MultipartFile file) {
-    Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getValidatedCompany();
-
-    List<Workspace> workspaces = company.getWorkspace();
-
-    String imageUrl = s3Provider.upload(file);
-    ReceiptSaveRequest request = ocr(file);
-
-    ReceiptMcpRequest mcpRequest = ReceiptMcpRequest.builder()
-            .approvalNumber(request.approvalNumber())
-            .storeAddress(request.storeAddress())
-            .totalAmount(request.totalAmount())
-            .imageUrl(imageUrl)
-            .paymentDate(request.paymentDate())
-            .build();
-
-    for (Workspace workspace : workspaces) {
-      List<McpService> mcpServices = registry.getServices(workspace);
-      for (McpService mcpService : mcpServices) {
-        mcpService.createReceipt(mcpRequest, company.getId(), member);
-      }
+        return ReceiptUpdateResponse.builder()
+                .ReceiptId(receipt.getId())
+                .build();
     }
 
-    return company.getWorkspace();
-  }
-
-  @Transactional
-  public ReceiptUpdateResponse updateReceipt(Long memberId, Long receiptId, ReceiptUpdateRequest request) {
-    Member member = memberRepository.findByMemberId(memberId);
-    Receipt receipt = receiptRepository.findByReceiptId(receiptId);
-    receipt.validateUpdateReceipt(member.getId());
-
-    receipt.updateReceipt(
-            request.paymentDate(),
-            request.approvalNumber(),
-            request.storeAddress(),
-            request.totalAmount()
-    );
-
-    return ReceiptUpdateResponse.builder()
-            .ReceiptId(receipt.getId())
-            .build();
-  }
-
-  public void deleteImageFromS3(Long memberId, String imageAddress) {
-    Receipt receipt = receiptRepository.findByUrl(imageAddress);
-    validateForbidden(memberId, receipt.getMemberId());
-    s3Provider.delete(imageAddress);
-  }
-
-  @Transactional(readOnly = true)
-  public List<ReceiptGetResponse> getAllReceipt(Long memberId) {
-    Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getValidatedCompany();
-
-    return receiptRepository.findAllByCompany(company).stream()
-            .map(ReceiptGetResponse::from)
-            .toList();
-  }
-
-  @Transactional(readOnly = true)
-  public ReceiptGetResponse getReceipt(Long memberId, Long receiptId) {
-    Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getValidatedCompany();
-    Receipt receipt = receiptRepository.findByIdAndCompany(receiptId, company);
-    return ReceiptGetResponse.from(receipt);
-  }
-
-  @Transactional
-  public void deleteReceipt(Long memberId, Long receiptId) {
-    Receipt receipt = receiptRepository.findByReceiptId(receiptId);
-    validateForbidden(memberId, receipt.getMemberId());
-
-    if (receipt.getUrl() != null) {
-      s3Provider.delete(receipt.getUrl());
+    public void deleteImageFromS3(Long memberId, String imageAddress) {
+        Receipt receipt = receiptRepository.findByUrl(imageAddress);
+        validateForbidden(memberId, receipt.getMemberId());
+        s3Provider.delete(imageAddress);
     }
-    receiptRepository.delete(receipt);
-  }
 
-  @Transactional(readOnly = true)
-  public List<Receipt> getReceiptsByCompany(Company company) {
-    return receiptRepository.findAllByCompany(company);
-  }
+    @Transactional(readOnly = true)
+    public List<ReceiptGetResponse> getAllReceipt(Long memberId) {
+        Member member = memberRepository.findByMemberId(memberId);
+        Company company = member.getValidatedCompany();
 
-  private ReceiptSaveRequest ocr(MultipartFile image) {
-    String imageUrl = s3Provider.upload(image);
-
-    String key = s3Provider.extractKeyFromUrl(imageUrl);
-
-    byte[] imageBytes = s3Provider.getObjectBytes(key);
-    ByteArrayResource imageResource = new ByteArrayResource(imageBytes);
-
-    Media media = new Media(MimeType.valueOf(MediaType.IMAGE_JPEG_VALUE), imageResource);
-
-    String fullPrompt = """
-            다음 사진에서 영수증 정보를 추출해줘.
-            paymentDate, approvalNumber, storeAddress, totalAmount
-            """;
-
-    return chatClient.prompt()
-            .user(p -> p.text(fullPrompt).media(media))
-            .call()
-            .entity(ReceiptSaveRequest.class);
-  }
-
-  private void validateForbidden(Long memberId, Long receiptMemberId) {
-    if (!receiptMemberId.equals(memberId)) {
-      throw new DeleteNotForbiddenExceptionCode();
+        return receiptRepository.findAllByCompany(company).stream()
+                .map(ReceiptGetResponse::from)
+                .toList();
     }
-  }
 
-  @Transactional(readOnly = true)
-  public List<ReceiptGetResponse> getAllReceipts() {
-    return receiptRepository.findAll().stream()
-            .map(ReceiptGetResponse::from)
-            .toList();
-  }
+    @Transactional(readOnly = true)
+    public ReceiptGetResponse getReceipt(Long memberId, Long receiptId) {
+        Member member = memberRepository.findByMemberId(memberId);
+        Company company = member.getValidatedCompany();
+        Receipt receipt = receiptRepository.findByIdAndCompany(receiptId, company);
+        return ReceiptGetResponse.from(receipt);
+    }
+
+    @Transactional
+    public void deleteReceipt(Long memberId, Long receiptId) {
+        Receipt receipt = receiptRepository.findByReceiptId(receiptId);
+        validateForbidden(memberId, receipt.getMemberId());
+
+        if (receipt.getUrl() != null) {
+            s3Provider.delete(receipt.getUrl());
+        }
+        receiptRepository.delete(receipt);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Receipt> getReceiptsByCompany(Company company) {
+        return receiptRepository.findAllByCompany(company);
+    }
+
+    private ReceiptSaveRequest ocr(MultipartFile image) {
+        String imageUrl = s3Provider.upload(image);
+
+        String key = s3Provider.extractKeyFromUrl(imageUrl);
+
+        byte[] imageBytes = s3Provider.getObjectBytes(key);
+        ByteArrayResource imageResource = new ByteArrayResource(imageBytes);
+
+        Media media = new Media(MimeType.valueOf(MediaType.IMAGE_JPEG_VALUE), imageResource);
+
+        String fullPrompt = """
+                다음 사진에서 영수증 정보를 추출해줘.
+                paymentDate, approvalNumber, storeAddress, totalAmount
+                """;
+
+        return chatClient.prompt()
+                .user(p -> p.text(fullPrompt).media(media))
+                .call()
+                .entity(ReceiptSaveRequest.class);
+    }
+
+    private void validateForbidden(Long memberId, Long receiptMemberId) {
+        if (!receiptMemberId.equals(memberId)) {
+            throw new DeleteNotForbiddenExceptionCode();
+        }
+    }
 
 }
