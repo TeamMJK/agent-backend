@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import team.mjk.agent.domain.review.application.ReviewService;
 import team.mjk.agent.domain.review.application.dto.response.ReviewAverageResponse;
 import team.mjk.agent.domain.review.application.dto.response.ReviewSaveResponse;
 import team.mjk.agent.domain.review.presentation.request.ReviewSaveRequest;
