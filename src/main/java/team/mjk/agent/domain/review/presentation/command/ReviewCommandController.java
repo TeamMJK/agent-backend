@@ -15,7 +15,7 @@ import team.mjk.agent.global.annotation.MemberId;
 @RequiredArgsConstructor
 @RequestMapping("/reviews")
 @RestController
-public class ReviewCommandController {
+public class ReviewCommandController implements ReviewCommandDocsController {
 
     private final ReviewCommandService reviewCommandService;
 
