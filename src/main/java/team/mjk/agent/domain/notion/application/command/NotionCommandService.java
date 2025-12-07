@@ -3,15 +3,12 @@ package team.mjk.agent.domain.notion.application.command;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.company.domain.CompanyRepository;
-import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.notion.application.dto.request.NotionConfigSaveServiceRequest;
 import team.mjk.agent.domain.notion.application.dto.request.NotionConfigUpdateServiceRequest;
 import team.mjk.agent.domain.notion.domain.Notion;
 import team.mjk.agent.domain.notion.domain.NotionRepository;
-import team.mjk.agent.domain.notion.dto.request.NotionTokenUpdateRequest;
 import team.mjk.agent.global.util.KmsUtil;
 
 import java.util.Optional;
