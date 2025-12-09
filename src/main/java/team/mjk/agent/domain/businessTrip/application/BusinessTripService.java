@@ -3,15 +3,15 @@ package team.mjk.agent.domain.businessTrip.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import team.mjk.agent.domain.businessTrip.application.dto.request.BusinessTripSaveServiceRequest;
 import team.mjk.agent.domain.businessTrip.domain.BusinessTrip;
 import team.mjk.agent.domain.businessTrip.domain.BusinessTripRepository;
-import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
-import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
-import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripUpdateRequest;
-import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetAllResponse;
-import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetResponse;
-import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripSaveResponse;
-import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripUpdateResponse;
+import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripAgentRequest;
+import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripUpdateRequest;
+import team.mjk.agent.domain.businessTrip.application.dto.response.BusinessTripGetAllResponse;
+import team.mjk.agent.domain.businessTrip.application.dto.response.BusinessTripGetResponse;
+import team.mjk.agent.domain.businessTrip.application.dto.response.BusinessTripSaveResponse;
+import team.mjk.agent.domain.businessTrip.application.dto.response.BusinessTripUpdateResponse;
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.companyworkspace.application.query.CompanyWorkspaceQueryService;
 import team.mjk.agent.domain.companyworkspace.domain.Workspace;
@@ -33,8 +33,8 @@ public class BusinessTripService {
 
   //사용자 직접 저장 메서드
   @Transactional
-  public BusinessTripSaveResponse save(Long memberId, BusinessTripSaveRequest request) {
-    Member member = memberRepository.findByMemberId(memberId);
+  public BusinessTripSaveResponse save(BusinessTripSaveServiceRequest request) {
+    Member member = memberRepository.findByMemberId(request.memberId());
     Company company = member.getValidatedCompany();
 
     BusinessTrip businessTrip = BusinessTrip.create(
@@ -55,8 +55,8 @@ public class BusinessTripService {
 
   //Controller(저장) -> saveMcp 호출 -> save 호출
   @Transactional
-  public List<Workspace> saveMcp(Long memberId, BusinessTripSaveRequest request) {
-    Member member = memberRepository.findByMemberId(memberId);
+  public List<Workspace> saveMcp(BusinessTripSaveServiceRequest request) {
+    Member member = memberRepository.findByMemberId(request.memberId());
     Company company = member.getValidatedCompany();
     List<Workspace> workspaces = companyWorkspaceQueryService.getWorkspacesByCompanyId(company.getId());
 

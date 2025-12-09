@@ -3,11 +3,12 @@ package team.mjk.agent.domain.mcp.none;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import team.mjk.agent.domain.businessTrip.application.dto.request.BusinessTripSaveServiceRequest;
 import team.mjk.agent.domain.businessTrip.domain.BusinessTrip;
 import team.mjk.agent.domain.businessTrip.domain.BusinessTripRepository;
 import team.mjk.agent.domain.businessTrip.domain.ServiceType;
-import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
-import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
+import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripAgentRequest;
+import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripSaveRequest;
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.companyworkspace.domain.Workspace;
 import team.mjk.agent.domain.mcp.McpService;
@@ -24,7 +25,7 @@ public class NoneService implements McpService {
   private final ReceiptRepository receiptRepository;
 
   @Override
-  public void createBusinessTrip(BusinessTripSaveRequest request, Long companyId, String requester) {
+  public void createBusinessTrip(BusinessTripSaveServiceRequest request, Long companyId, String requester) {
     BusinessTrip businessTrip = BusinessTrip.create(
         request.departDate(),
         request.arriveDate(),

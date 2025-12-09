@@ -1,4 +1,4 @@
-package team.mjk.agent.domain.businessTrip.dto.response;
+package team.mjk.agent.domain.businessTrip.application.dto.response;
 
 import java.util.List;
 import lombok.Builder;

@@ -3,8 +3,9 @@ package team.mjk.agent.domain.slack.application.command;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
-import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
+import team.mjk.agent.domain.businessTrip.application.dto.request.BusinessTripSaveServiceRequest;
+import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripAgentRequest;
+import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripSaveRequest;
 import team.mjk.agent.domain.companyworkspace.domain.Workspace;
 import team.mjk.agent.domain.mcp.McpService;
 import team.mjk.agent.domain.member.domain.Member;
@@ -60,7 +61,7 @@ public class SlackCommandService implements McpService {
     }
 
     @Override
-    public void createBusinessTrip(BusinessTripSaveRequest request, Long companyId, String requester) {
+    public void createBusinessTrip(BusinessTripSaveServiceRequest request, Long companyId, String requester) {
         Slack slack = slackRepository.findByCompanyId(companyId);
         String token = kmsUtil.decrypt(slack.getToken());
         String channelId = kmsUtil.decrypt(slack.getChannelId());

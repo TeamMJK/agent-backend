@@ -1,8 +1,9 @@
 package team.mjk.agent.domain.slack.infrastructure;
 
 import org.springframework.stereotype.Component;
-import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
-import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
+import team.mjk.agent.domain.businessTrip.application.dto.request.BusinessTripSaveServiceRequest;
+import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripSaveRequest;
+import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripAgentRequest;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.receipt.presentation.request.ReceiptMcpRequest;
 
@@ -11,8 +12,8 @@ import java.util.List;
 @Component
 public class SlackPayloadFactory {
 
-    public String businessTrip(BusinessTripSaveRequest req, String requester) {
-        List<String> members = req.names();
+    public String businessTrip(BusinessTripSaveServiceRequest request, String requester) {
+        List<String> members = request.names();
         String memberStr = String.join(", ", members);
 
         return String.format(
@@ -24,10 +25,10 @@ public class SlackPayloadFactory {
                 출장 인원: %s
                 """,
                 requester,
-                req.departDate(),
-                req.arriveDate(),
-                req.destination(),
-                req.serviceType().getCategory(),
+                request.departDate(),
+                request.arriveDate(),
+                request.destination(),
+                request.serviceType().getCategory(),
                 memberStr
         );
     }

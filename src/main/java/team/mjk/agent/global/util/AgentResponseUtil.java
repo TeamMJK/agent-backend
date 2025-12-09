@@ -14,7 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.HttpProtocol;
 import reactor.netty.http.client.HttpClient;
 import team.mjk.agent.domain.businessTrip.application.BusinessTripService;
-import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
+import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripAgentRequest;
 import team.mjk.agent.domain.vnc.application.VncCacheService;
 import team.mjk.agent.domain.vnc.domain.VncStatus;
 import team.mjk.agent.domain.vnc.dto.VncResponse;

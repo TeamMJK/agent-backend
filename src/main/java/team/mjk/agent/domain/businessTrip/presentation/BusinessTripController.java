@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import team.mjk.agent.domain.businessTrip.application.BusinessTripService;
-import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
-import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripUpdateRequest;
-import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetAllResponse;
-import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetResponse;
-import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripSaveResponse;
-import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripUpdateResponse;
+import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripSaveRequest;
+import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripUpdateRequest;
+import team.mjk.agent.domain.businessTrip.application.dto.response.BusinessTripGetAllResponse;
+import team.mjk.agent.domain.businessTrip.application.dto.response.BusinessTripGetResponse;
+import team.mjk.agent.domain.businessTrip.application.dto.response.BusinessTripSaveResponse;
+import team.mjk.agent.domain.businessTrip.application.dto.response.BusinessTripUpdateResponse;
 import team.mjk.agent.domain.companyworkspace.domain.Workspace;
 import team.mjk.agent.global.annotation.MemberId;
 
@@ -35,7 +35,7 @@ public class BusinessTripController implements BusinessTripDocsController {
       @MemberId Long memberId,
       @RequestBody BusinessTripSaveRequest request
   ) {
-    BusinessTripSaveResponse response = businessTripService.save(memberId, request);
+    BusinessTripSaveResponse response = businessTripService.save(request.toServiceRequest(memberId));
     return new ResponseEntity<>(response, HttpStatus.CREATED);
   }
 
@@ -45,7 +45,7 @@ public class BusinessTripController implements BusinessTripDocsController {
       @MemberId Long memberId,
       @RequestBody BusinessTripSaveRequest request
   ) {
-    List<Workspace> workspace = businessTripService.saveMcp(memberId, request);
+    List<Workspace> workspace = businessTripService.saveMcp(request.toServiceRequest(memberId));
     return new ResponseEntity<>(workspace, HttpStatus.CREATED);
   }
 
