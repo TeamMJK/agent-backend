@@ -55,7 +55,7 @@ public class ReceiptCommandController implements ReceiptCommandDocsController {
     }
 
 
-    @PostMapping(value = "/i/ocr", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/upload/ocr", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<List<Workspace>> ocr(
             @MemberId Long memberId,
             @RequestPart(value = "image", required = false) MultipartFile image
