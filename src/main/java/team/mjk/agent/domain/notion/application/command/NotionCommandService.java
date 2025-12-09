@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
 import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
+import team.mjk.agent.domain.companyworkspace.domain.Workspace;
+import team.mjk.agent.domain.mcp.McpService;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.notion.application.dto.request.NotionConfigSaveServiceRequest;
 import team.mjk.agent.domain.notion.application.dto.request.NotionConfigUpdateServiceRequest;
@@ -20,7 +22,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
-public class NotionCommandService {
+public class NotionCommandService implements McpService {
 
     private final NotionRepository notionRepository;
     private final KmsUtil kmsUtil;
@@ -61,6 +63,7 @@ public class NotionCommandService {
         }
     }
 
+    @Override
     public void createBusinessTrip(BusinessTripSaveRequest request, Long companyId, String requester) {
         Notion notion = notionRepository.findByCompanyId(companyId);
 
@@ -70,6 +73,7 @@ public class NotionCommandService {
         notionProvider.send(payload, notion, kmsUtil.decrypt(notion.getToken()));
     }
 
+    @Override
     public void createBusinessTripAgent(BusinessTripAgentRequest request, Long companyId, String requester) {
         Notion notion = notionRepository.findByCompanyId(companyId);
 
@@ -79,6 +83,7 @@ public class NotionCommandService {
         notionProvider.send(payload, notion, kmsUtil.decrypt(notion.getToken()));
     }
 
+    @Override
     public void createReceipt(ReceiptMcpRequest request, Long companyId, Member member) {
         Notion notion = notionRepository.findByCompanyId(companyId);
 
@@ -86,6 +91,11 @@ public class NotionCommandService {
                 notionPayloadFactory.receipt(request, notion, member);
 
         notionProvider.send(payload, notion, kmsUtil.decrypt(notion.getToken()));
+    }
+
+    @Override
+    public Workspace getWorkspace() {
+        return Workspace.NOTION;
     }
 
 }
