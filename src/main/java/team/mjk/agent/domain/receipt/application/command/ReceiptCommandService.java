@@ -21,7 +21,7 @@ import team.mjk.agent.domain.receipt.application.dto.request.ReceiptSaveServiceR
 import team.mjk.agent.domain.receipt.application.dto.request.ReceiptUpdateServiceRequest;
 import team.mjk.agent.domain.receipt.domain.Receipt;
 import team.mjk.agent.domain.receipt.domain.ReceiptRepository;
-import team.mjk.agent.domain.receipt.dto.request.ReceiptMcpRequest;
+import team.mjk.agent.domain.receipt.presentation.request.ReceiptMcpRequest;
 import team.mjk.agent.domain.receipt.application.dto.response.ImageUploadResponse;
 import team.mjk.agent.domain.receipt.application.dto.response.ReceiptSaveResponse;
 import team.mjk.agent.domain.receipt.application.dto.response.ReceiptUpdateResponse;
@@ -105,27 +105,28 @@ public class ReceiptCommandService {
     @Transactional
     public List<Workspace> saveMcp(Long memberId, MultipartFile file) {
         Member member = memberRepository.findByMemberId(memberId);
-        Company company = member.getValidatedCompany();
+        Long companyId = member.getCompany().getId();
+        Company company = companyRepository.findByCompanyId(companyId);
 
         List<Workspace> workspaces = companyWorkspaceQueryService.getWorkspacesByCompanyId(company.getId());
 
         String imageUrl = s3Provider.upload(file);
-        ReceiptSaveRequest request = ocr(file);
+        ReceiptSaveRequest request = ocr(imageUrl);
 
         ReceiptMcpRequest mcpRequest = ReceiptMcpRequest.builder()
+                .paymentDate(request.paymentDate())
                 .approvalNumber(request.approvalNumber())
                 .storeAddress(request.storeAddress())
                 .totalAmount(request.totalAmount())
                 .imageUrl(imageUrl)
-                .paymentDate(request.paymentDate())
                 .build();
 
-        for (Workspace workspace : workspaces) {
-            List<McpService> mcpServices = registry.getServices(workspace);
-            for (McpService mcpService : mcpServices) {
-                mcpService.createReceipt(mcpRequest, company.getId(), member);
-            }
-        }
+        workspaces.forEach(workspace ->
+                registry.getServices(workspace)
+                        .forEach(service ->
+                                service.createReceipt(mcpRequest, company.getId(), member)
+                        )
+        );
 
         return workspaces;
     }
@@ -169,9 +170,7 @@ public class ReceiptCommandService {
         receiptRepository.delete(receipt);
     }
 
-    private ReceiptSaveRequest ocr(MultipartFile image) {
-        String imageUrl = s3Provider.upload(image);
-
+    private ReceiptSaveRequest ocr(String imageUrl) {
         String key = s3Provider.extractKeyFromUrl(imageUrl);
 
         byte[] imageBytes = s3Provider.getObjectBytes(key);

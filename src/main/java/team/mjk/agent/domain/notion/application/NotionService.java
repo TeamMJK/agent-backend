@@ -20,7 +20,7 @@ import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
 import team.mjk.agent.domain.notion.dto.request.NotionTokenUpdateRequest;
 import team.mjk.agent.domain.notion.presentation.exception.NotionAPIException;
-import team.mjk.agent.domain.receipt.dto.request.ReceiptMcpRequest;
+import team.mjk.agent.domain.receipt.presentation.request.ReceiptMcpRequest;
 import team.mjk.agent.domain.mcp.McpService;
 import team.mjk.agent.global.util.KmsUtil;
 

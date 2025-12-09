@@ -18,7 +18,7 @@ import team.mjk.agent.domain.slack.dto.request.SlackSaveRequest;
 import team.mjk.agent.domain.slack.dto.request.SlackUpdateRequest;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.member.domain.MemberRepository;
-import team.mjk.agent.domain.receipt.dto.request.ReceiptMcpRequest;
+import team.mjk.agent.domain.receipt.presentation.request.ReceiptMcpRequest;
 import team.mjk.agent.domain.mcp.McpService;
 import team.mjk.agent.global.util.KmsUtil;
 
