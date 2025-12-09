@@ -14,7 +14,7 @@ import team.mjk.agent.domain.mcp.McpService;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.receipt.domain.Receipt;
 import team.mjk.agent.domain.receipt.domain.ReceiptRepository;
-import team.mjk.agent.domain.receipt.dto.request.ReceiptMcpRequest;
+import team.mjk.agent.domain.receipt.presentation.request.ReceiptMcpRequest;
 
 @Service
 @RequiredArgsConstructor
