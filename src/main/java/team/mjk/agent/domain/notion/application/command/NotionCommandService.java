@@ -3,14 +3,19 @@ package team.mjk.agent.domain.notion.application.command;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import team.mjk.agent.domain.company.domain.CompanyRepository;
-import team.mjk.agent.domain.member.domain.MemberRepository;
+import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
+import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
+import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.notion.application.dto.request.NotionConfigSaveServiceRequest;
 import team.mjk.agent.domain.notion.application.dto.request.NotionConfigUpdateServiceRequest;
 import team.mjk.agent.domain.notion.domain.Notion;
 import team.mjk.agent.domain.notion.domain.NotionRepository;
+import team.mjk.agent.domain.notion.infrastructure.NotionPayloadFactory;
+import team.mjk.agent.domain.notion.infrastructure.NotionProvider;
+import team.mjk.agent.domain.receipt.presentation.request.ReceiptMcpRequest;
 import team.mjk.agent.global.util.KmsUtil;
 
+import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -18,9 +23,9 @@ import java.util.Optional;
 public class NotionCommandService {
 
     private final NotionRepository notionRepository;
-    private final MemberRepository memberRepository;
-    private final CompanyRepository companyRepository;
     private final KmsUtil kmsUtil;
+    private final NotionProvider notionProvider;
+    private final NotionPayloadFactory notionPayloadFactory;
 
     @Transactional
     public void saveNotion(NotionConfigSaveServiceRequest request) {
@@ -54,6 +59,33 @@ public class NotionCommandService {
             );
             notionRepository.save(notion);
         }
+    }
+
+    public void createBusinessTrip(BusinessTripSaveRequest request, Long companyId, String requester) {
+        Notion notion = notionRepository.findByCompanyId(companyId);
+
+        Map<String, Object> payload =
+                notionPayloadFactory.businessTrip(request, notion, requester);
+
+        notionProvider.send(payload, notion, kmsUtil.decrypt(notion.getToken()));
+    }
+
+    public void createBusinessTripAgent(BusinessTripAgentRequest request, Long companyId, String requester) {
+        Notion notion = notionRepository.findByCompanyId(companyId);
+
+        Map<String, Object> payload =
+                notionPayloadFactory.businessTripAgent(request, notion, requester);
+
+        notionProvider.send(payload, notion, kmsUtil.decrypt(notion.getToken()));
+    }
+
+    public void createReceipt(ReceiptMcpRequest request, Long companyId, Member member) {
+        Notion notion = notionRepository.findByCompanyId(companyId);
+
+        Map<String, Object> payload =
+                notionPayloadFactory.receipt(request, notion, member);
+
+        notionProvider.send(payload, notion, kmsUtil.decrypt(notion.getToken()));
     }
 
 }

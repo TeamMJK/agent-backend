@@ -71,115 +71,38 @@ public class NotionService implements McpService {
     return notion.getId();
   }
 
-  private void sendNotionMessage(Map<String, Object> payload, Notion notion) {
-    notionWebClient.post()
-        .uri("/pages")
-        .header("Authorization", "Bearer " + kmsUtil.decrypt(notion.getToken()))
-        .header("Content-Type", "application/json")
-        .bodyValue(payload)
-        .retrieve()
-        .onStatus(status -> !status.is2xxSuccessful(),
-            response -> Mono.error(new NotionAPIException()))
-        .bodyToMono(String.class)
-        .block();
-  }
+    @Override
+    public void createBusinessTrip(BusinessTripSaveRequest request, Long companyId, String requester) {
+        Notion notion = notionRepository.findByCompanyId(companyId);
 
-  @Override
-  public void createBusinessTrip(BusinessTripSaveRequest request, Long companyId, String requester) {
-    Notion notion = notionRepository.findByCompanyId(companyId);
+        Map<String, Object> payload =
+                payloadFactory.businessTrip(request, notion, requester);
 
-    List<Map<String, Map<String, String>>> nameBlocks = request.names().stream()
-        .map(name -> Map.of("text", Map.of("content", name)))
-        .toList();
+        notionProvider.send(payload, notion, kmsUtil.decrypt(notion.getToken()));
+    }
 
-    Map<String, Object> payload = Map.of(
-        "parent", Map.of("database_id", kmsUtil.decrypt(notion.getBusinessTripDatabaseId())),
-        "properties", Map.of(
-            "출장인원", Map.of("title", nameBlocks),
-            "도착일자", Map.of("rich_text", List.of(
-                Map.of("text", Map.of("content", request.arriveDate().toString()))
-            )),
-            "출발일자", Map.of("rich_text", List.of(
-                Map.of("text", Map.of("content", request.departDate().toString()))
-            )),
-            "출장지", Map.of("rich_text", List.of(
-                Map.of("text", Map.of("content", request.destination()))
-            )),
-            "카테고리", Map.of("rich_text", List.of(
-                Map.of("text", Map.of("content", request.serviceType().getCategory()))
-            )),
-            "작성자", Map.of("rich_text", List.of(
-                Map.of("text", Map.of("content", requester))
-            ))
-        )
-    );
+    @Override
+    public void createBusinessTripAgent(BusinessTripAgentRequest request, Long companyId, String requester) {
+        Notion notion = notionRepository.findByCompanyId(companyId);
 
-    sendNotionMessage(payload, notion);
-  }
+        Map<String, Object> payload =
+                payloadFactory.businessTripAgent(request, notion, requester);
 
-  @Override
-  public void createBusinessTripAgent(BusinessTripAgentRequest request, Long companyId, String requester) {
-    Notion notion = notionRepository.findByCompanyId(companyId);
+        notionProvider.send(payload, notion, kmsUtil.decrypt(notion.getToken()));
+    }
 
-    List<Map<String, Map<String, String>>> nameBlocks = request.names().stream()
-        .map(name -> Map.of("text", Map.of("content", name)))
-        .toList();
+    @Override
+    public void createReceipt(ReceiptMcpRequest request, Long companyId, Member member) {
+        Notion notion = notionRepository.findByCompanyId(companyId);
 
-    Map<String, Object> payload = Map.of(
-        "parent", Map.of("database_id", kmsUtil.decrypt(notion.getBusinessTripDatabaseId())),
-        "properties", Map.of(
-            "출장인원", Map.of("title", nameBlocks),
-            "도착일자", Map.of("rich_text", List.of(
-                Map.of("text", Map.of("content", request.arriveDate()))
-            )),
-            "출발일자", Map.of("rich_text", List.of(
-                Map.of("text", Map.of("content", request.departDate()))
-            )),
-            "출장지", Map.of("rich_text", List.of(
-                Map.of("text", Map.of("content", request.destination()))
-            )),
-            "카테고리", Map.of("rich_text", List.of(
-                Map.of("text", Map.of("content", request.serviceType()))
-            )),
-            "작성자", Map.of("rich_text", List.of(
-                Map.of("text", Map.of("content", requester))
-            ))
-        )
-    );
+        Map<String, Object> payload =
+                payloadFactory.receipt(request, notion, member);
 
-    sendNotionMessage(payload, notion);
-  }
+        notionProvider.send(payload, notion, kmsUtil.decrypt(notion.getToken()));
+    }
 
-  @Override
-  public void createReceipt(ReceiptMcpRequest request ,Long companyId,  Member member) {
-    Notion notion = notionRepository.findByCompanyId(companyId);
 
-    Map<String, Object> payload = Map.of(
-        "parent", Map.of("database_id", kmsUtil.decrypt(notion.getReceiptDatabaseId())),
-        "properties", Map.of(
-            "작성자", Map.of("rich_text", List.of(
-                Map.of("text", Map.of("content", member.getName()))
-            )),
-            "승인번호", Map.of("rich_text", List.of(
-                Map.of("text", Map.of("content", request.approvalNumber()))
-            )),
-            "주소", Map.of("rich_text", List.of(
-                Map.of("text", Map.of("content", request.storeAddress()))
-            )),
-            "총금액", Map.of("rich_text", List.of(
-                Map.of("text", Map.of("content", request.totalAmount().toString()))
-            )),
-            "이미지", Map.of("url", request.imageUrl()),
-            "거래일자", Map.of("rich_text", List.of(
-                Map.of("text", Map.of("content", request.paymentDate().toString()))
-            ))
-        )
-    );
-
-    sendNotionMessage(payload, notion);
-  }
-
-  @Override
+    @Override
   public Workspace getWorkspace() {
     return Workspace.NOTION;
   }
