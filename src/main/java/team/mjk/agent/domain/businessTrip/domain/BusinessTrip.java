@@ -54,12 +54,18 @@ public class BusinessTrip extends BaseTimeEntity {
                 .build();
     }
 
-    public void update(BusinessTripUpdateRequest request) {
-        this.departDate = request.departDate();
-        this.arriveDate = request.arriveDate();
-        this.destination = request.destination();
-        this.names = request.names();
-        this.serviceType = request.serviceType();
+    public void update(
+            LocalDate departDate,
+            LocalDate arriveDate,
+            String destination,
+            List<String> names,
+            ServiceType serviceType
+    ) {
+        this.departDate = departDate;
+        this.arriveDate = arriveDate;
+        this.destination = destination;
+        this.names = names;
+        this.serviceType = serviceType;
     }
 
 }

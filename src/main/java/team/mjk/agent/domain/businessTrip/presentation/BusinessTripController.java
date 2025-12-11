@@ -66,8 +66,7 @@ public class BusinessTripController implements BusinessTripDocsController {
       @PathVariable("business-trip-id") Long businessTripId,
       @RequestBody BusinessTripUpdateRequest request
   ) {
-    BusinessTripUpdateResponse response = businessTripService.update(memberId, businessTripId,
-        request);
+    BusinessTripUpdateResponse response = businessTripService.update(request.toServiceRequest(memberId, businessTripId));
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 

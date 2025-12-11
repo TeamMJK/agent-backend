@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
+import team.mjk.agent.domain.businessTrip.application.dto.request.BusinessTripUpdateServiceRequest;
 import team.mjk.agent.domain.businessTrip.domain.ServiceType;
 
 public record BusinessTripUpdateRequest(
@@ -26,5 +27,17 @@ public record BusinessTripUpdateRequest(
         ServiceType serviceType
 
 ) {
+
+        public BusinessTripUpdateServiceRequest toServiceRequest(Long memberId, Long businessTripId) {
+                return BusinessTripUpdateServiceRequest.builder()
+                        .memberId(memberId)
+                        .businessTripId(businessTripId)
+                        .departDate(departDate)
+                        .arriveDate(arriveDate)
+                        .destination(destination)
+                        .names(names)
+                        .serviceType(serviceType)
+                        .build();
+        }
 
 }

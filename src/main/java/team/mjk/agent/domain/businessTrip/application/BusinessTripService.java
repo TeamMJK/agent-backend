@@ -4,14 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.mjk.agent.domain.businessTrip.application.dto.request.BusinessTripSaveServiceRequest;
-import team.mjk.agent.domain.businessTrip.domain.BusinessTrip;
-import team.mjk.agent.domain.businessTrip.domain.BusinessTripRepository;
-import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripAgentRequest;
-import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripUpdateRequest;
+import team.mjk.agent.domain.businessTrip.application.dto.request.BusinessTripUpdateServiceRequest;
 import team.mjk.agent.domain.businessTrip.application.dto.response.BusinessTripGetAllResponse;
 import team.mjk.agent.domain.businessTrip.application.dto.response.BusinessTripGetResponse;
 import team.mjk.agent.domain.businessTrip.application.dto.response.BusinessTripSaveResponse;
 import team.mjk.agent.domain.businessTrip.application.dto.response.BusinessTripUpdateResponse;
+import team.mjk.agent.domain.businessTrip.domain.BusinessTrip;
+import team.mjk.agent.domain.businessTrip.domain.BusinessTripRepository;
+import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripAgentRequest;
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.companyworkspace.application.query.CompanyWorkspaceQueryService;
 import team.mjk.agent.domain.companyworkspace.domain.Workspace;
@@ -106,19 +106,25 @@ public class BusinessTripService {
 
   @Transactional
   public BusinessTripUpdateResponse update(
-      Long memberId,
-      Long businessTripId,
-      BusinessTripUpdateRequest request
+          BusinessTripUpdateServiceRequest request
   ) {
-    Member member = memberRepository.findByMemberId(memberId);
+    Member member = memberRepository.findByMemberId(request.memberId());
     Company company = member.getValidatedCompany();
 
-    BusinessTrip businessTrip = businessTripRepository.findByIdAndCompanyId(businessTripId,
-        company.getId());
-    businessTrip.update(request);
+    BusinessTrip businessTrip = businessTripRepository.findByIdAndCompanyId(
+            request.businessTripId(),
+            company.getId()
+    );
+    businessTrip.update(
+            request.departDate(),
+            request.arriveDate(),
+            request.destination(),
+            request.names(),
+            request.serviceType()
+    );
 
     return BusinessTripUpdateResponse.builder()
-        .businessTripId(businessTripId)
+        .businessTripId(businessTrip.getId())
         .build();
   }
 
