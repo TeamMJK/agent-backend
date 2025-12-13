@@ -2,8 +2,9 @@ package team.mjk.agent.domain.notion.infrastructure;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripAgentRequest;
-import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
+import team.mjk.agent.domain.businessTrip.application.dto.request.BusinessTripSaveServiceRequest;
+import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripAgentRequest;
+import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripSaveRequest;
 import team.mjk.agent.domain.member.domain.Member;
 import team.mjk.agent.domain.notion.domain.Notion;
 import team.mjk.agent.domain.receipt.presentation.request.ReceiptMcpRequest;
@@ -18,7 +19,7 @@ public class NotionPayloadFactory {
 
     private final KmsUtil kmsUtil;
 
-    public Map<String, Object> businessTrip(BusinessTripSaveRequest request, Notion notion, String requester) {
+    public Map<String, Object> businessTrip(BusinessTripSaveServiceRequest request, Notion notion, String requester) {
 
         List<String> names = request.names();
         String dbId = kmsUtil.decrypt(notion.getBusinessTripDatabaseId());

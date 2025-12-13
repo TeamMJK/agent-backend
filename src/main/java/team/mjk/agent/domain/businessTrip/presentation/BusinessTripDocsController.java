@@ -11,12 +11,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
-import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripSaveRequest;
-import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripUpdateRequest;
-import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetAllResponse;
-import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripGetResponse;
-import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripSaveResponse;
-import team.mjk.agent.domain.businessTrip.dto.response.BusinessTripUpdateResponse;
+import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripSaveRequest;
+import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripUpdateRequest;
+import team.mjk.agent.domain.businessTrip.application.dto.response.BusinessTripGetAllResponse;
+import team.mjk.agent.domain.businessTrip.application.dto.response.BusinessTripGetResponse;
+import team.mjk.agent.domain.businessTrip.application.dto.response.BusinessTripSaveResponse;
+import team.mjk.agent.domain.businessTrip.application.dto.response.BusinessTripUpdateResponse;
 import team.mjk.agent.domain.companyworkspace.domain.Workspace;
 
 @Tag(name = "BusinessTrip", description = "출장 관련 API")

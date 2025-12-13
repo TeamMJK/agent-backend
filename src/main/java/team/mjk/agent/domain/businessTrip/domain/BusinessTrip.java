@@ -1,89 +1,71 @@
 package team.mjk.agent.domain.businessTrip.domain;
 
-import jakarta.persistence.Convert;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import java.time.LocalDate;
-import java.util.List;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import team.mjk.agent.domain.businessTrip.dto.request.BusinessTripUpdateRequest;
+import jakarta.persistence.*;
+import lombok.*;
+import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripUpdateRequest;
 import team.mjk.agent.global.domain.BaseTimeEntity;
 
-@Getter
+import java.time.LocalDate;
+import java.util.List;
+
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 @Entity
-public class BusinessTrip {
+public class BusinessTrip extends BaseTimeEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  private LocalDate departDate;
+    private LocalDate departDate;
 
-  private LocalDate arriveDate;
+    private LocalDate arriveDate;
 
-  private String destination;
+    private String destination;
 
-  private ServiceType serviceType;
+    private ServiceType serviceType;
 
-  private String writer;
+    private String writer;
 
-  private Long companyId;
+    private Long companyId;
 
-  @Convert(converter = NameListConverter.class)
-  private List<String> names;
+    @Convert(converter = NameListConverter.class)
+    private List<String> names;
 
-  @Builder
-  private BusinessTrip(
-      LocalDate departDate,
-      LocalDate arriveDate,
-      String destination,
-      List<String> names,
-      String writer,
-      Long companyId,
-      ServiceType serviceType
-  ) {
-    this.destination = destination;
-    this.departDate = departDate;
-    this.arriveDate = arriveDate;
-    this.names = names;
-    this.writer = writer;
-    this.companyId = companyId;
-    this.serviceType = serviceType;
-  }
+    public static BusinessTrip create(
+            LocalDate departDate,
+            LocalDate arriveDate,
+            String destination,
+            List<String> names,
+            String writer,
+            Long companyId,
+            ServiceType serviceType
+    ) {
+        return BusinessTrip.builder()
+                .arriveDate(arriveDate)
+                .departDate(departDate)
+                .destination(destination)
+                .names(names)
+                .writer(writer)
+                .companyId(companyId)
+                .serviceType(serviceType)
+                .build();
+    }
 
-  public void update(BusinessTripUpdateRequest request) {
-    this.departDate = request.departDate();
-    this.arriveDate =  request.arriveDate();
-    this.destination = request.destination();
-    this.names = request.names();
-    this.serviceType = request.serviceType();
-  }
-
-  public static BusinessTrip create(
-      LocalDate departDate,
-      LocalDate arriveDate,
-      String destination,
-      List<String> names,
-      String writer,
-      Long companyId,
-      ServiceType serviceType
-  ) {
-    return BusinessTrip.builder()
-        .arriveDate(arriveDate)
-        .departDate(departDate)
-        .destination(destination)
-        .names(names)
-        .writer(writer)
-        .companyId(companyId)
-        .serviceType(serviceType)
-        .build();
-  }
+    public void update(
+            LocalDate departDate,
+            LocalDate arriveDate,
+            String destination,
+            List<String> names,
+            ServiceType serviceType
+    ) {
+        this.departDate = departDate;
+        this.arriveDate = arriveDate;
+        this.destination = destination;
+        this.names = names;
+        this.serviceType = serviceType;
+    }
 
 }
