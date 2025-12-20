@@ -31,44 +31,6 @@ public class BusinessTripService {
   private final CompanyWorkspaceQueryService companyWorkspaceQueryService;
   private final McpServiceRegistry registry;
 
-  //사용자 직접 저장 메서드
-  @Transactional
-  public BusinessTripSaveResponse save(BusinessTripSaveServiceRequest request) {
-    Member member = memberRepository.findByMemberId(request.memberId());
-    Company company = member.getValidatedCompany();
-
-    BusinessTrip businessTrip = BusinessTrip.create(
-        request.departDate(),
-        request.arriveDate(),
-        request.destination(),
-        request.names(),
-        member.getName(),
-        company.getId(),
-        request.serviceType()
-    );
-    businessTripRepository.save(businessTrip);
-
-    return BusinessTripSaveResponse.builder()
-        .businessTripId(businessTrip.getId())
-        .build();
-  }
-
-  //Controller(저장) -> saveMcp 호출 -> save 호출
-  @Transactional
-  public List<Workspace> saveMcp(BusinessTripSaveServiceRequest request) {
-    Member member = memberRepository.findByMemberId(request.memberId());
-    Company company = member.getValidatedCompany();
-    List<Workspace> workspaces = companyWorkspaceQueryService.getWorkspacesByCompanyId(company.getId());
-
-    for (Workspace workspace : workspaces) {
-      List<McpService> mcpServices = registry.getServices(workspace);
-      for (McpService mcpService : mcpServices) {
-        mcpService.createBusinessTrip(request, company.getId(), member.getName());
-      }
-    }
-
-    return workspaces;
-  }
 
   //Agent(저장) -> saveAgentMcp 호출 -> save 호출
   @Transactional

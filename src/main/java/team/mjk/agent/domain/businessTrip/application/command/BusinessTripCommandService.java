@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.mjk.agent.domain.businessTrip.application.dto.request.BusinessTripSaveServiceRequest;
+import team.mjk.agent.domain.businessTrip.application.dto.request.BusinessTripUpdateServiceRequest;
 import team.mjk.agent.domain.businessTrip.application.dto.response.BusinessTripSaveResponse;
+import team.mjk.agent.domain.businessTrip.application.dto.response.BusinessTripUpdateResponse;
 import team.mjk.agent.domain.businessTrip.domain.BusinessTrip;
 import team.mjk.agent.domain.businessTrip.domain.BusinessTripRepository;
 import team.mjk.agent.domain.company.domain.Company;
@@ -62,6 +64,30 @@ public class BusinessTripCommandService {
         }
 
         return workspaces;
+    }
+
+    @Transactional
+    public BusinessTripUpdateResponse update(
+            BusinessTripUpdateServiceRequest request
+    ) {
+        Member member = memberRepository.findByMemberId(request.memberId());
+        Company company = member.getValidatedCompany();
+
+        BusinessTrip businessTrip = businessTripRepository.findByIdAndCompanyId(
+                request.businessTripId(),
+                company.getId()
+        );
+        businessTrip.update(
+                request.departDate(),
+                request.arriveDate(),
+                request.destination(),
+                request.names(),
+                request.serviceType()
+        );
+
+        return BusinessTripUpdateResponse.builder()
+                .businessTripId(businessTrip.getId())
+                .build();
     }
 
 }
