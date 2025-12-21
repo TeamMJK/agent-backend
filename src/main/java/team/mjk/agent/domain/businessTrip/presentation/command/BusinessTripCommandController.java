@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/business-trips")
 @RestController
-public class BusinessTripCommandController {
+public class BusinessTripCommandController implements BusinessTripCommandDocsController {
 
     private final BusinessTripCommandService businessTripCommandService;
 
