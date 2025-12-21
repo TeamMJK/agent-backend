@@ -67,30 +67,6 @@ public class BusinessTripService {
   }
 
   @Transactional
-  public BusinessTripUpdateResponse update(
-          BusinessTripUpdateServiceRequest request
-  ) {
-    Member member = memberRepository.findByMemberId(request.memberId());
-    Company company = member.getValidatedCompany();
-
-    BusinessTrip businessTrip = businessTripRepository.findByIdAndCompanyId(
-            request.businessTripId(),
-            company.getId()
-    );
-    businessTrip.update(
-            request.departDate(),
-            request.arriveDate(),
-            request.destination(),
-            request.names(),
-            request.serviceType()
-    );
-
-    return BusinessTripUpdateResponse.builder()
-        .businessTripId(businessTrip.getId())
-        .build();
-  }
-
-  @Transactional
   public void delete(
       Long memberId,
       Long businessTripId

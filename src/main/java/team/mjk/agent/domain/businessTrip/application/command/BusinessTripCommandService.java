@@ -90,4 +90,17 @@ public class BusinessTripCommandService {
                 .build();
     }
 
+    @Transactional
+    public void delete(
+            Long memberId,
+            Long businessTripId
+    ) {
+        Member member = memberRepository.findByMemberId(memberId);
+        Company company = member.getValidatedCompany();
+
+        BusinessTrip businessTrip = businessTripRepository.findByIdAndCompanyId(businessTripId,
+                company.getId());
+        businessTripRepository.delete(businessTrip);
+    }
+
 }
