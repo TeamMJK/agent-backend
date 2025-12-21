@@ -15,7 +15,7 @@ import team.mjk.agent.global.annotation.MemberId;
 @RequiredArgsConstructor
 @RequestMapping("/business-trips")
 @RestController
-public class BusinessTripQueryController {
+public class BusinessTripQueryController implements BusinessTripQueryDocsController {
 
     private final BusinessTripQueryService businessTripQueryService;
 
