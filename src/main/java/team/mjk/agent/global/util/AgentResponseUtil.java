@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.HttpProtocol;
 import reactor.netty.http.client.HttpClient;
-import team.mjk.agent.domain.businessTrip.application.BusinessTripService;
+import team.mjk.agent.domain.businessTrip.application.command.BusinessTripCommandService;
 import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripAgentRequest;
 import team.mjk.agent.domain.vnc.application.VncCacheService;
 import team.mjk.agent.domain.vnc.domain.VncStatus;
@@ -31,7 +31,7 @@ public class AgentResponseUtil {
 
   private final WebClient webClient;
   private final ObjectMapper objectMapper;
-  private final BusinessTripService businessTripService;
+  private final BusinessTripCommandService businessTripCommandService;
   private final AgentUrlConfig agentUrlConfig;
   private final VncCacheService vncCacheService;
 
@@ -143,7 +143,7 @@ public class AgentResponseUtil {
                     log.info("result: {}", responseResult);
                     BusinessTripAgentRequest agentRequest = objectMapper.readValue(detailJson, BusinessTripAgentRequest.class);
                     log.info("names: {}", agentRequest.names());
-                    businessTripService.saveAgentMcp(memberId, agentRequest);
+                    businessTripCommandService.saveAgentMcp(memberId, agentRequest);
                   } else {
                     log.warn("ERROR: detailNode is null in response: {}", responseResult);
                   }
