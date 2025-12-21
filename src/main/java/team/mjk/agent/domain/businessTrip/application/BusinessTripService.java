@@ -32,22 +32,6 @@ public class BusinessTripService {
   private final McpServiceRegistry registry;
 
 
-  //Agent(저장) -> saveAgentMcp 호출 -> save 호출
-  @Transactional
-  public void saveAgentMcp(Long memberId, BusinessTripAgentRequest request) {
-    Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getValidatedCompany();
-    List<Workspace> workspaces = companyWorkspaceQueryService.getWorkspacesByCompanyId(company.getId());
-
-    for (Workspace workspace : workspaces) {
-      List<McpService> mcpServices = registry.getServices(workspace);
-      for (McpService mcpService : mcpServices) {
-        mcpService.createBusinessTripAgent(request, company.getId(), member.getName());
-      }
-    }
-
-  }
-
   @Transactional(readOnly = true)
   public BusinessTripGetResponse getBusinessTrip(Long memberId, Long businessTripId) {
     Member member = memberRepository.findByMemberId(memberId);
@@ -64,19 +48,6 @@ public class BusinessTripService {
         .writer(businessTrip.getWriter())
         .serviceType(businessTrip.getServiceType())
         .build();
-  }
-
-  @Transactional
-  public void delete(
-      Long memberId,
-      Long businessTripId
-  ) {
-    Member member = memberRepository.findByMemberId(memberId);
-    Company company = member.getValidatedCompany();
-
-    BusinessTrip businessTrip = businessTripRepository.findByIdAndCompanyId(businessTripId,
-        company.getId());
-    businessTripRepository.delete(businessTrip);
   }
 
   @Transactional(readOnly = true)

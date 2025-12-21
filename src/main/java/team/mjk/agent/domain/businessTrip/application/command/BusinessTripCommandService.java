@@ -9,6 +9,7 @@ import team.mjk.agent.domain.businessTrip.application.dto.response.BusinessTripS
 import team.mjk.agent.domain.businessTrip.application.dto.response.BusinessTripUpdateResponse;
 import team.mjk.agent.domain.businessTrip.domain.BusinessTrip;
 import team.mjk.agent.domain.businessTrip.domain.BusinessTripRepository;
+import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripAgentRequest;
 import team.mjk.agent.domain.company.domain.Company;
 import team.mjk.agent.domain.companyworkspace.application.query.CompanyWorkspaceQueryService;
 import team.mjk.agent.domain.companyworkspace.domain.Workspace;
@@ -64,6 +65,22 @@ public class BusinessTripCommandService {
         }
 
         return workspaces;
+    }
+
+    //Agent(저장) -> saveAgentMcp 호출 -> save 호출
+    @Transactional
+    public void saveAgentMcp(Long memberId, BusinessTripAgentRequest request) {
+        Member member = memberRepository.findByMemberId(memberId);
+        Company company = member.getValidatedCompany();
+        List<Workspace> workspaces = companyWorkspaceQueryService.getWorkspacesByCompanyId(company.getId());
+
+        for (Workspace workspace : workspaces) {
+            List<McpService> mcpServices = mcpServiceRegistry.getServices(workspace);
+            for (McpService mcpService : mcpServices) {
+                mcpService.createBusinessTripAgent(request, company.getId(), member.getName());
+            }
+        }
+
     }
 
     @Transactional
