@@ -2,7 +2,6 @@ package team.mjk.agent.domain.businessTrip.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import team.mjk.agent.domain.businessTrip.presentation.request.BusinessTripUpdateRequest;
 import team.mjk.agent.global.domain.BaseTimeEntity;
 
 import java.time.LocalDate;
