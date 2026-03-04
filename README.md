@@ -205,7 +205,7 @@ docker-compose-monitoring.yml
         <sub><b>최명재</b></sub>
       </a>
       <br/>
-      <sub>CTO · Backend · AI Agent</sub>
+      <sub>CEO · Backend · AI Agent</sub>
       <br/>
     </td>
   </tr>
