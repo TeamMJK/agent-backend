@@ -141,8 +141,6 @@ GitHub Actions  →  Docker Hub (Build & Push)
 EC2 SSH 접속  →  Docker Image Pull
     ↓
 Docker Compose 재배포
-    ↓
-Discord Webhook 알림
 ```
 
 ### 🐳 Docker Compose 구성
